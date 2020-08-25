@@ -1,0 +1,3 @@
+[submodule "rust/sqlx"]
+	path = rust/sqlx
+	url = https://github.com/launchbadge/sqlx.git
