@@ -1,3 +1,6 @@
 [submodule "rust/sqlx"]
 	path = rust/sqlx
 	url = https://github.com/launchbadge/sqlx.git
+[submodule "rust/mysql_async"]
+	path = rust/mysql_async
+	url = https://github.com/blackbeam/mysql_async
