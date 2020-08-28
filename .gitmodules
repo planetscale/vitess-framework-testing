@@ -2,7 +2,7 @@
 	path = rust/sqlx
 	url = https://github.com/launchbadge/sqlx.git
 [submodule "rust/mysql_async"]
-	path = rust/mysql_async
+	path = rust/mysql_async/upstream
 	url = https://github.com/blackbeam/mysql_async
 [submodule "rust/mysql"]
 	path = rust/mysql/upstream
