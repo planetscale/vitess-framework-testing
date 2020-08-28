@@ -5,5 +5,5 @@
 	path = rust/mysql_async
 	url = https://github.com/blackbeam/mysql_async
 [submodule "rust/mysql"]
-	path = rust/mysql
+	path = rust/mysql/upstream
 	url = git@github.com:blackbeam/rust-mysql-simple.git
