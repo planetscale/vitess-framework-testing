@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# General setup
+git submodule update --init;
+
+# TODO:  Start Vitess, and detect the database URL here
+# TODO:  Run MySQL as well so we can compare results for both
+if [ "$#" -ne 1 ]; then
+	echo "usage: $0 vitess_database_url";
+	exit 1;
+fi;
+VITESS_DATABASE_URL="$1";
+
+# rust
+echo '=== Running `rust` tests';
+pushd rust >/dev/null;
+./test "${VITESS_DATABASE_URL}";
+popd >/dev/null;
+
