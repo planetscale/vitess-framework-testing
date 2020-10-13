@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+	echo "usage: $0 vitess_database_url";
+	exit 1;
+fi;
+
+docker run --rm -i "-v$(pwd):/src" -e DATABASE_URL="$1" rust bash -c 'cd /src; cargo run' &>/dev/null
+#DATABASE_URL="$1" cargo test --no-fail-fast -- --nocapture -Z unstable-options --format=json 2>/dev/null | grep '^{' >../mysql_async.vitess.out || true;
+#DATABASE_URL="$2" cargo test --no-fail-fast -- --nocapture -Z unstable-options --format=json 2>/dev/null | grep '^{' >../mysql_async.mysql.out || true;
+

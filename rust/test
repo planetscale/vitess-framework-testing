@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+	echo "usage: $0 vitess_database_url";
+	exit 1;
+fi;
+
+# mysql
+echo '--- Running in `mysql` framework';
+pushd mysql >/dev/null;
+./test $@;
+echo $?;
+popd >/dev/null;
+
+# mysql_async
+echo '--- Running in `mysql_async` framework';
+pushd mysql_async >/dev/null;
+./test $@;
+echo $?;
+popd >/dev/null;
+
+echo '--- Running in `sqlx` framework';
+# sqlx
+pushd sqlx >/dev/null;
+./test $@;
+echo $?;
+popd >/dev/null;
+
