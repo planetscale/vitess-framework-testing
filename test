@@ -17,3 +17,9 @@ pushd rust >/dev/null;
 ./test "${VITESS_DATABASE_URL}";
 popd >/dev/null;
 
+# go
+echo '=== Running `go` tests';
+pushd go >/dev/null;
+./test "${VITESS_DATABASE_URL}";
+popd >/dev/null;
+
