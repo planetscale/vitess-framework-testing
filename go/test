@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+	echo "usage: $0 vitess_database_url";
+	exit 1;
+fi;
+
+# gorm
+echo '--- Running in `gorm` framework';
+pushd gorm >/dev/null;
+./test $@;
+echo $?;
+popd >/dev/null;
+
