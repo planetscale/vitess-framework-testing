@@ -12,3 +12,10 @@ pushd PyMySQL >/dev/null;
 echo $?;
 popd >/dev/null;
 
+# mysqlclient
+echo '--- Running in `mysqlclient`';
+pushd mysqlclient >/dev/null;
+./test $@;
+echo $?;
+popd >/dev/null;
+
