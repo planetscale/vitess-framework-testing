@@ -23,3 +23,9 @@ pushd go >/dev/null;
 ./test "${VITESS_DATABASE_URL}";
 popd >/dev/null;
 
+# python
+echo '=== Running `python` tests';
+pushd python >/dev/null;
+./test "${VITESS_DATABASE_URL}";
+popd >/dev/null;
+
