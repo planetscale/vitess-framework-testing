@@ -14,6 +14,6 @@ database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
 (
 	echo 'DROP TABLE IF EXISTS todos;';
 	cat upstream/examples/mysql/todos/migrations/*.sql;
-) | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" &>/dev/null || exit 1;
-docker run --rm -i "-v$(pwd)/upstream:/src" -e DATABASE_URL="${1}" rust bash -c 'cd /src/examples/mysql/todos; cargo run' &>/dev/null || exit 2;
+) | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" || exit 1;
+docker run --rm -i "-v$(pwd)/upstream:/src" -e DATABASE_URL="${1}" rust bash -c 'cd /src/examples/mysql/todos; cargo run' || exit 2;
 
