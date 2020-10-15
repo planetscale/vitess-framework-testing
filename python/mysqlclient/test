@@ -12,5 +12,5 @@ port="$(echo "${1}" | cut -d@ -f2 | cut -d: -f2 | cut -d/ -f1)";
 database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
 
 echo 'DROP TABLE IF EXISTS people;' | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" || exit 1;
-docker run --rm -i "-v$(pwd):/src" -e DATABASE_URL="${1}" python bash -c 'cd /src; pip3 install -r requirements.txt; python3 test.py' || exit 2;
+docker run --rm -i "-v$(pwd):/src" -e DATABASE_URL="${1}" python bash -c 'cd /src; pip3 install -r requirements.txt; python3 test.py';
 
