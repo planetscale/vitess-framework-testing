@@ -11,21 +11,13 @@ if [ "$#" -ne 1 ]; then
 fi;
 VITESS_DATABASE_URL="$1";
 
-# rust
-echo '=== Running `rust` tests';
-pushd rust >/dev/null;
-./test "${VITESS_DATABASE_URL}";
-popd >/dev/null;
-
-# go
-echo '=== Running `go` tests';
-pushd go >/dev/null;
-./test "${VITESS_DATABASE_URL}";
-popd >/dev/null;
-
-# python
-echo '=== Running `python` tests';
-pushd python >/dev/null;
-./test "${VITESS_DATABASE_URL}";
-popd >/dev/null;
+for language in $(find . -mindepth 3 -maxdepth 3 -type f -name test | sed 's:^\./::' | xargs dirname | xargs dirname | sort -u); do
+	echo "=== Running \`${language}\` tests";
+	for framework in $(find "${language}" -mindepth 2 -maxdepth 2 -type f -name test | sed 's:^\./::' | xargs dirname | xargs -n1 basename); do
+		echo "--- Running in \`${framework}\` framework";
+		pushd "${language}/${framework}" >/dev/null;
+		./test "${VITESS_DATABASE_URL}";
+		popd >/dev/null;
+	done
+done
 
