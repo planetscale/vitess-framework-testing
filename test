@@ -11,6 +11,7 @@ if [ "$#" -ne 1 ]; then
 fi;
 VITESS_DATABASE_URL="$1";
 
+# TODO:  There's a huge opportunity for parallelism here
 for language in $(find . -mindepth 3 -maxdepth 3 -type f -name test | sed 's:^\./::' | xargs dirname | xargs dirname | sort -u); do
 	echo "${language}:";
 	for framework in $(find "${language}" -mindepth 2 -maxdepth 2 -type f -name test | sed 's:^\./::' | xargs dirname | xargs -n1 basename); do
