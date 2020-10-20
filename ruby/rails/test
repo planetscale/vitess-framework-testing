@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+	echo "usage: $0 vitess_database_url";
+	exit 1;
+fi;
+
+username="$(echo "${1}" | cut -d@ -f1 | cut -d/ -f3 | cut -d: -f1)";
+password="$(echo "${1}" | cut -d@ -f1 | cut -d: -f3)";
+host="$(echo "${1}" | cut -d@ -f2 | cut -d: -f1)";
+port="$(echo "${1}" | cut -d@ -f2 | cut -d: -f2 | cut -d/ -f1)";
+database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
+
+(
+	echo 'DROP TABLE IF EXISTS articles;';
+	echo 'DROP TABLE IF EXISTS comments;';
+) | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" || exit 1;
+# TODO:  Test running, not just migrations:  bundle exec rails s -p 80 -b 0.0.0.0
+docker run --rm -i "-v$(pwd)/src:/src" -e DATABASE_HOST="${host}" -e DATABASE_USERNAME="${username}" -e DATABASE_PASSWORD="${password}" -e DEVELOPMENT_DATABASE="${database}" -p8000:80 ruby:2.6.5 bash -ex -c 'export PATH="/src/bin:${PATH}"; cd /src; bundle install & (apt-get update; apt-get install -y yarnpkg; yarn install --check-files); wait; rake db:migrate';
+
