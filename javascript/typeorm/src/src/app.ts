@@ -20,4 +20,9 @@ createConnection().then(async connection => {
     await connection.manager.save(post);
 
     console.log("Post has been save: ", post);
-}).catch(error => console.log("Error: ",error));
+
+	return process.exit(0);
+}).catch(error => {
+	console.log("Error: ", error);
+	return process.exit(1);
+});
