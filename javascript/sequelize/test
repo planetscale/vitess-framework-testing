@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+	echo "usage: $0 vitess_database_url";
+	exit 1;
+fi;
+
+docker run --rm -i "-v$(pwd)/src:/src.ro:ro" -e DATABASE_URL="$1" --entrypoint=sh node:alpine -ex -c 'cp -avf /src.ro /src; cd /src; npm install; npx sequelize-cli db:migrate; npm start';
+
