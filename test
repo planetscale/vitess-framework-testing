@@ -11,6 +11,12 @@ if [ "$#" -ne 1 ]; then
 fi;
 VITESS_DATABASE_URL="$1";
 
+username="$(echo "${1}" | cut -d@ -f1 | cut -d/ -f3 | cut -d: -f1)";
+password="$(echo "${1}" | cut -d@ -f1 | cut -d: -f3)";
+host="$(echo "${1}" | cut -d@ -f2 | cut -d: -f1)";
+port="$(echo "${1}" | cut -d@ -f2 | cut -d: -f2 | cut -d/ -f1)";
+database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
+
 # TODO:  There's a huge opportunity for parallelism here
 for language in $(find . -mindepth 3 -maxdepth 3 -type f -name test | sed 's:^\./::' | xargs dirname | xargs dirname | sort -u); do
 	echo "${language}:";
@@ -19,6 +25,10 @@ for language in $(find . -mindepth 3 -maxdepth 3 -type f -name test | sed 's:^\.
 		./test "${VITESS_DATABASE_URL}" &>/dev/null;
 		echo "  ${framework}: $?";
 		popd >/dev/null;
+		tables="$(mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
+		if [[ "${tables}" != '' ]]; then
+			mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" -Ne "DROP TABLE ${tables}" &>/dev/null;
+		fi;
 	done
 done
 
