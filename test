@@ -3,19 +3,17 @@
 # General setup
 git submodule update --init;
 
-# TODO:  Start Vitess, and detect the database URL here
-# TODO:  Run MySQL as well so we can compare results for both
-if [ "$#" -ne 1 ]; then
-	echo "usage: $0 vitess_database_url";
-	exit 1;
-fi;
-VITESS_DATABASE_URL="$1";
+VT_USERNAME=${VT_USERNAME:-"root"}
+VT_PASSWORD=${VT_PASSWORD:-"root"}
+VT_HOST=${VT_HOST:-"127.0.0.1"}
+VT_PORT=${VT_PORT:-"3306"}
+VT_DATABASE=${VT_DATABASE:-"vitess"}
 
-username="$(echo "${1}" | cut -d@ -f1 | cut -d/ -f3 | cut -d: -f1)";
-password="$(echo "${1}" | cut -d@ -f1 | cut -d: -f3)";
-host="$(echo "${1}" | cut -d@ -f2 | cut -d: -f1)";
-port="$(echo "${1}" | cut -d@ -f2 | cut -d: -f2 | cut -d/ -f1)";
-database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
+username=$VT_USERNAME
+password=$VT_PASSWORD
+host=$VT_HOST
+port=$VT_PORT
+database=$VT_DATABASE
 
 # TODO:  There's a huge opportunity for parallelism here
 for language in $(find . -mindepth 3 -maxdepth 3 -type f -name test | sed 's:^\./::' | xargs dirname | xargs dirname | sort -u); do
