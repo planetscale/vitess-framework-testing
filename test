@@ -3,30 +3,58 @@
 # General setup
 git submodule update --init;
 
+if [ $# -gt 0 ]; then
+  echo "This script only accepts configuration via VT_ environment variables"
+  exit 1
+fi
+
+# New variables
 VT_USERNAME=${VT_USERNAME:-"root"}
 VT_PASSWORD=${VT_PASSWORD:-"root"}
 VT_HOST=${VT_HOST:-"127.0.0.1"}
 VT_PORT=${VT_PORT:-"3306"}
 VT_DATABASE=${VT_DATABASE:-"vitess"}
 
-username=$VT_USERNAME
-password=$VT_PASSWORD
-host=$VT_HOST
-port=$VT_PORT
-database=$VT_DATABASE
+# Reconstruct the database URL for passing down to scripts for compatability.
+VITESS_DATABASE_URL="${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}"
 
-# TODO:  There's a huge opportunity for parallelism here
-for language in $(find . -mindepth 3 -maxdepth 3 -type f -name test | sed 's:^\./::' | xargs dirname | xargs dirname | sort -u); do
-	echo "${language}:";
-	for framework in $(find "${language}" -mindepth 2 -maxdepth 2 -type f -name test | sed 's:^\./::' | xargs dirname | xargs -n1 basename); do
-		pushd "${language}/${framework}" >/dev/null;
-		./test "${VITESS_DATABASE_URL}" &>/dev/null;
-		echo "  ${framework}: $?";
-		popd >/dev/null;
-		tables="$(mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
-		if [[ "${tables}" != '' ]]; then
-			mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" -Ne "DROP TABLE ${tables}" &>/dev/null;
-		fi;
-	done
+function show_and_drop_tables() {
+  tables="$(mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
+
+  if [[ "${tables}" != '' ]]; then
+    mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne "DROP TABLE ${tables}" &>/dev/null;
+  fi
+}
+
+function run_test() {
+  local language="$1"
+  local framework="$2"
+
+  pushd "${language}/${framework}"
+  ./test ${VITESS_DATABASE_URL}
+  echo "${language}/${framework}: $?"
+  popd >/dev/null
+
+  show_and_drop_tables
+}
+
+function get_languages() {
+  for directory in $(ls -d */); do
+    echo "${directory%%/}"
+  done
+}
+
+function get_frameworks() {
+  local language="$1"
+
+  for framework in $(ls "${language}"); do
+    echo $framework
+  done
+}
+
+for language in $(get_languages); do
+  for framework in $(get_frameworks "${language}"); do
+    run_test "${language}" "${framework}"
+  done
 done
 
