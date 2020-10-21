@@ -30,7 +30,7 @@ function run_test() {
   local language="$1"
   local framework="$2"
 
-  pushd "${language}/${framework}"
+  pushd "${language}/${framework}" >/dev/null
   ./test ${VITESS_DATABASE_URL}
   echo "${language}/${framework}: $?"
   popd >/dev/null
@@ -57,4 +57,3 @@ for language in $(get_languages); do
     run_test "${language}" "${framework}"
   done
 done
-
