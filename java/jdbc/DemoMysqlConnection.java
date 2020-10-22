@@ -16,13 +16,11 @@ class DemoMysqlConnection {
 
 			String connectionUri = "jdbc:mysql://" + vtHost + ":" + vtPort + "/" + vtDatabase;
 			Connection con = DriverManager.getConnection(connectionUri, vtUsername, vtPassword);
-			
+
+			String createTableSql = "CREATE TABLE people (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL) ";
+
 			Statement st = con.createStatement();
-			ResultSet rs = st.executeQuery("select * from login");
-			
-			while(rs.next()){
-				System.out.println("there was another result");
-			}
+			st.executeUpdate(createTableSql);
 			
 			con.close();
 		}
