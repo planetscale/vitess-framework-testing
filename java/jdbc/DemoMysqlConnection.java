@@ -21,7 +21,7 @@ class DemoMysqlConnection {
 			String insertUser1Sql = "INSERT INTO people VALUES (1, 'Vitess User 1')";
 			String insertUser2Sql = "INSERT INTO people VALUES (2, 'Vitess User 2')";
 			String insertUser3Sql = "INSERT INTO people VALUES (3, 'Vitess User 3')";
-			String selectPeopleSql = "SELECT * FROM people";
+			String selectPeopleSql = "SELECT COUNT(*) as rowcount FROM people";
 			String updatePeopleSql = "UPDATE people SET name='Vitess User 500' where id=2";
 			String dropPeopleSql = "DROP TABLE people";
 
@@ -38,7 +38,10 @@ class DemoMysqlConnection {
 			con.commit();
 
 			// Select * from people
-			st.executeQuery(selectPeopleSql);
+			ResultSet people = st.executeQuery(selectPeopleSql);
+			people.getRow();
+			Integer selectedCount = people.getInt("rowcount");
+			assert selectedCount == 3;
 
 			// Update records
 			st.executeUpdate(updatePeopleSql);
