@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --rm -i "-v$(pwd)/src:/src.ro:ro" -e DATABASE_HOST="${host}" -e DATABASE_USERNAME="${username}" -e DATABASE_PASSWORD="${password}" -e DEVELOPMENT_DATABASE="${database}" openjdk:12
