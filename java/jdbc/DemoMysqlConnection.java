@@ -38,7 +38,8 @@ class DemoMysqlConnection {
 
 			// Select * from people
 			ResultSet rs = st.executeQuery(selectPeopleSql);
-			int selectedCount = rs.last() ? rs.getRow() : 0;
+			rs.next();
+			int selectedCount = rs.getInt(1);
 			assert selectedCount == 3;
 
 			// Update records
