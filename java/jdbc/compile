@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /mnt/src
+cd /src/src/
 
 export CLASSPATH="$CONNECTOR_CLASSPATH:$CLASSPATH"
 
