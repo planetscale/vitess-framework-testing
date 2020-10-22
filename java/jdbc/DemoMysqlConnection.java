@@ -28,6 +28,7 @@ class DemoMysqlConnection {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 }
