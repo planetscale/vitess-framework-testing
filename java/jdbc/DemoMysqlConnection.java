@@ -18,22 +18,41 @@ class DemoMysqlConnection {
 			Connection con = DriverManager.getConnection(connectionUri, vtUsername, vtPassword);
 
 			String createTableSql = "CREATE TABLE people (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL) ";
+			String insertUser1Sql = "INSERT INTO people VALUES (1, 'Vitess User 1')";
+			String insertUser2Sql = "INSERT INTO people VALUES (2, 'Vitess User 2')";
+			String insertUser3Sql = "INSERT INTO people VALUES (3, 'Vitess User 3')";
+			String selectPeopleSql = "SELECT * FROM people";
+			String updatePeopleSql = "UPDATE people SET name='Vitess User 500' where id=2";
+			String dropPeopleSql = "DROP TABLE people";
 
 			Statement st = con.createStatement();
+			st.getConnection();
+
+			// Create table
 			st.executeUpdate(createTableSql);
-			st.close();
 
-			st.getConnection();
-			String insertUser1 = "INSERT INTO people VALUES (1, 'Vitess User 1')";
-			String insertUser2 = "INSERT INTO people VALUES (2, 'Vitess User 2')";
-			String insertUser3 = "INSERT INTO people VALUES (3, 'Vitess User 3')";
-			st.executeUpdate(insertUser1);
-			st.executeUpdate(insertUser2);
-			st.executeUpdate(insertUser3);
-			st.close();
+			// Insert three records into people table
+			st.executeUpdate(insertUser1Sql);
+			st.executeUpdate(insertUser2Sql);
+			st.executeUpdate(insertUser3Sql);
+			con.commit();
 
+			// Select * from people
+			st.executeQuery(selectPeopleSql);
+
+			// Update records
+			st.executeUpdate(updatePeopleSql);
+			con.commit();
+
+			// Select * again
+			st.executeQuery(selectPeopleSql);
+
+			// Drop the table
 			st.getConnection();
-			
+			st.executeUpdate(dropPeopleSql);
+			con.commit();
+
+			st.close();
 			con.close();
 		}
 		catch(Exception e) {
