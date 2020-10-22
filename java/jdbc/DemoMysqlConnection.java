@@ -21,6 +21,18 @@ class DemoMysqlConnection {
 
 			Statement st = con.createStatement();
 			st.executeUpdate(createTableSql);
+			st.close();
+
+			st.getConnection();
+			String insertUser1 = "INSERT INTO people VALUES (1, 'Vitess User 1')";
+			String insertUser2 = "INSERT INTO people VALUES (2, 'Vitess User 2')";
+			String insertUser3 = "INSERT INTO people VALUES (3, 'Vitess User 3')";
+			st.executeUpdate(insertUser1);
+			st.executeUpdate(insertUser2);
+			st.executeUpdate(insertUser3);
+			st.close();
+
+			st.getConnection();
 			
 			con.close();
 		}
