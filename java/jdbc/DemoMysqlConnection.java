@@ -4,8 +4,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 class DemoMysqlConnection {
-	public static void main(String args[]){
-		try{
+	public static void main(String args[]) {
+		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 
 			String vtUsername = System.getenv("VT_USERNAME");
@@ -26,7 +26,7 @@ class DemoMysqlConnection {
 			
 			con.close();
 		}
-		catch(Exception e){
+		catch(Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
