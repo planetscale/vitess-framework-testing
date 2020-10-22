@@ -21,7 +21,7 @@ class DemoMysqlConnection {
 			ResultSet rs = st.executeQuery("select * from login");
 			
 			while(rs.next()){
-				System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getString(3));
+				System.out.println("there was another result");
 			}
 			
 			con.close();
