@@ -1,0 +1,21 @@
+name: Run framework integration tests
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  run_tests:
+    name: Framework tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+    
+      - name: Print docker info
+        run: docker info
+
+      - name: Execute serial tests
+        run: ./test
+
