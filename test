@@ -29,9 +29,16 @@ function show_and_drop_tables() {
 function run_test() {
   local language="$1"
   local framework="$2"
-
   pushd "${language}/${framework}" >/dev/null
-  ./test ${VITESS_DATABASE_URL} &>/dev/null
+
+  if [ -e test ]; then
+    ./test ${VITESS_DATABASE_URL} &>/dev/null
+  elif [ -e Dockerfile ]; then
+    local tag="${language}-${platform}-framework-testing:latest"
+    docker build -t ${tag} .
+    docker run --rm -i "-v$(pwd):/src" -e VT_HOST -e VT_USER -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag}
+  fi
+
   echo "${language}/${framework}: $?"
   popd >/dev/null
 
@@ -54,6 +61,6 @@ function get_frameworks() {
 
 for language in $(get_languages); do
   for framework in $(get_frameworks "${language}"); do
-    run_test "${language}" "${framework}"
+#    run_test "${language}" "${framework}"
   done
 done
