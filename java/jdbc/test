@@ -1,4 +1,0 @@
-#!/bin/bash
-
-docker build -t java-jdbc-framework-testing:latest .
-docker run --rm -i "-v$(pwd):/src" -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE java-jdbc-framework-testing:latest
