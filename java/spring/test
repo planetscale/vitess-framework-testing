@@ -1,5 +1,5 @@
 #!/bin/sh -e
 
 docker build -t vitess/test/java/spring .
-docker run --rm -i -e VT_HOST -e VT_PORT -e VT_USERNAME -e VT_PASSWORD -e VT_NAME vitess/test/java/spring
+docker run --rm -i -e VT_HOST -e VT_PORT -e VT_USERNAME -e VT_PASSWORD -e VT_DATABASE vitess/test/java/spring
 
