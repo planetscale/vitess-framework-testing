@@ -61,6 +61,6 @@ function get_frameworks() {
 
 for language in $(get_languages); do
   for framework in $(get_frameworks "${language}"); do
-#    run_test "${language}" "${framework}"
+    run_test "${language}" "${framework}"
   done
 done
