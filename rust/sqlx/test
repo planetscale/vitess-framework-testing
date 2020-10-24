@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 if [ "$#" -ne 1 ]; then
 	echo "usage: $0 vitess_database_url";
@@ -15,5 +15,7 @@ database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
 	echo 'DROP TABLE IF EXISTS todos;';
 	cat upstream/examples/mysql/todos/migrations/*.sql;
 ) | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" || exit 1;
-docker run --rm -i "-v$(pwd)/upstream:/src" -e DATABASE_URL="${1}" rust bash -c 'cd /src/examples/mysql/todos; timeout 120s cargo run';
+
+docker build -t vitess/test/rust/sqlx .;
+docker run --rm -i -e DATABASE_URL="${1}" vitess/test/rust/sqlx;
 
