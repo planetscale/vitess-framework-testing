@@ -1,11 +1,11 @@
 {
   "name": "default",
   "type": "mysql",
-  "host": "${DB_HOST}",
-  "port": ${DB_PORT},
-  "username": "${DB_USERNAME}",
-  "password": "${DB_PASSWORD}",
-  "database": "${DB_NAME}",
+  "host": "${VT_HOST}",
+  "port": ${VT_PORT},
+  "username": "${VT_USERNAME}",
+  "password": "${VT_PASSWORD}",
+  "database": "${VT_DATABASE}",
   "synchronize": true,
   "logging": false,
   "entities": [
