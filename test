@@ -36,7 +36,7 @@ function run_test() {
   elif [ -e Dockerfile ]; then
     local tag="${language}-${platform}-framework-testing:latest"
     docker build -t ${tag} . &>/dev/null
-    docker run --rm -i "-v$(pwd):/src" -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
+    docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
   fi
 
   echo "${language}/${framework}: $?"
