@@ -8,5 +8,5 @@
 	path = rust/mysql/upstream
 	url = git@github.com:blackbeam/rust-mysql-simple.git
 [submodule "python/sqlalchemy/upstream"]
-	path = python/sqlalchemy/upstream
+	path = python/sqlalchemy/src/upstream
 	url = git@github.com:sqlalchemy/sqlalchemy.git
