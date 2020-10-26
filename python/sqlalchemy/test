@@ -5,12 +5,6 @@ if [ "$#" -ne 1 ]; then
 	exit 1;
 fi;
 
-docker run --rm -i "-v$(pwd):/src" -e DATABASE_URL="${1}" python bash -c 'cd /src; pip3 install ./upstream; pip3 install mysqlclient; ./run-examples-with-database-url "${DATABASE_URL}"';
-result="$?";
-echo "result = ${result}";
-
-cd upstream;
-git reset --hard; git clean -xdf;
-
-exit "${result}";
+docker build -t vitess/test/python/sqlalchemy .;
+docker run --rm -i -e DATABASE_URL="${1}" vitess/test/python/sqlalchemy;
 

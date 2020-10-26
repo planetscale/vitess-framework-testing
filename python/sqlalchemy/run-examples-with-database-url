@@ -1,14 +1,9 @@
 #!/bin/sh
 
-if [ "$#" -ne 1 ]; then
-	echo "usage: $0 database_url";
-	exit 1;
-fi;
-
 cd upstream/examples;
 for file in $(find . -name '*.py'); do
 	echo "file: ${file}";
-	sed -i 's%create_engine("[^"]*"%create_engine("'"${1}"'"%' "${file}";
+	sed -i 's%create_engine("[^"]*"%create_engine("'"${DATABASE_URL}"'"%' "${file}";
 	if [ "$(basename ${file})" != '__init__.py' ]; then 
 		python3 "${file}";
 		result="$?";

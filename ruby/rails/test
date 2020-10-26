@@ -5,6 +5,8 @@ if [ "$#" -ne 1 ]; then
 	exit 1;
 fi;
 
+docker build -t vitess/test/ruby/rails .;
+
 username="$(echo "${1}" | cut -d@ -f1 | cut -d/ -f3 | cut -d: -f1)";
 password="$(echo "${1}" | cut -d@ -f1 | cut -d: -f3)";
 host="$(echo "${1}" | cut -d@ -f2 | cut -d: -f1)";
@@ -18,5 +20,5 @@ database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
 # TODO:  Test running, not just migrations:  bundle exec rails s -p 80 -b 0.0.0.0
 # Note:  Have to do this janky thing where we copy /src because Rails likes to
 #    write over db/schema.rb when it runs migrations
-docker run --rm -i "-v$(pwd)/src:/src.ro:ro" -e DATABASE_HOST="${host}" -e DATABASE_USERNAME="${username}" -e DATABASE_PASSWORD="${password}" -e DEVELOPMENT_DATABASE="${database}" -p8000:80 ruby:2.6.5 bash -ex -c 'cp -avf /src.ro /src; export PATH="/src/bin:${PATH}"; cd /src; bundle install & (apt-get update; apt-get install -y yarnpkg; yarn install --check-files); wait; rake db:migrate';
+docker run --rm -i -e DATABASE_HOST="${host}" -e DATABASE_USERNAME="${username}" -e DATABASE_PASSWORD="${password}" -e DEVELOPMENT_DATABASE="${database}" -p8000:80 vitess/test/ruby/rails;
 

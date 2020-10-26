@@ -5,6 +5,8 @@ if [ "$#" -ne 1 ]; then
 	exit 1;
 fi;
 
+docker build -t vitess/test/php/laravel .;
+
 username="$(echo "${1}" | cut -d@ -f1 | cut -d/ -f3 | cut -d: -f1)";
 password="$(echo "${1}" | cut -d@ -f1 | cut -d: -f3)";
 host="$(echo "${1}" | cut -d@ -f2 | cut -d: -f1)";
@@ -17,6 +19,5 @@ database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
 	echo 'DROP TABLE IF EXISTS password_resets;';
 	echo 'DROP TABLE IF EXISTS users;';
 ) | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" || exit 1;
-# TODO:  Test running, not just migrations:  apache2-foreground
-docker run --rm -i "-v$(pwd)/src:/src" --env-file=src/.env.example -e DATABASE_URL="${1}" -p8000:80 php:7-apache bash -ex -c 'cp -avf /src/* /var/www; cd /var/www; chown -Rc www-data:www-data .; env | grep -v " " > .env; apt-get update; apt-get install -y git curl libpng-dev libonig-dev libxml2-dev zip unzip; docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd; curl -v https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer; composer install; rmdir html; mv -vf public html; ./artisan migrate:install; ./artisan migrate:fresh; ./artisan db:seed';
+docker run --rm -i --env-file=src/.env.example -e DATABASE_URL="${1}" -p8000:80 vitess/test/php/laravel;
 
