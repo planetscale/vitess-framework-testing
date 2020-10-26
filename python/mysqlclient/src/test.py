@@ -3,21 +3,34 @@ import urllib.parse
 
 import MySQLdb
 
-url = os.environ.get('DATABASE_URL')
-if(url is None):
-	print("DATABASE_URL must be set")
-	exit(1)
+args = {}
 
-parsed = urllib.parse.urlparse(os.environ.get('DATABASE_URL'))
-print(parsed)
+args['host'] = os.environ.get('VT_HOST')
+if(args['host'] is None):
+	print('VT_HOST must be set')
+	os.Exit(1)
 
-connection = MySQLdb.connect(
-	host = parsed.hostname,
-	port = 3306 if parsed.port == '' else parsed.port,
-	user = parsed.username,
-	passwd = parsed.password,
-	db = parsed.path.strip('/')
-)
+port = os.environ.get('VT_PORT')
+if(port is None):
+	args['port'] = 3306
+else:
+	args['port'] = int(port)
+
+args['user'] = os.environ.get('VT_USERNAME')
+if(args['user'] is None):
+	print('VT_USERNAME must be set')
+	os.Exit(2)
+
+password = os.environ.get('VT_PASSWORD')
+if(password is not None):
+	args['passwd'] = password
+
+args['db'] = os.environ.get('VT_DATABASE')
+if(args['db'] is None):
+	print('VT_DATABASE must be set')
+	os.Exit(3)
+
+connection = MySQLdb.connect(**args)
 
 with connection.cursor() as cursor:
 	query = 'CREATE TABLE people (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL)'
