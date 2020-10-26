@@ -1,6 +1,6 @@
 FROM golang
 
-ADD . /src
+ADD src /src
 WORKDIR /src
 RUN go build .
 ENTRYPOINT ["go", "run", "."]
