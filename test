@@ -35,8 +35,8 @@ function run_test() {
     ./test ${VITESS_DATABASE_URL} &>/dev/null
   elif [ -e Dockerfile ]; then
     local tag="${language}-${platform}-framework-testing:latest"
-    docker build -t ${tag} .
-    docker run --rm -i "-v$(pwd):/src" -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag}
+    docker build -t ${tag} . &>/dev/null
+    docker run --rm -i "-v$(pwd):/src" -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
   fi
 
   echo "${language}/${framework}: $?"
