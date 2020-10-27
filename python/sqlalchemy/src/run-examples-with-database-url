@@ -39,7 +39,6 @@ exclude_files = [
 	'./generic_associations/generic_fk.py',
 	'./generic_associations/table_per_association.py',
 	'./generic_associations/table_per_related.py',
-	'./graphs/directed_graph.py', # https://github.com/vitessio/vitess/issues/6651
 	'./join_conditions/cast.py',
 	'./join_conditions/threeway.py',
 	# large_collection is built for postgres specifically
@@ -62,7 +61,6 @@ exclude_files = [
 	'./sharding/separate_databases.py', # This only makes sense with four actual separate databases, and we can'"'"'t really do that with the simple sed replace in here
 	'./space_invaders/space_invaders.py',
 	'./versioned_history/test_versioning.py', # relative import problem again
-	'./versioned_rows/versioned_map.py', # https://github.com/vitessio/vitess/issues/6651
 	'./versioned_rows/versioned_rows.py',
 	'./versioned_rows/versioned_rows_w_versionid.py',
 	'./versioned_rows/versioned_update_old_row.py',
