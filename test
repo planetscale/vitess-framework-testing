@@ -15,9 +15,6 @@ VT_HOST=${VT_HOST:-"127.0.0.1"}
 VT_PORT=${VT_PORT:-"3306"}
 VT_DATABASE=${VT_DATABASE:-"vitess"}
 
-# Reconstruct the database URL for passing down to scripts for compatability.
-VITESS_DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}"
-
 function show_and_drop_tables() {
   tables="$(mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
 
@@ -32,7 +29,7 @@ function run_test() {
   pushd "${language}/${framework}" >/dev/null
 
   if [ -e test ]; then
-    ./test ${VITESS_DATABASE_URL} &>/dev/null
+    ./test &>/dev/null
   elif [ -e Dockerfile ]; then
     local tag="${language}-${platform}-framework-testing:latest"
     docker build -t ${tag} . &>/dev/null
