@@ -2,10 +2,8 @@
 package main
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"strconv"
-	"strings"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -18,54 +16,40 @@ type Product struct {
 }
 
 func main() {
-	db_url := os.Getenv("DATABASE_URL")
-	if(db_url == "") {
-		println("DATABASE_URL must be set")
+	host := os.Getenv("VT_HOST")
+	if(host == "") {
+		println("VT_HOST must be set")
 		os.Exit(1)
 	}
 
-	parsed, err := url.Parse(db_url)
-	if(err != nil) {
-		fmt.Printf("Failed to parse DATABASE_URL: %s\n", err)
-		os.Exit(2)
+	port := uint16(3306)
+	port_str := os.Getenv("VT_PORT")
+	if(port_str != "") {
+		port_u64, err := strconv.ParseUint(port_str, 10, 16)
+		if(err != nil) {
+			fmt.Printf("Failed to parse VT_PORT ('%s'):  %s\n", port_str, err)
+			os.Exit(2)
+		}
+		port = uint16(port_u64)
 	}
 
-	if(parsed.User == nil) {
-		println("Must include username/password in DATABASE_URL")
+	auth := os.Getenv("VT_USERNAME")
+	if(auth == "") {
+		println("VT_USERNAME must be set")
 		os.Exit(3)
 	}
 
-	host_parts := strings.Split(parsed.Host, ":")
-	var host string
-	var port uint16
-	if(len(host_parts) > 2) {
-		fmt.Printf("Malformed host:port in DATABASE_URL: '%s'\n", parsed.Host)
-		os.Exit(4)
-	} else if(len(host_parts) == 2) {
-		host = host_parts[0]
-		port_u64, err := strconv.ParseUint(host_parts[1], 10, 16)
-		if(err != nil) {
-			fmt.Printf("Malformed host:port in DATABASE_URL: '%s'\n", parsed.Host)
-			os.Exit(5)
-		}
-		port = uint16(port_u64)
-	} else if(len(host_parts) == 1) {
-		host = host_parts[0]
-		port = 3306
-	}
-
-	if(parsed.Path == "" || parsed.Path == "/") {
-		println("Must include a database in DATABASE_URL")
-		os.Exit(6)
-	}
-
-	auth := parsed.User.Username()
-	password, has_password := parsed.User.Password()
-	if(has_password) {
+	password := os.Getenv("VT_PASSWORD")
+	if(password != "") {
 		auth = auth + ":" + password
 	}
 
-	db_url = fmt.Sprintf("%s@tcp(%s:%d)%s?parseTime=true", auth, host, port, parsed.Path)
+	database := os.Getenv("VT_DATABASE")
+	if(database != "") {
+		println("VT_DATABASE must be set")
+	}
+
+	db_url := fmt.Sprintf("%s@tcp(%s:%d)/%s?parseTime=true", auth, host, port, database)
 	fmt.Printf("--- Generated database URL: %s\n", db_url)
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN: db_url,

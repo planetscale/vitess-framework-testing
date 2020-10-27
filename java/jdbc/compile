@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd /src
-
-export CLASSPATH="$CONNECTOR_CLASSPATH:$CLASSPATH"
-
-javac DemoMysqlConnection.java
-java DemoMysqlConnection

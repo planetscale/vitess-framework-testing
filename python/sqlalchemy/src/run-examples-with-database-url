@@ -1,5 +1,6 @@
 #!/bin/sh
 
+DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}";
 cd upstream/examples;
 for file in $(find . -name '*.py'); do
 	echo "file: ${file}";

@@ -1,7 +1,7 @@
 FROM python
 
 RUN pip3 install --no-cache-dir mysqlclient
-ADD . /src
+ADD src /src
 WORKDIR /src
 RUN pip3 install --no-cache-dir ./upstream
 

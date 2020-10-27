@@ -15,6 +15,7 @@ class DemoMysqlConnection {
 			String vtDatabase = System.getenv("VT_DATABASE");
 
 			String connectionUri = "jdbc:mysql://" + vtHost + ":" + vtPort + "/" + vtDatabase + "?serverTimezone=UTC";
+			System.out.println("+++ URL: " + connectionUri);
 			Connection con = DriverManager.getConnection(connectionUri, vtUsername, vtPassword);
 
 			String createTableSql = "CREATE TABLE people (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL) ";

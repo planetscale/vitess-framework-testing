@@ -19,7 +19,19 @@ struct Payment {
 
 #[tokio::main]
 async fn main() {
-	let url = std::env::var("DATABASE_URL").unwrap();
+	let host = std::env::var("VT_HOST").unwrap();
+	let port = match std::env::var("VT_PORT") {
+		Ok(port_str) => port_str.parse::<u16>().unwrap(),
+		Err(_) => 3306
+	};
+	let username = std::env::var("VT_USERNAME").unwrap();
+	let auth = match std::env::var("VT_PASSWORD") {
+		Ok(password) => format!("{}:{}", username, password),
+		Err(_) => username
+	};
+	let database = std::env::var("VT_DATABASE").unwrap();
+	let url = format!("mysql://{}@{}:{}/{}", &auth, &host, port, &database);
+	println!("+++ URL: {}\n", &url);
 	let pool = Pool::new(url);
 	let mut conn = pool.get_conn().await.unwrap();
 

@@ -1,15 +1,12 @@
 FROM rust AS builder
 
-ADD Cargo.toml /src/
+ADD src/Cargo.toml /src/
 WORKDIR /src
-RUN \
-	mkdir -pv /src/src && \
-	echo 'fn main() {}' > /src/src/main.rs && \
-	cargo build && \
-	rm -Rvf /src/src
-ADD src /src/src
+ADD src/src /src/src
 RUN cargo build
+ENTRYPOINT ["/src/target/debug/mysql-test"]
 
-FROM gcr.io/distroless/cc-debian10
+FROM fedora:32
 COPY --from=builder /src/target/debug/mysql-test /
 ENTRYPOINT ["/mysql-test"]
+

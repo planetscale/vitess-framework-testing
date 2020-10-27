@@ -1,23 +1,4 @@
 #!/bin/sh
-
-if [ "$#" -ne 1 ]; then
-	echo "usage: $0 vitess_database_url";
-	exit 1;
-fi;
-
 docker build -t vitess/test/php/laravel .;
-
-username="$(echo "${1}" | cut -d@ -f1 | cut -d/ -f3 | cut -d: -f1)";
-password="$(echo "${1}" | cut -d@ -f1 | cut -d: -f3)";
-host="$(echo "${1}" | cut -d@ -f2 | cut -d: -f1)";
-port="$(echo "${1}" | cut -d@ -f2 | cut -d: -f2 | cut -d/ -f1)";
-database="$(echo "${1}" | cut -d@ -f2 | cut -d/ -f2)";
-
-(
-	echo 'DROP TABLE IF EXISTS migrations;';
-	echo 'DROP TABLE IF EXISTS failed_jobs;';
-	echo 'DROP TABLE IF EXISTS password_resets;';
-	echo 'DROP TABLE IF EXISTS users;';
-) | mysql --host "${host}" --port "${port}" --user "${username}" "-p${password}" "${database}" || exit 1;
-docker run --rm -i --env-file=src/.env.example -e DATABASE_URL="${1}" -p8000:80 vitess/test/php/laravel;
+docker run --rm -i --env-file=src/.env.example -e VT_HOST -e VT_PORT -e VT_USERNAME -e VT_PASSWORD -e VT_DATABASE -p8000:80 vitess/test/php/laravel;
 
