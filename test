@@ -42,6 +42,19 @@ function run_test() {
   show_and_drop_tables
 }
 
+function validate_environment() {
+  if ensure_environment_variables 'VT_PORT' 'VT_DATABASE' 'VT_USERNAME' 'VT_PASSWORD' 'VT_DATABASE'; then
+    echo "Ensure VT_{PORT,DATABASE,USERNAME,PASSWORD,DATABASE} are set"
+    exit 1
+  fi
+}
+
+function ensure_environment_variables() {
+  for variable; do
+    : ${!variable:?}
+  done
+}
+
 function get_languages() {
   for directory in $(ls -d */); do
     echo "${directory%%/}"
@@ -55,6 +68,8 @@ function get_frameworks() {
     echo $framework
   done
 }
+
+validate_environment
 
 for language in $(get_languages); do
   for framework in $(get_frameworks "${language}"); do
