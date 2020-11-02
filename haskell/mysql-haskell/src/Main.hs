@@ -85,15 +85,15 @@ main = defaultMain $ testCaseSteps "mysql-haskell test suite" $ \step -> do
 
     resetTestTable c
 
-    step "testing executeMany"
-    ExecuteMany.tests c
-
-    resetTestTable c
-
-    step "testing text protocol"
-    TextRow.tests c
-
-    resetTestTable c
+--    step "testing executeMany"
+--    ExecuteMany.tests c
+--
+--    resetTestTable c
+--
+--    step "testing text protocol"
+--    TextRow.tests c
+--
+--    resetTestTable c
 
     step "testing binary protocol"
     BinaryRow.tests c
@@ -101,27 +101,27 @@ main = defaultMain $ testCaseSteps "mysql-haskell test suite" $ \step -> do
     resetTestTable c
 
 
-    when isNew $ do
-        execute_ c "CREATE TABLE test_new(\
-                   \__id           INT,\
-                   \__datetime     DATETIME(2),\
-                   \__timestamp    TIMESTAMP(4) NULL,\
-                   \__time         TIME(6)\
-                   \) CHARACTER SET utf8"
-
-        resetTest57Table c
-
-        step "testing MySQL5.7 extra text protocol"
-        TextRowNew.tests c
-
-        resetTest57Table c
-
-        step "testing MySQL5.7 extra binary protocol"
-        BinaryRowNew.tests c
-
-        void $ resetTest57Table c
-
-    step "testing binlog protocol"
+--    when isNew $ do
+--        execute_ c "CREATE TABLE test_new(\
+--                   \__id           INT,\
+--                   \__datetime     DATETIME(2),\
+--                   \__timestamp    TIMESTAMP(4) NULL,\
+--                   \__time         TIME(6)\
+--                   \) CHARACTER SET utf8"
+--
+--        resetTest57Table c
+--
+--        step "testing MySQL5.7 extra text protocol"
+--        TextRowNew.tests c
+--
+--        resetTest57Table c
+--
+--        step "testing MySQL5.7 extra binary protocol"
+--        BinaryRowNew.tests c
+--
+--        void $ resetTest57Table c
+--
+--    step "testing binlog protocol"
 
 -- TODO:  https://github.com/vitessio/vitess/issues/6973
 --    if isNew
