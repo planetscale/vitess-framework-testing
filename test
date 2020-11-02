@@ -31,7 +31,7 @@ function run_test() {
   if [ -e test ]; then
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
-    local tag="${language}-${framework}-framework-testing:latest"
+    local tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
     docker build -t ${tag} . &>/dev/null
     docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
   fi
