@@ -71,7 +71,9 @@ import Control.Monad.Trans.Resource (ResourceT, runResourceT)
 import qualified Data.ByteString as BS
 import Data.Int (Int32, Int64)
 import Data.Text (Text)
+import Data.Word
 import qualified Database.MySQL.Base as MySQL
+import System.Environment
 import System.Log.FastLogger (fromLogStr)
 
 import Database.Persist
@@ -97,26 +99,20 @@ runConn f = do
     -- which can cause an exception in MaxLenTest, depending on the server
     -- configuration.  Persistent tests do not need any of the modes which are
     -- set by default, so it is simplest to clear `sql_mode` for the session.
-    let baseConnectInfo =
-            defaultConnectInfo {
-                connectOptions =
-                    connectOptions defaultConnectInfo
-                    ++ [MySQL.InitCommand "SET SESSION sql_mode = '';\0"]
-            }
-    _ <- if not travis
-      then withMySQLPool baseConnectInfo
-                        { connectHost     = "localhost"
-                        , connectUser     = "test"
-                        , connectPassword = "test"
-                        , connectDatabase = "test"
-                        } 1 $ runSqlPool f
-      else withMySQLPool baseConnectInfo
-                        { connectHost     = "127.0.0.1"
-                        , connectUser     = "test"
-                        , connectPassword = "test"
-                        , connectDatabase = "test"
-                        , connectPort     = 33306
-                        } 1 $ runSqlPool f
+    host <- getEnv "VT_HOST"
+    port <- getEnv "VT_PORT"
+    user <- getEnv "VT_USERNAME"
+    password <- getEnv "VT_PASSWORD"
+    database <- getEnv "VT_DATABASE"
+    let baseConnectInfo = defaultConnectInfo {
+        connectHost = host,
+        connectPort = read port :: Word16,
+        connectUser = user,
+        connectPassword = password,
+        connectDatabase = database,
+        connectOptions = connectOptions defaultConnectInfo ++ [MySQL.InitCommand "SET SESSION sql_mode = '';\0"]
+    }
+    _ <- withMySQLPool baseConnectInfo 1 $ runSqlPool f
     return ()
 
 db :: SqlPersistT (LoggingT (ResourceT IO)) () -> Assertion
