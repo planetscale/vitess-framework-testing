@@ -99,11 +99,11 @@ runConn f = do
     -- which can cause an exception in MaxLenTest, depending on the server
     -- configuration.  Persistent tests do not need any of the modes which are
     -- set by default, so it is simplest to clear `sql_mode` for the session.
-    host <- getEnv "VT_HOST"
-    port <- getEnv "VT_PORT"
-    user <- getEnv "VT_USERNAME"
-    password <- getEnv "VT_PASSWORD"
-    database <- getEnv "VT_DATABASE"
+    host <- liftIO (getEnv "VT_HOST")
+    port <- liftIO (getEnv "VT_PORT")
+    user <- liftIO (getEnv "VT_USERNAME")
+    password <- liftIO (getEnv "VT_PASSWORD")
+    database <- liftIO (getEnv "VT_DATABASE")
     let baseConnectInfo = defaultConnectInfo {
         connectHost = host,
         connectPort = read port :: Word16,
