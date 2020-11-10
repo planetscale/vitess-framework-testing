@@ -1,0 +1,43 @@
+name:           test
+version:        0.1.0.0
+build-type:     Simple
+homepage:       https://github.com/planetscale/vitess-framework-testing
+license:        NONE
+author:         Mike Cronce
+maintainer:     mc@planetscale.com
+category:       Integration test
+
+executable test
+    type:                exitcode-stdio-1.0
+    main-is:             Main.hs
+    other-modules:       MyInit
+                         InsertDuplicateUpdate
+                         CustomConstraintTest
+    -- other-extensions:
+    build-depends:       base >= 4.9 && < 5,
+                         persistent,
+                         persistent-mysql,
+                         persistent-qq,
+                         persistent-template,
+                         persistent-test,
+                         bytestring,
+                         containers,
+                         fast-logger,
+                         hspec >= 2.4,
+                         HUnit,
+                         monad-logger,
+                         mysql,
+                         QuickCheck,
+                         quickcheck-instances,
+                         resourcet,
+                         text,
+                         time,
+                         transformers,
+                         unliftio-core
+    -- hs-source-dirs:
+    default-language:    Haskell2010
+    default-extensions:  MultiWayIf
+                         OverloadedStrings
+                         ImplicitParams
+    ghc-options:         -Wno-tabs -threaded
+
