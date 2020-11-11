@@ -7,9 +7,8 @@ import pathlib
 def frameworks_on_disk():
     frameworks = []
     for framework in glob.glob('frameworks/*/*'):
-        if not None:
-            framework_parts = pathlib.Path(framework).parts[1:]
-            frameworks.append(str(pathlib.Path(*framework_parts)))
+        framework_parts = pathlib.Path(framework).parts[1:]
+        frameworks.append(str(pathlib.Path(*framework_parts)))
 
     return sorted(frameworks)
 
