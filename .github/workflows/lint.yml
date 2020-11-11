@@ -21,7 +21,7 @@ jobs:
           scandir: '.'
 
   framework_compare:
-    name: Check out the repository
+    name: Compare test.yml to workflows on disk
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
