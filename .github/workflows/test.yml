@@ -1,4 +1,4 @@
-name: Run framework integration tests
+name: Integration tests
 on:
   push:
     branches:
@@ -6,8 +6,25 @@ on:
 
 jobs:
   run_tests:
-    name: Framework tests
+    name: Frameworks
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        framework:
+          - 'go/gorm'
+          - 'haskell/mysql-haskell'
+          - 'haskell/mysql-simple'
+          - 'java/jdbc'
+          - 'java/spring'
+          - 'javascript/sequelize'
+          - 'javascript/typeorm'
+          - 'php/laravel'
+          - 'python/PyMySQL'
+          - 'python/mysqlclient'
+          - 'ruby/rails'
+          - 'rust/mysql'
+          - 'rust/mysql_async'
+          - 'rust/sqlx'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -16,6 +33,7 @@ jobs:
       - name: Print docker info
         run: docker info
 
-      - name: Execute serial tests
-        run: ./test
+      - name: Bring in test helpers
+        run: source lib.sh
 
+      - run: run_tests ${{ matrix['framework'] }}
