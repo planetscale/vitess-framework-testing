@@ -15,21 +15,22 @@ function show_and_drop_tables() {
 }
 
 function run_test() {
-  local language="$(echo "$1" | cut -d'/' -f1)"
-  local framework="$(echo "$1" | cut -d'/' -f2)"
+  local language framework
+  language="$(echo "$1" | cut -d'/' -f1)"
+  framework="$(echo "$1" | cut -d'/' -f2)"
 
-  pushd "frameworks/${language}/${framework}" >/dev/null
+  pushd "frameworks/${language}/${framework}" >/dev/null || return
 
   if [ -e test ]; then
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
-    local tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
-    docker build -t ${tag} .
-    docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
+    tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
+    docker build -t "${tag}" .
+    docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
   fi
 
   echo "${language}/${framework}: $?"
-  popd >/dev/null
+  popd >/dev/null || return
 
   show_and_drop_tables
 }
