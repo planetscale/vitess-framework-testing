@@ -15,10 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Set up
+        run: apt-get install -y shellcheck
+
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
-        with:
-          scandir: '.'
+        run: shellcheck *.sh
+
 
   framework_compare:
     name: Compare test.yml to workflows on disk
