@@ -33,5 +33,5 @@ jobs:
       - name: Print docker info
         run: docker info
 
-        name: Test
+      - name: Run test
       - run: source lib && run_tests ${{ matrix['framework'] }}
