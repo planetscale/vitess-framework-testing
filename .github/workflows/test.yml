@@ -9,6 +9,7 @@ jobs:
     name: Frameworks
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         framework:
           - 'go/gorm'
