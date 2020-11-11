@@ -25,6 +25,7 @@ jobs:
           - 'php/laravel'
           - 'python/PyMySQL'
           - 'python/mysqlclient'
+          - 'python/sqlalchemy'
           - 'ruby/rails'
           - 'rust/mysql'
           - 'rust/mysql_async'

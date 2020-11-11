@@ -22,6 +22,8 @@ function run_test() {
   pushd "frameworks/${language}/${framework}" >/dev/null || return
 
   if [ -e test ]; then
+    # shellcheck disable=SC2065
+    # The redirection here is intentional.
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
     tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
