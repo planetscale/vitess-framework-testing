@@ -42,5 +42,5 @@ function validate_environment() {
 }
 
 function get_frameworks() {
-  echo "$(find frameworks -mindepth 2 -maxdepth 2 -prune -type d | cut -d'/' -f2-)"
+  find frameworks -mindepth 2 -maxdepth 2 -prune -type d | cut -d'/' -f2-
 }
