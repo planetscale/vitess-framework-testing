@@ -2,12 +2,6 @@
 
 source lib.sh
 
-pushd "frameworks" >/dev/null
-
-for language in $(get_languages); do
-  for framework in $(get_frameworks "${language}"); do
-    run_test "${language}" "${framework}"
-  done
+for framework in $(get_frameworks); do
+  run_test "${framework}"
 done
-
-popd >/dev/null
