@@ -9,14 +9,21 @@ on:
 
 jobs:
   shellcheck:
-    name: Check out the repository
+    name: ShellCheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
 
-  
+  framework_compare:
+    name: Check out the repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compare on-disk to test.yml
+        run: ./tools/compare-frameworks
