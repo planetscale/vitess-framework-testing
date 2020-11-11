@@ -22,7 +22,7 @@ function run_test() {
     local language="$1"
     local framework="$2"
   fi
-  pushd "${language}/${framework}" >/dev/null
+  pushd "frameworks/${language}/${framework}" >/dev/null
 
   if [ -e test ]; then
     ./test &>/dev/null
