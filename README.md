@@ -5,7 +5,7 @@
 New frameworks, languages, or tools can get added for testing by introducing the following directory structure:
 
 - __vitess\-framework\-testing__
-   - __language__
+   - frameworks/__language__
      - __framework__
        - src/main.go (source code)
        - Dockerfile (dockerfile)
