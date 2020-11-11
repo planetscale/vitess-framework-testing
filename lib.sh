@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# General setup
-git submodule update --init;
-
-if [ $# -gt 0 ]; then
-  echo "This script only accepts configuration via VT_ environment variables"
-  exit 1
-fi
-
-# New variables
 VT_USERNAME=${VT_USERNAME:-"root"}
 VT_PASSWORD=${VT_PASSWORD:-"root"}
 VT_HOST=${VT_HOST:-"127.0.0.1"}
@@ -24,15 +15,20 @@ function show_and_drop_tables() {
 }
 
 function run_test() {
-  local language="$1"
-  local framework="$2"
+  if [ "$#" -eq 1 ]; then
+    local language="$(echo "$1" | cut -d'/' -f1)"
+    local framework="$(echo "$1" | cut -d'/' -f2)"
+  else
+    local language="$1"
+    local framework="$2"
+  fi
   pushd "${language}/${framework}" >/dev/null
 
   if [ -e test ]; then
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
     local tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
-    docker build -t ${tag} . &>/dev/null
+    docker build -t ${tag} .
     docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
   fi
 
@@ -68,11 +64,3 @@ function get_frameworks() {
     echo $framework
   done
 }
-
-validate_environment
-
-for language in $(get_languages); do
-  for framework in $(get_frameworks "${language}"); do
-    run_test "${language}" "${framework}"
-  done
-done
