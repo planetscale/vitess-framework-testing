@@ -15,25 +15,22 @@ function show_and_drop_tables() {
 }
 
 function run_test() {
-  if [ "$#" -eq 1 ]; then
-    local language="$(echo "$1" | cut -d'/' -f1)"
-    local framework="$(echo "$1" | cut -d'/' -f2)"
-  else
-    local language="$1"
-    local framework="$2"
-  fi
-  pushd "${language}/${framework}" >/dev/null
+  local language framework
+  language="$(echo "$1" | cut -d'/' -f1)"
+  framework="$(echo "$1" | cut -d'/' -f2)"
+
+  pushd "frameworks/${language}/${framework}" >/dev/null || return
 
   if [ -e test ]; then
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
-    local tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
-    docker build -t ${tag} .
-    docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE ${tag} &>/dev/null
+    tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
+    docker build -t "${tag}" .
+    docker run --rm -i -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
   fi
 
   echo "${language}/${framework}: $?"
-  popd >/dev/null
+  popd >/dev/null || return
 
   show_and_drop_tables
 }
@@ -45,22 +42,6 @@ function validate_environment() {
   fi
 }
 
-function ensure_environment_variables() {
-  for variable; do
-    : ${!variable:?}
-  done
-}
-
-function get_languages() {
-  for directory in $(ls -d */); do
-    echo "${directory%%/}"
-  done
-}
-
 function get_frameworks() {
-  local language="$1"
-
-  for framework in $(ls "${language}"); do
-    echo $framework
-  done
+  find frameworks -mindepth 2 -maxdepth 2 -prune -type d | cut -d'/' -f2-
 }
