@@ -1,4 +1,4 @@
-name: Run framework integration tests
+name: Integration tests
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   run_tests:
-    name: Framework tests
+    name: Frameworks
     runs-on: ubuntu-latest
     strategy:
       matrix:
