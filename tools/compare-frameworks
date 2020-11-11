@@ -13,7 +13,6 @@ def frameworks_on_disk():
 
     return sorted(frameworks)
 
-
 def frameworks_in_workflow():
     with open(".github/workflows/test.yml") as workflow:
          config = yaml.load(workflow, Loader=yaml.SafeLoader)
