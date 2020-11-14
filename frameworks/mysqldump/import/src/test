@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+for file in cases/*.sql; do
+	tables="$(mysql "-h${VT_HOST}" "-P${VT_PORT}" "-u${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW TABLES;' | sed 's/^\(.*\)$/`\1`/' | xargs echo | sed 's/` `/`, `/g')";
+	if [ "${tables}" != '' ]; then
+		echo "DROP TABLE ${tables};" | mysql "-h${VT_HOST}" "-P${VT_PORT}" "-u${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}";
+	fi;
+	echo "--- ${file}";
+	cat "${file}" | timeout 60s mysql "-h${VT_HOST}" "-P${VT_PORT}" "-u${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}";
+done;
+
