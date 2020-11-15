@@ -51,13 +51,11 @@ jobs:
       - name: Print docker info
         run: docker info
 
-      - name: Verify MySQL connectivity
-        env:
-          PORT: 3806
-        run: |
-          while ! mysqladmin ping -h"127.0.0.1" -P"$PORT" --silent; do
-            sleep 1
-          done
-
       - name: Run test
         run: source lib.sh && run_test ${{ matrix['framework'] }}
+        env:
+          VT_USERNAME: vt_test
+          VT_PASSWORD: vt_test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 3806
