@@ -11,6 +11,18 @@ jobs:
   run_tests:
     name: Frameworks
     runs-on: ubuntu-latest
+
+    services:
+      mysql8:
+        image: mysql:8
+        ports:
+          - 3806
+        env:
+          MYSQL_USER: vt_test
+          MYSQL_PASSWORD: vt_test
+          MYSQL_DATABASE: test
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     strategy:
       fail-fast: false
       matrix:
@@ -38,6 +50,14 @@ jobs:
     
       - name: Print docker info
         run: docker info
+
+      - name: Verify MySQL connectivity
+        env:
+          PORT: 3806
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"$PORT" --silent; do
+            sleep 1
+          done
 
       - name: Run test
         run: source lib.sh && run_test ${{ matrix['framework'] }}
