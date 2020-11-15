@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql8:
-        image: mysql:8.0
+      mysql:
+        image: mysql:5.7
         ports:
           - 3306:3306
         env:
@@ -56,4 +56,4 @@ jobs:
           VT_PASSWORD: root
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
-          VT_PORT: ${{ job.services.mysql8.ports[3306] }}
+          VT_PORT: ${{ job.services.mysql.ports[3306] }}
