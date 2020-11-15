@@ -15,6 +15,8 @@ function show_and_drop_tables() {
 }
 
 function run_test() {
+  validate_environment
+
   local language framework
   language="$(echo "$1" | cut -d'/' -f1)"
   framework="$(echo "$1" | cut -d'/' -f2)"
