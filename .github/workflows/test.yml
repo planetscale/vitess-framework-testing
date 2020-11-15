@@ -16,7 +16,7 @@ jobs:
       mysql8:
         image: mysql:8
         ports:
-          - 3806
+          - 3306
         env:
           MYSQL_USER: vt_test
           MYSQL_PASSWORD: vt_test
@@ -58,4 +58,4 @@ jobs:
           VT_PASSWORD: vt_test
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
-          VT_PORT: 3806
+          VT_PORT: 3306
