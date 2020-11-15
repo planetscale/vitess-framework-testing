@@ -45,7 +45,7 @@ function run_test() {
 }
 
 function validate_environment() {
-  if ! ensure_environment_variables 'VT_HOST' 'VT_PORT' 'VT_USERNAME' 'VT_PASSWORD' 'VT_DATABASE'; then
+  if [[ -z $VT_HOST || -z $VT_PORT || -z $VT_USERNAME || -z $VT_PASSWORD || -z $VT_DATABASE ]]; then
     echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE} are set"
     exit 1
   fi
