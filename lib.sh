@@ -1,11 +1,5 @@
 #!/bin/bash
 
-VT_USERNAME=${VT_USERNAME:-"root"}
-VT_PASSWORD=${VT_PASSWORD:-"root"}
-VT_HOST=${VT_HOST:-"127.0.0.1"}
-VT_PORT=${VT_PORT:-"3306"}
-VT_DATABASE=${VT_DATABASE:-"vitess"}
-
 function show_and_drop_tables() {
   tables="$(mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
 
