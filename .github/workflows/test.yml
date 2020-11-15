@@ -11,6 +11,16 @@ jobs:
   run_tests:
     name: Frameworks
     runs-on: ubuntu-latest
+
+    services:
+      mysql8:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: test
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     strategy:
       fail-fast: false
       matrix:
@@ -39,9 +49,6 @@ jobs:
       - name: Print docker info
         run: docker info
 
-      - name: Start mysqld
-        run: sudo /etc/init.d/mysql start
-
       - name: Run test
         run: source lib.sh && run_test ${{ matrix['framework'] }}
         env:
@@ -49,4 +56,4 @@ jobs:
           VT_PASSWORD: root
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
-          VT_PORT: 3306
+          VT_PORT: ${{ job.services.mysql8.ports['3306'] }}
