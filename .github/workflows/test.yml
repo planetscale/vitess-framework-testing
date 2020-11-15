@@ -23,6 +23,7 @@ jobs:
           - 'java/spring'
           - 'javascript/sequelize'
           - 'javascript/typeorm'
+          - 'mysqldump/import'
           - 'php/laravel'
           - 'python/PyMySQL'
           - 'python/mysqlclient'
