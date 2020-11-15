@@ -56,4 +56,4 @@ jobs:
           VT_PASSWORD: root
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
-          VT_PORT: ${{ job.services.mysql8.ports['3306'] }}
+          VT_PORT: ${{ job.services.mysql8.ports[3306] }}
