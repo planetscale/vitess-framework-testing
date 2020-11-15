@@ -14,12 +14,10 @@ jobs:
 
     services:
       mysql8:
-        image: mysql:8
+        image: mysql:8.0
         ports:
           - 3306:3306
         env:
-          MYSQL_USER: vt_test
-          MYSQL_PASSWORD: vt_test
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
@@ -54,8 +52,8 @@ jobs:
       - name: Run test
         run: source lib.sh && run_test ${{ matrix['framework'] }}
         env:
-          VT_USERNAME: vt_test
-          VT_PASSWORD: vt_test
+          VT_USERNAME: root
+          VT_PASSWORD: root
           VT_DATABASE: test
-          VT_HOST: localhost
+          VT_HOST: 127.0.0.1
           VT_PORT: ${{ job.services.mysql8.ports['3306'] }}
