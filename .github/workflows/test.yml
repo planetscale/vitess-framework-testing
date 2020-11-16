@@ -16,7 +16,7 @@ jobs:
       mysql:
         image: mysql:5.7
         ports:
-          - 3306/tcp
+          - 3306:3306
         env:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
@@ -55,5 +55,5 @@ jobs:
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: test
-          VT_HOST: 0.0.0.0
+          VT_HOST: mysql
           VT_PORT: 3306
