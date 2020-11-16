@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+echo '--- Documented mysqldump options from https://vitess.io/docs/user-guides/configuration-basic/exporting-data/';
+mysqldump --lock-tables=off --set-gtid-purged=OFF --no-tablespaces "-h${VT_HOST}" "-P${VT_PORT}" "-u${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" >/dev/null;
+
+echo '--- No options';
+mysqldump "-h${VT_HOST}" "-P${VT_PORT}" "-u${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" >/dev/null;
+
+echo '--- --single-transaction';
+mysqldump --single-transaction "-h${VT_HOST}" "-P${VT_PORT}" "-u${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" >/dev/null;
+
