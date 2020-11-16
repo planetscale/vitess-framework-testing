@@ -1,4 +1,3 @@
-Warning: World-writable config file '/etc/my.cnf' is ignored
 -- MariaDB dump 10.17  Distrib 10.4.12-MariaDB, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: nextcloud
