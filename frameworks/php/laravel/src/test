@@ -4,6 +4,6 @@
 
 env | grep -v " " > .env;
 ./artisan migrate:install --no-interaction
-./artisan migrate:fresh --no-interaction
-./artisan db:seed --no-interaction
+yes | ./artisan migrate:fresh
+./artisan db:seed
 
