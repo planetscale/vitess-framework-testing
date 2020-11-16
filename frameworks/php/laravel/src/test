@@ -1,9 +1,5 @@
 #!/bin/sh -e
 
-# TODO:  Test running, not just migrations:  apache2-foreground
-
-env | grep -v " " > .env
-
 ./artisan migrate:install
 yes | ./artisan migrate:fresh
 yes | ./artisan db:seed
