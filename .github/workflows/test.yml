@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql8:
-        image: mysql:8.0
+      mysql57:
+        image: mysql:5.7
         ports:
-          - 33806:3306
+          - 33576:3306
         env:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
@@ -47,11 +47,11 @@ jobs:
         with:
           submodules: true
     
-      - name: Run test
+      - name: Run tests against upstream MySQL 5.7
         run: source lib.sh && run_test ${{ matrix['framework'] }}
         env:
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
-          VT_PORT: 33806
+          VT_PORT: 33576
