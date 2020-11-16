@@ -1,4 +1,0 @@
-#!/bin/sh
-docker build -t vitess/test/php/laravel .;
-docker run --rm -i --env-file=src/.env.example -e VT_HOST -e VT_PORT -e VT_USERNAME -e VT_PASSWORD -e VT_DATABASE -p8000:80 vitess/test/php/laravel;
-
