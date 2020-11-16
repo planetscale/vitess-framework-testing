@@ -1,12 +1,12 @@
-[submodule "rust/sqlx/upstream"]
-	path = rust/sqlx/upstream
-	url = https://github.com/launchbadge/sqlx.git
-[submodule "python/sqlalchemy/src/upstream"]
-	path = python/sqlalchemy/src/upstream
-	url = https://github.com/sqlalchemy/sqlalchemy.git
-[submodule "rust/mysql_async/upstream"]
-	path = rust/mysql_async/upstream
-	url = https://github.com/blackbeam/mysql_async
-[submodule "rust/mysql/upstream"]
-	path = rust/mysql/upstream
+[submodule "frameworks/rust/mysql/upstream"]
+	path = frameworks/rust/mysql/upstream
 	url = https://github.com/blackbeam/rust-mysql-simple.git
+[submodule "frameworks/rust/mysql_async/upstream"]
+	path = frameworks/rust/mysql_async/upstream
+	url = https://github.com/blackbeam/mysql_async.git
+[submodule "frameworks/python/sqlalchemy/src/upstream"]
+	path = frameworks/python/sqlalchemy/src/upstream
+	url = https://github.com/sqlalchemy/sqlalchemy.git
+[submodule "frameworks/rust/sqlx/upstream"]
+	path = frameworks/rust/sqlx/upstream
+	url = https://github.com/launchbadge/sqlx.git
