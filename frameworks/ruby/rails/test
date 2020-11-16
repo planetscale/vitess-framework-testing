@@ -1,5 +1,0 @@
-#!/bin/sh
-docker build -t vitess/test/ruby/rails .;
-# TODO:  Test running, not just migrations:  bundle exec rails s -p 80 -b 0.0.0.0
-docker run --rm -i -e VT_HOST -e VT_PORT -e VT_USERNAME -e VT_PASSWORD -e VT_DATABASE -p8000:80 vitess/test/ruby/rails;
-
