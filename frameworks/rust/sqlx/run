@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+git clone https://github.com/launchbadge/sqlx.git upstream
+
 DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}";
 
 (
