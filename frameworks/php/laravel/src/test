@@ -3,7 +3,7 @@
 # TODO:  Test running, not just migrations:  apache2-foreground
 
 env | grep -v " " > .env;
-./artisan migrate:install;
-./artisan migrate:fresh;
-./artisan db:seed
+./artisan migrate:install --no-interaction
+./artisan migrate:fresh --no-interaction
+./artisan db:seed --no-interaction
 
