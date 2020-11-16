@@ -5,6 +5,7 @@ default: &default
   username: <%= ENV['VT_USERNAME'] %>
   password: <%= ENV['VT_PASSWORD'] %>
   host: <%= ENV['VT_HOST'] %>
+  port: <%= ENV['VT_PORT'] %>
   variables:
     sql_mode: 'STRICT_ALL_TABLES,NO_AUTO_VALUE_ON_ZERO'
 
