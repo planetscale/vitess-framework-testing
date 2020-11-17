@@ -129,7 +129,6 @@ for filename in testfiles:
 					complete = True
 				except MySQLdb._exceptions.IntegrityError as e:
 					print(e)
-					pass
 		code = subprocess.call(['python3', filename], stdout = sys.stdout, stderr = sys.stderr)
 		if(code != 0):
 			sys.exit(code)
