@@ -61,6 +61,7 @@ exclude_files = [
 	'./sharding/separate_databases.py', # This only makes sense with four actual separate databases, and we can'"'"'t really do that with the simple sed replace in here
 	'./space_invaders/space_invaders.py',
 	'./versioned_history/test_versioning.py', # relative import problem again
+	'./versioned_rows/versioned_map.py',
 	'./versioned_rows/versioned_rows.py',
 	'./versioned_rows/versioned_rows_w_versionid.py',
 	'./versioned_rows/versioned_update_old_row.py',
@@ -126,8 +127,8 @@ for filename in testfiles:
 					tables = ','.join(['`' + table[0] + '`' for table in tables])
 					cursor.execute('DROP TABLE ' + tables)
 					complete = True
-				except MySQLdb._exceptions.IntegrityError:
-					pass
+				except MySQLdb._exceptions.IntegrityError as e:
+					print(e)
 		code = subprocess.call(['python3', filename], stdout = sys.stdout, stderr = sys.stderr)
 		if(code != 0):
 			sys.exit(code)
