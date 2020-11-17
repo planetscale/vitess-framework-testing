@@ -127,7 +127,8 @@ for filename in testfiles:
 					tables = ','.join(['`' + table[0] + '`' for table in tables])
 					cursor.execute('DROP TABLE ' + tables)
 					complete = True
-				except MySQLdb._exceptions.IntegrityError:
+				except MySQLdb._exceptions.IntegrityError as e:
+					print(e)
 					pass
 		code = subprocess.call(['python3', filename], stdout = sys.stdout, stderr = sys.stderr)
 		if(code != 0):
