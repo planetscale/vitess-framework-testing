@@ -1,10 +1,13 @@
 #!/bin/bash
 
-function show_and_drop_tables() {
-  tables="$(mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
+function cleanup_tables() {
+  mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL' 2>/dev/null | while read -r table key; do
+    echo "ALTER TABLE \`${table}\` DROP FOREIGN KEY \`${key}\`;";
+  done | mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" 2>/dev/null;
 
+  tables="$(mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW TABLES' 2>/dev/null | sed 's/^\|$/`/g' | xargs echo | sed 's/ /,/g')";
   if [[ "${tables}" != '' ]]; then
-    mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne "DROP TABLE ${tables}" &>/dev/null;
+    mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne "DROP TABLE ${tables}" 2>/dev/null;
   fi
 }
 
@@ -35,7 +38,7 @@ function run_test() {
   echo "${language}/${framework}: $?"
   popd >/dev/null || return
 
-  show_and_drop_tables
+  cleanup_tables
 }
 
 function validate_environment() {
@@ -48,3 +51,4 @@ function validate_environment() {
 function get_frameworks() {
   find frameworks -mindepth 2 -maxdepth 2 -prune -type d | cut -d'/' -f2-
 }
+
