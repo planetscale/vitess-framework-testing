@@ -46,6 +46,8 @@ main = defaultMain $ testCaseSteps "mysql-haskell test suite" $ \step -> do
                 || "5.7" `B.isPrefixOf` ver  -- from MySQL 5.6.4 and up
                                              -- TIME, DATETIME, and TIMESTAMP support fractional seconds
 
+    step "setting max_allowed_packet..."
+    execute_ c "SET GLOBAL max_allowed_packet=32 * 1024 * 1024"
 
     execute_ c "DROP TABLE IF EXISTS test"
     execute_ c "DROP TABLE IF EXISTS test_new"
