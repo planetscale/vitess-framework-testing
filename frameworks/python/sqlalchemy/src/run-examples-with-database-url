@@ -114,11 +114,12 @@ for filename in testfiles:
 	if(os.path.basename(filename) != '__init__.py' and filename not in exclude_files):
 		with connection.cursor() as cursor:
 			complete = False
-			# This retry loop is necessary because even dropping all the
-			#    tables at once will throw an error about foreign keys in
-			#    Vitess; it clears up after a couple tries, though.
 			while(not complete):
 				try:
+					cursor.execute('SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL')
+					keys = cursor.fetchall()
+					for (table, key) in keys:
+						cursor.execute('ALTER TABLE `%s` DROP FOREIGN KEY `%s`' % (table, key))
 					cursor.execute('SHOW TABLES')
 					tables = cursor.fetchall()
 					if(len(tables) == 0):
