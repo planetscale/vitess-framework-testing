@@ -9,9 +9,12 @@ RUN \
 	cabal update && \
 	cabal install --enable-profiling persistent-mysql mysql-simple tasty-hunit
 
-ADD src /src
-
 WORKDIR /src
+ADD src/test.cabal /src/
+RUN cabal v2-build --dependencies-only
+
+ADD src/* /src/
+
 RUN cabal v2-build
 
 ENTRYPOINT ["/src/dist-newstyle/build/x86_64-linux/ghc-8.6.5/test-0.1.0.0/build/test/test"]
