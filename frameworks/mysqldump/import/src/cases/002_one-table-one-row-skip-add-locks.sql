@@ -34,11 +34,9 @@ CREATE TABLE `partitioning` (
 -- Dumping data for table `partitioning`
 --
 
-LOCK TABLES `partitioning` WRITE;
 /*!40000 ALTER TABLE `partitioning` DISABLE KEYS */;
 INSERT INTO `partitioning` VALUES (1,1,'All');
 /*!40000 ALTER TABLE `partitioning` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -49,4 +47,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-11-12 15:40:20
+-- Dump completed on 2020-11-23 12:00:21
