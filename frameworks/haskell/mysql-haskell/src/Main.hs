@@ -50,6 +50,15 @@ main = defaultMain $ testCaseSteps "mysql-haskell test suite" $ \step -> do
     catch (void $ execute_ c "SET GLOBAL max_allowed_packet=33554432")
         (\ (e :: ERRException) -> return ())
 
+    step "spinning up fresh connection..."
+    c <- Database.MySQL.Base.connect defaultConnectInfo{
+        ciHost = host,
+        ciPort = read port :: PortNumber,
+        ciUser = pack user,
+        ciPassword = pack password,
+        ciDatabase = pack database
+    }
+
     execute_ c "DROP TABLE IF EXISTS test"
     execute_ c "DROP TABLE IF EXISTS test_new"
 
