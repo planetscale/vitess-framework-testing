@@ -47,7 +47,7 @@ main = defaultMain $ testCaseSteps "mysql-haskell test suite" $ \step -> do
                                              -- TIME, DATETIME, and TIMESTAMP support fractional seconds
 
     step "setting max_allowed_packet..."
-    catch (void $ execute_ c "SET GLOBAL max_allowed_packet=33554432")
+    catch (void $ execute_ c "SET GLOBAL max_allowed_packet=32 * 1024 * 1024")
         (\ (e :: ERRException) -> return ())
 
     step "spinning up fresh connection..."
