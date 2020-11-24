@@ -56,3 +56,10 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
+
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v1
+        with:
+          images: 'mysql:5.7'
+
