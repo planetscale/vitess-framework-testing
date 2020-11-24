@@ -46,6 +46,18 @@ main = defaultMain $ testCaseSteps "mysql-haskell test suite" $ \step -> do
                 || "5.7" `B.isPrefixOf` ver  -- from MySQL 5.6.4 and up
                                              -- TIME, DATETIME, and TIMESTAMP support fractional seconds
 
+    step "setting max_allowed_packet..."
+    catch (void $ execute_ c "SET GLOBAL max_allowed_packet=32 * 1024 * 1024")
+        (\ (e :: ERRException) -> return ())
+
+    step "spinning up fresh connection..."
+    c <- Database.MySQL.Base.connect defaultConnectInfo{
+        ciHost = host,
+        ciPort = read port :: PortNumber,
+        ciUser = pack user,
+        ciPassword = pack password,
+        ciDatabase = pack database
+    }
 
     execute_ c "DROP TABLE IF EXISTS test"
     execute_ c "DROP TABLE IF EXISTS test_new"

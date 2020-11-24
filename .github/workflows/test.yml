@@ -56,3 +56,4 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
+
