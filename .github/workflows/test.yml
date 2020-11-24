@@ -20,7 +20,8 @@ jobs:
         env:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3 docker-entrypoint.sh mysqld --max-allowed-packet=33554432
+        # TODO:  Specify options better so we don't need to do this, it's super janky
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3 mysql:5.7 docker-entrypoint.sh mysqld --max-allowed-packet=33554432
     strategy:
       fail-fast: false
       matrix:
