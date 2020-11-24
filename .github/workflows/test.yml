@@ -20,7 +20,7 @@ jobs:
         env:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3 --max-allowed-packet=33554432
     strategy:
       fail-fast: false
       matrix:
