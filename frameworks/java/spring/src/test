@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 cat src/main/resources/application.properties.tpl | envsubst > src/main/resources/application.properties;
 ./gradlew --no-daemon test;
 timeout -t 30 ./gradlew --no-daemon bootRun &
