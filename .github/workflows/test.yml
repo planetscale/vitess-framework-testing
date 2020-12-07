@@ -27,9 +27,6 @@ jobs:
       matrix:
         framework:
           - 'go/gorm'
-          - 'haskell/mysql-haskell'
-          - 'haskell/mysql-simple'
-          - 'haskell/persistent-mysql'
           - 'java/jdbc'
           - 'java/spring'
           - 'javascript/sequelize'
