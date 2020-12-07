@@ -23,6 +23,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         framework:
           - 'go/gorm'
