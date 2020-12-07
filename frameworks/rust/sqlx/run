@@ -2,10 +2,7 @@
 
 export DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}?ssl-mode=DISABLED";
 
-(
-	echo 'DROP TABLE IF EXISTS todos;';
-	cat migrations/*.sql;
-) | mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" || exit 1;
+sqlx migrate run
 
 cargo run
 
