@@ -18,7 +18,7 @@ sqlx = { path = "../../../", features = [ "mysql", "runtime-async-std-native-tls
 structopt = { version = "0.3", features = [ "paw" ] }
 EOF
 
-export DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}";
+export DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}?ssl-mode=DISABLED";
 
 (
 	echo 'DROP TABLE IF EXISTS todos;';
