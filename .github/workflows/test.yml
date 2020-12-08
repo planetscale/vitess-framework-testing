@@ -32,7 +32,6 @@ jobs:
           - 'javascript/sequelize'
           - 'javascript/typeorm'
           - 'mysqldump/export'
-          - 'mysqldump/import'
           - 'php/laravel'
           - 'python/PyMySQL'
           - 'python/mysqlclient'
