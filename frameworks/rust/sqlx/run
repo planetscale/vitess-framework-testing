@@ -1,29 +1,8 @@
 #!/bin/sh -e
 
-git clone https://github.com/launchbadge/sqlx.git upstream
-
-cat <<EOF > Cargo.toml
-[package]
-name = "sqlx-example-mysql-todos"
-version = "0.1.0"
-edition = "2018"
-workspace = "../../../"
-
-[dependencies]
-anyhow = "1.0"
-async-std = { version = "1.5.0", features = [ "attributes" ] }
-futures = "0.3"
-paw = "1.0"
-sqlx = { path = "../../../", features = [ "mysql", "runtime-async-std-native-tls" ] }
-structopt = { version = "0.3", features = [ "paw" ] }
-EOF
-
 export DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}?ssl-mode=DISABLED";
 
-(
-	echo 'DROP TABLE IF EXISTS todos;';
-	cat upstream/examples/mysql/todos/migrations/*.sql;
-) | mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" || exit 1;
+sqlx migrate run
 
 cargo run
 
