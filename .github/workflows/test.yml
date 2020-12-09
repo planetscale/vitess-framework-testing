@@ -80,3 +80,11 @@ jobs:
         with:
           images: 'mysql:5.7'
 
+      - name: Push test container images
+        if: github.ref == 'refs/heads/master'
+        run: |
+          source lib.sh
+          if contains "${{ steps.frameworks.outputs.changed }}" "${{ matrix['framework'] }}"; then
+            docker push "$(generate_image_name "${{ matrix['framework'] }}")"
+          fi
+
