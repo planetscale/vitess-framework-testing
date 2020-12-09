@@ -11,6 +11,8 @@ function cleanup_tables() {
   fi
 }
 
+# usage: run_test language/framework [build]
+#    if $2 is set to "build", test image for that framework will be built instead of pulling from gcr.io
 function run_test() {
   validate_environment
 
