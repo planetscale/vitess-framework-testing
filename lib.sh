@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# usage: contains "$list" "$value"
+#   returns success if $value is in $list; failure if not
+function contains() {
+  for item in $1; do
+    if [ "$item" == "$2" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 function cleanup_tables() {
   mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL' 2>/dev/null | while read -r table key; do
     echo "ALTER TABLE \`${table}\` DROP FOREIGN KEY \`${key}\`;";
