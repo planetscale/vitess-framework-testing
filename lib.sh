@@ -25,12 +25,16 @@ function run_test() {
     # The redirection here is intentional.
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
-    tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
+    tag="$(echo "gcr.io/planetscale-vitess-testing/frameworks/${language}/${framework}:latest" | tr '[:upper:]' '[:lower:]')"
+    acquire_image="docker pull ${tag}"
+    if [ "$2" == 'build' ]; then
+      acquire_image="docker build -t ${tag} ."
+    fi
     if ! [ -z "${QUIET}" ]; then
-      docker build -t "${tag}" . &>/dev/null
+      ${acquire_image} &>/dev/null
       docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
     else
-      docker build -t "${tag}" .
+      ${acquire_image}
       docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
     fi;
   fi
