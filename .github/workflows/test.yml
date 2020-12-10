@@ -39,6 +39,7 @@ jobs:
           - 'python/PyMySQL'
           - 'python/mysqlclient'
           - 'python/sqlalchemy'
+          - 'python/django'
           - 'ruby/rails'
           - 'rust/mysql'
           - 'rust/mysql_async'
