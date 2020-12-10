@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -77,11 +78,11 @@ WSGI_APPLICATION = 'psdb_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db1',
-        'USER': 'yujie',
-        'PASSWORD': 'password',
-        'HOST': 'a8fa7e6f7d64248ec9d9b97f0f635fcb-1759223906.us-east-1.elb.amazonaws.com',
-        'PORT': '3306',
+        'NAME': os.environ['VT_DATABASE'],
+        'USER': os.environ['VT_USERNAME'],
+        'PASSWORD': os.environ['VT_PASSWORD'],
+        'HOST': os.environ['VT_HOST'],
+        'PORT': os.environ['VT_PORT'],
     }
 }
 
