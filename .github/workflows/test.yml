@@ -36,6 +36,7 @@ jobs:
           - 'javascript/typeorm'
           - 'mysqldump/export'
           - 'php/laravel'
+          - 'python/django'
           - 'python/PyMySQL'
           - 'python/mysqlclient'
           - 'python/sqlalchemy'
