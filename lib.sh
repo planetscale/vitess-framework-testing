@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# usage: contains "$list" "$value"
+#   returns success if $value is in $list; failure if not
+function contains() {
+  for item in $1; do
+    if [ "$item" == "$2" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 function cleanup_tables() {
   mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL' 2>/dev/null | while read -r table key; do
     echo "ALTER TABLE \`${table}\` DROP FOREIGN KEY \`${key}\`;";
@@ -11,6 +22,13 @@ function cleanup_tables() {
   fi
 }
 
+# usage: generate_image_name "$language/$framework"
+function generate_image_name() {
+  echo "gcr.io/planetscale-vitess-testing/frameworks/${1}:latest" | tr '[:upper:]' '[:lower:]'
+}
+
+# usage: run_test language/framework [build]
+#    if $2 is set to "build", test image for that framework will be built instead of pulling from gcr.io
 function run_test() {
   validate_environment
 
@@ -25,12 +43,16 @@ function run_test() {
     # The redirection here is intentional.
     ./test &>/dev/null
   elif [ -e Dockerfile ]; then
-    tag="$(echo "${language}-${framework}-framework-testing:latest" | tr '[:upper:]' '[:lower:]')"
+    tag="$(generate_image_name "${language}/${framework}")"
+    acquire_image="docker pull ${tag}"
+    if [ "$2" == 'build' ]; then
+      acquire_image="docker build -t ${tag} ."
+    fi
     if ! [ -z "${QUIET}" ]; then
-      docker build -t "${tag}" . &>/dev/null
+      ${acquire_image} &>/dev/null
       docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
     else
-      docker build -t "${tag}" .
+      ${acquire_image}
       docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
     fi;
   fi
