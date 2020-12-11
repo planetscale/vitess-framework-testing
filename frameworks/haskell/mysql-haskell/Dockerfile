@@ -17,7 +17,8 @@ ADD src/* /src/
 
 RUN cabal v2-build --enable-profiling
 
-FROM fedora:32
+FROM debian:stretch-slim
+RUN apt-get update && apt-get install -y libgmp10 && rm -Rvf /var/lib/apt
 COPY --from=builder /src/dist-newstyle/build/x86_64-linux/ghc-8.6.5/test-0.1.0.0/x/test/build/test/test /test
 
 ENTRYPOINT ["/test", "+RTS", "-xc"]
