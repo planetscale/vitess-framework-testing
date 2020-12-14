@@ -1,14 +1,16 @@
 FROM ruby:2.6.5
 
-ADD src /src
+RUN gem update bundler
+
+ADD src/Gemfile /src/Gemfile
 WORKDIR /src
 ENV PATH /src/bin:$PATH
 
-RUN gem update bundler
+RUN bundle install --no-deployment & apt-get update && apt-get install -y yarnpkg && rm -Rvf /var/lib/apt && wait && rm -Rvf /src
+ADD src /src
+RUN bundle install && yarn install --check-files
 
-RUN bundle install --no-deployment & apt-get update && apt-get install -y yarnpkg && rm -Rvf /var/lib/apt && yarn install --check-files && wait
-
-ENV RAILS_ENV=prod
+ENV RAILS_ENV=production
 
 ENTRYPOINT ["rake", "db:migrate"]
 
