@@ -1,0 +1,12 @@
+current directory: /Users/skottler/planetscale/vitess-framework-testing/frameworks/ruby/rails6/src/vendor/cache/ruby/2.6.0/gems/bindex-0.8.1/ext/skiptrace
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby -I /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0 -r ./siteconf20201214-86934-m3imdm.rb extconf.rb
+creating Makefile
+
+current directory: /Users/skottler/planetscale/vitess-framework-testing/frameworks/ruby/rails6/src/vendor/cache/ruby/2.6.0/gems/bindex-0.8.1/ext/skiptrace
+make "DESTDIR=" clean
+
+current directory: /Users/skottler/planetscale/vitess-framework-testing/frameworks/ruby/rails6/src/vendor/cache/ruby/2.6.0/gems/bindex-0.8.1/ext/skiptrace
+make "DESTDIR="
+make: *** No rule to make target `/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/include/ruby-2.6.0/universal-darwin19/ruby/config.h', needed by `cruby.o'.  Stop.
+
+make failed, exit code 2
