@@ -6,7 +6,7 @@ ENV PATH /src/bin:$PATH
 
 RUN gem update bundler
 
-RUN bundle install & apt-get update && apt-get install -y yarnpkg && rm -Rvf /var/lib/apt && yarn install --check-files && wait
+RUN bundle install --no-deployment & apt-get update && apt-get install -y yarnpkg && rm -Rvf /var/lib/apt && yarn install --check-files && wait
 
 ENV RAILS_ENV=prod
 
