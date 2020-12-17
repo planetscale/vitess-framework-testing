@@ -76,15 +76,6 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
 
-      - name: Run tests against PSDB
-        run: source lib.sh && run_test ${{ matrix['framework'] }}
-        env:
-          VT_USERNAME: actions
-          VT_PASSWORD: ${{ secrets.VT_PASSWORD }}
-          VT_DATABASE: itest
-          VT_HOST: ${{ secrets.VT_HOST }}
-          VT_PORT: 3306
-
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
