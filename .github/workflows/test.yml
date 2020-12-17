@@ -57,7 +57,7 @@ jobs:
           echo -n '::set-output name=changed::'
           for changed_file in ${{ steps.files.outputs.all }}; do
               echo "${changed_file}";
-          done | grep '^frameworks/' | cut -d/ -f1-2 | uniq | xargs echo
+          done | grep '^frameworks/' | cut -d/ -f2-3 | uniq | xargs echo
           echo -n "\n"
     
       - name: Run tests against upstream MySQL 5.7
