@@ -85,11 +85,11 @@ jobs:
         with:
           images: 'mysql:5.7'
 
-      - name: Push test container images
-        if: github.ref == 'refs/heads/master'
+      - id: push
+        name: Push test container images
+        if: github.ref == 'refs/heads/master' && contains(steps.frameworks.outputs.changed, matrix.framework)
         run: |
           source lib.sh
-          if contains "${{ steps.frameworks.outputs.changed }}" "${{ matrix['framework'] }}"; then
-            docker push "$(generate_image_name "${{ matrix['framework'] }}")"
-          fi
+          echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io/
+          docker push "$(generate_image_name "${{ matrix.framework }}")"
 
