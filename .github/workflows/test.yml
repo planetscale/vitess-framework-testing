@@ -62,7 +62,6 @@ jobs:
     
       - name: Run tests against upstream MySQL 5.7
         run: |
-          echo "${{ steps.frameworks.outputs.changed }}"
           source lib.sh
           if contains "${{ steps.frameworks.outputs.changed }}" "${{ matrix['framework'] }}"; then
             run_test ${{ matrix['framework'] }} build
