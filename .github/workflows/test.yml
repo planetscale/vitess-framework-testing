@@ -90,6 +90,6 @@ jobs:
         if: github.ref == 'refs/heads/master' && contains(steps.frameworks.outputs.changed, matrix.framework)
         run: |
           source lib.sh
-          echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io/
+          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
           docker push "$(generate_image_name "${{ matrix.framework }}")"
 
