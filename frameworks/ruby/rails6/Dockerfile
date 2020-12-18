@@ -1,15 +1,18 @@
-FROM ruby:2.6.5
+FROM ruby:2.6.5-alpine
 
-RUN apt-get update && apt-get install -y yarnpkg && rm -Rvf /var/lib/apt
+RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata
 RUN gem update bundler
 
 ADD src/Gemfile /src/Gemfile
 WORKDIR /src
 ENV PATH /src/bin:$PATH
 
-RUN bundle install && rm -Rvf /src
+RUN \
+	apk add --no-cache --virtual .build-deps build-base sqlite-dev mariadb-connector-c-dev && \
+	bundle install && \
+	apk del .build-deps
 ADD src /src
-RUN bundle install && yarn install --check-files
+RUN yarn install --check-files
 
 ENV RAILS_ENV=production
 
