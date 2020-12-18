@@ -57,17 +57,21 @@ jobs:
           echo -n '::set-output name=changed::'
           for changed_file in ${{ steps.files.outputs.all }}; do
               echo "${changed_file}";
-          done | grep '^frameworks/' | cut -d/ -f1-2 | uniq | xargs echo
+          done | grep '^frameworks/' | cut -d/ -f2-3 | uniq | xargs echo
           echo -n "\n"
+
+      - id: build
+        name: Build changed containers
+        if: contains(steps.frameworks.outputs.changed, matrix.framework)
+        run: |
+          source lib.sh
+          cd "frameworks/${{ matrix['framework'] }}"
+          docker build -t "$(generate_image_name "${{ matrix['framework'] }}")" .
     
       - name: Run tests against upstream MySQL 5.7
         run: |
           source lib.sh
-          if contains "${{ steps.frameworks.outputs.changed }}" "${{ matrix['framework'] }}"; then
-            run_test ${{ matrix['framework'] }} build
-          else
-            run_test ${{ matrix['framework'] }}
-          fi
+          run_test ${{ matrix['framework'] }}
         env:
           VT_USERNAME: root
           VT_PASSWORD: root
@@ -90,11 +94,11 @@ jobs:
         with:
           images: 'mysql:5.7'
 
-      - name: Push test container images
-        if: github.ref == 'refs/heads/master'
+      - id: push
+        name: Push test container images
+        if: github.ref == 'refs/heads/master' && contains(steps.frameworks.outputs.changed, matrix.framework)
         run: |
           source lib.sh
-          if contains "${{ steps.frameworks.outputs.changed }}" "${{ matrix['framework'] }}"; then
-            docker push "$(generate_image_name "${{ matrix['framework'] }}")"
-          fi
+          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
+          docker push "$(generate_image_name "${{ matrix.framework }}")"
 
