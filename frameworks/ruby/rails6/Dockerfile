@@ -9,8 +9,10 @@ ENV PATH /src/bin:$PATH
 
 RUN \
 	apk add --no-cache --virtual .build-deps build-base sqlite-dev mariadb-connector-c-dev && \
-	bundle install -j"$(cat /proc/cpuinfo | grep 'cpu cores' | cut -d: -f2 | awk '{print $1}')" && \
-	apk del .build-deps
+	bundle install -j"$(cat /proc/cpuinfo | grep 'cpu cores' | cut -d: -f2 | awk '{print $1}')" --path=vendor/bundle && \
+	apk del .build-deps && \
+	rm -Rvf vendor/bundle/ruby/*/cache/*.gem && \
+	find vendor/bundle/ruby/*/gems -name '*.c' -or -name '*.o' -print -delete
 ADD src /src
 RUN yarn install --check-files
 
