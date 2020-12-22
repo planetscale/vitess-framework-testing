@@ -5,9 +5,7 @@ RUN \
 	apt-get install -y libmariadb-dev-compat libpcre3-dev libghc-hsopenssl-dev ghc-8.6.5-prof && \
 	rm -Rvf /var/lib/apt
 
-RUN \
-	cabal update && \
-	cabal install --enable-profiling persistent-mysql mysql-simple tasty-hunit
+RUN cabal update
 
 WORKDIR /src
 ADD src/test.cabal /src/
