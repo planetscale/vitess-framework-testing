@@ -5,9 +5,7 @@ RUN \
 	apt-get install -y libghc-hsopenssl-dev ghc-8.6.5-prof && \
 	rm -Rvf /var/lib/apt
 
-RUN \
-	cabal update && \
-	cabal install --enable-profiling mysql-haskell tasty-hunit
+RUN cabal update
 
 WORKDIR /src
 ADD src/test.cabal src/cabal.project.local /src/
