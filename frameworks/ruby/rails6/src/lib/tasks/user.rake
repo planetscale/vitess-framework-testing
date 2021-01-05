@@ -19,5 +19,10 @@ namespace :user do
 		table = Terminal::Table.new :rows => users
 		puts table
 	end
+
+	desc "Delete the first user"
+	task :delete_first do
+		users = User.all.first.destroy
+	end
 end
 
