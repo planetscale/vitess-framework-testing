@@ -13,6 +13,7 @@ namespace :user do
 		)
 	end
 
+	desc "List all users"
 	task :list do
 		users = User.all.collect { |user| [user.id, user.name, user.email, user.activated] }
 		table = Terminal::Table.new :rows => users
