@@ -8,4 +8,6 @@ rake user:delete_first;
 rake user:list | head;
 rake user:create;
 rake 'user:get[101]';
+rake 'user:set_name[101, "User Name"]';
+rake 'user:get[101]';
 
