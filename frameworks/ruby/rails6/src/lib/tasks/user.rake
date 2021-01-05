@@ -30,6 +30,13 @@ namespace :user do
 		puts table
 	end
 
+	desc "Set a user's name"
+	task :set_name, [:id, :name] do |t, args|
+		user = User.find_by! id: args[:id]
+		user.name = args[:name]
+		user.save!
+	end
+
 	desc "Delete the first user"
 	task :delete_first do
 		users = User.all.first.destroy
