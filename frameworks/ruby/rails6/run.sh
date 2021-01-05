@@ -3,6 +3,7 @@
 rake db:migrate;
 rake db:seed;
 rake user:create;
+rake 'user:get[101]';
 rake user:list;
 rake 'user:get[1]';
 rake user:delete_first;
