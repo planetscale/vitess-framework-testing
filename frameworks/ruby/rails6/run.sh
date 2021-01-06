@@ -1,4 +1,5 @@
 #!/bin/sh -ex
+set -o pipefail;
 
 rake db:migrate;
 rake db:seed;
@@ -10,4 +11,6 @@ rake user:create;
 rake 'user:get[101]';
 rake 'user:set_name[101, "User Name"]';
 rake 'user:get[101]';
+rake user:create_fail || true;
+rake user:list | tail;
 
