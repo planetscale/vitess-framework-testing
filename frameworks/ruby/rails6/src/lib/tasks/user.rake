@@ -41,5 +41,20 @@ namespace :user do
 	task :delete_first do
 		users = User.all.first.destroy
 	end
+
+	desc "Create a user in a transaction, but bomb out of the transaction"
+	task :create_fail do
+		ActiveRecord::Base.transaction do
+			user = User.create!(
+				name:                  Faker::Name.name,
+				email:                 Faker::Internet.email,
+				password:              "password",
+				password_confirmation: "password",
+				activated:             true,
+				activated_at:          Time.zone.now
+			)
+			raise StandardError, 'Nothing bad happened'
+		end
+	end
 end
 
