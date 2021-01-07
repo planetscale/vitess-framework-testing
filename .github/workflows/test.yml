@@ -61,14 +61,21 @@ jobs:
           echo -n "\n"
 
       - id: build
-        name: Build changed containers
+        name: Build changed tests and run against upstream MySQL 5.7
         if: contains(steps.frameworks.outputs.changed, matrix.framework)
         run: |
           source lib.sh
-          cd "frameworks/${{ matrix['framework'] }}"
-          docker build -t "$(generate_image_name "${{ matrix['framework'] }}")" .
+          run_test ${{ matrix.framework }} build
+        env:
+          VT_USERNAME: root
+          VT_PASSWORD: root
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33576
     
-      - name: Run tests against upstream MySQL 5.7
+      - id: run
+        name: Run unchanged tests against upstream MySQL 5.7
+        if: contains(steps.frameworks.outputs.changed, matrix.framework) != true
         run: |
           source lib.sh
           run_test ${{ matrix['framework'] }}
