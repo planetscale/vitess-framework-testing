@@ -1,0 +1,27 @@
+#!/bin/bash -ex
+
+export DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}/${VT_DATABASE}?ssl-mode=DISABLED"
+
+pushd all_about_inserts
+diesel database reset
+diesel database setup
+cargo test
+diesel database reset
+popd
+
+for dir in getting_started_step_*; do
+	pushd "${dir}"
+	diesel migration run
+	popd
+done
+
+cd getting_started_step_3
+sed -i 's/^\([a-z_]\+!\)/diesel::\1/' src/schema.rs
+cargo run --bin show_posts
+(echo 'test'; echo 'post body') | cargo run --bin write_post
+cargo run --bin show_posts
+cargo run --bin publish_post -- 1
+cargo run --bin show_posts
+cargo run --bin delete_post -- test
+cargo run --bin show_posts
+
