@@ -1,8 +1,9 @@
 #!/bin/bash
 
-source lib.sh
+dir="$(dirname "${0}")"
 
 QUIET=1;
-for framework in $(get_frameworks); do
-  run_test "${framework}" "$@"
+for framework in $("${dir}/run.sh" get_frameworks); do
+  "${dir}/run.sh" run_test "${framework}"
 done
+
