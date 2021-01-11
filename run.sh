@@ -72,3 +72,8 @@ function get_frameworks() {
   find frameworks -mindepth 2 -maxdepth 2 -prune -type d | cut -d'/' -f2-
 }
 
+cmd="${1}"
+shift
+
+"${cmd}" "$@"
+
