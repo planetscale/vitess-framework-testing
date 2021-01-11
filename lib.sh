@@ -27,7 +27,17 @@ function generate_image_name() {
   echo "gcr.io/planetscale-vitess-testing/frameworks/${1}:latest" | tr '[:upper:]' '[:lower:]'
 }
 
-# usage: run_test language/framework [build]
+# usage: pull_image "$language/$framework"
+function pull_image() {
+  docker pull "$(generate_image_name "${1}")"
+}
+
+# usage: build_iamge "$language/$frameowrk"
+function build_image() {
+  docker build -t "$(generate_image_name "${1}")" "frameworks/${1}"
+}
+
+# usage: run_test language/framework
 #    if $2 is set to "build", test image for that framework will be built instead of pulling from gcr.io
 function run_test() {
   validate_environment
@@ -39,15 +49,9 @@ function run_test() {
   pushd "frameworks/${language}/${framework}" >/dev/null || return
 
   tag="$(generate_image_name "${language}/${framework}")"
-  acquire_image="docker pull ${tag}"
-  if [ "$2" == 'build' ]; then
-    acquire_image="docker build -t ${tag} ."
-  fi
   if ! [ -z "${QUIET}" ]; then
-    ${acquire_image} &>/dev/null
     docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
   else
-    ${acquire_image}
     docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
   fi;
 
