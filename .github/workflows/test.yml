@@ -87,8 +87,24 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
 
-      - name: Run tests against PSDB
-        run: ./run.sh run_test "${{ matrix['framework'] }}"
+      - name: Run changed tests against PSDB
+        if: contains(steps.frameworks.outputs.changed, matrix.framework)
+        run: |
+          # TODO:  Reuse image from previous step instead of building it again
+          ./run.sh build_image "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: actions
+          VT_PASSWORD: ${{ secrets.VT_PASSWORD }}
+          VT_DATABASE: itest
+          VT_HOST: ${{ secrets.VT_HOST }}
+          VT_PORT: 3306
+
+      - name: Run unchanged tests against PSDB
+        if: contains(steps.frameworks.outputs.changed, matrix.framework) != true
+        run: |
+          ./run.sh pull "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: actions
           VT_PASSWORD: ${{ secrets.VT_PASSWORD }}
