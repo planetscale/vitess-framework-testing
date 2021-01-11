@@ -17,6 +17,7 @@ ADD src /src
 RUN yarn install --check-files
 
 ENV RAILS_ENV=production
+ADD run.sh /
 
-ENTRYPOINT ["rake", "db:migrate"]
+ENTRYPOINT ["/run.sh"]
 
