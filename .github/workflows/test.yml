@@ -103,7 +103,7 @@ jobs:
       - name: Run unchanged tests against PSDB
         if: contains(steps.frameworks.outputs.changed, matrix.framework) != true
         run: |
-          ./run.sh pull "${{ matrix.framework }}"
+          ./run.sh pull_image "${{ matrix.framework }}"
           ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: actions
