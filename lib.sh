@@ -38,24 +38,18 @@ function run_test() {
 
   pushd "frameworks/${language}/${framework}" >/dev/null || return
 
-  if [ -e test ]; then
-    # shellcheck disable=SC2065
-    # The redirection here is intentional.
-    ./test &>/dev/null
-  elif [ -e Dockerfile ]; then
-    tag="$(generate_image_name "${language}/${framework}")"
-    acquire_image="docker pull ${tag}"
-    if [ "$2" == 'build' ]; then
-      acquire_image="docker build -t ${tag} ."
-    fi
-    if ! [ -z "${QUIET}" ]; then
-      ${acquire_image} &>/dev/null
-      docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
-    else
-      ${acquire_image}
-      docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
-    fi;
+  tag="$(generate_image_name "${language}/${framework}")"
+  acquire_image="docker pull ${tag}"
+  if [ "$2" == 'build' ]; then
+    acquire_image="docker build -t ${tag} ."
   fi
+  if ! [ -z "${QUIET}" ]; then
+    ${acquire_image} &>/dev/null
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
+  else
+    ${acquire_image}
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
+  fi;
 
   echo "${language}/${framework}: $?"
   popd >/dev/null || return
