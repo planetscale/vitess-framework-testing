@@ -55,10 +55,12 @@ function run_test() {
     docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
   fi;
 
-  echo "${language}/${framework}: $?"
+  result="$?"
+  echo "${language}/${framework}: $result"
   popd >/dev/null || return
 
   cleanup_tables
+  return $result
 }
 
 function validate_environment() {
