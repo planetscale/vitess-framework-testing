@@ -14,7 +14,11 @@ To run the tests, there are five environment variables you need to set:  `VT_HOS
 Using a simple MySQL container as an example:
 ```bash
 docker run --name=mysql -d -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=testpassword mysql:5.7
-# Wait for container to start
+# ... wait for container to start ...
+# Note that simply doing a port forward with -p on the `docker run` line doesn't
+#    allow us to use `localhost` here, because the framework runs the tests in
+#    their own containers.  For that reason, we get the IP address for the MySQL
+#    container and use that.
 export VT_HOST="$(docker inspect mysql | jq -r '.[].NetworkSettings.IPAddress')"
 export VT_PORT=3306
 export VT_USERNAME=root
