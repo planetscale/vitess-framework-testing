@@ -39,5 +39,17 @@ New frameworks, languages, or tools can get added for testing by introducing the
        - Dockerfile (dockerfile)
        - build (entrypoint)
 
-Provided there is a `Dockerfile` _or_ `test` tests will start to automatically get run.
+Provided there is a `Dockerfile`, tests will be run automatically.  The guidelines for an individual test are as follows:
+* The test is run in a container.
+* As much as possible should be done at container build time
+  * Examples
+    * Any run-time dependencies should all be installed at build time
+    * For compiled languages, the code should be compiled and the binary placed in the image.
+      * One exception would be when database interaction at compile time is a feature of the framework; Rust `sqlx` is an example
+* The container's `ENTRYPOINT` is responsible for everything related to test setup, run, and teardown _EXCEPT_ running the database itself; the database will be provided by CI, and, for local test runs, is expected to be provided.
+  * Examples
+    * If the framework can be used for a "simple" program that just runs to completion and exits, that is preferable.  In this case, the program would create any tables it needs, run through code that exercises its database features (e.g. runs queries), drops the tables, then exits.
+    * If the framework is strictly used to setup a server, such as a web service, the container entrypoint should start the service as a background process, then interact with it in ways that exercise the database features.
+* The container's entrypoint should exit with a status code of 0 when the test succeeds, or nonzero if it fails in any way.
+* In cases when the test container fails prematurely, the framework will take care of cleaning up tables after each test.
 
