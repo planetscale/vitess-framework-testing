@@ -117,6 +117,31 @@ jobs:
           VT_HOST: ${{ secrets.VT_HOST }}
           VT_PORT: 3306
 
+      - name: Run changed tests against vttestserver
+        if: contains(steps.frameworks.outputs.changed, matrix.framework)
+        run: |
+          # TODO:  Reuse image from previous step instead of building it again
+          ./run.sh build_image "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33577
+
+      - name: Run unchanged tests against vttestserver
+        if: contains(steps.frameworks.outputs.changed, matrix.framework) != true
+        run: |
+          ./run.sh pull_image "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33577
+
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
