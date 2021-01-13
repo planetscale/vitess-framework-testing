@@ -21,6 +21,11 @@ jobs:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+      vttestserver:
+        image: vitess/vttestserver:mysql57
+        ports:
+          - 33577:27381
+        options: /vt/bin/vttestserver -keyspaces test -num_shards 1 -mysql_bind_host 0.0.0.0
     strategy:
       fail-fast: false
       max-parallel: 1
