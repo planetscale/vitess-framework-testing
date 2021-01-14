@@ -25,7 +25,10 @@ jobs:
         image: vitess/vttestserver:mysql57
         ports:
           - 33577:27381
-        options: --entrypoint="/vt/bin/vttestserver -keyspaces test -num_shards 1 -mysql_bind_host 0.0.0.0"
+        env:
+          KEYSPACES: test
+          NUM_SHARDS: "1"
+          MYSQL_BIND_HOST: "0.0.0.0"
     strategy:
       fail-fast: false
       max-parallel: 1
