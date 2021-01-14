@@ -1,0 +1,41 @@
+default: &default
+  pool: 5
+  timeout: 5000
+
+development:
+  <<: *default
+  adapter: sqlite3
+  database: db/development.sqlite3
+
+#development:
+#  <<: *default
+#  adapter: postgresql
+#  encoding: unicode
+#  host: db
+#  username: postgres
+#  password:
+#  database: sample_rails_app_db
+
+test:
+  <<: *default
+  adapter: sqlite3
+  database: db/test.sqlite3
+
+#test:
+#  <<: *default
+#  adapter: postgresql
+#  encoding: unicode
+#  host: db
+#  username: postgres
+#  password:
+#  database: sample_rails_app_db_test
+
+production:
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("VT_HOST") %>
+  database: <%= ENV.fetch("VT_DATABASE") %>
+  username: <%= ENV.fetch("VT_USERNAME") %>
+  password: <%= ENV.fetch("VT_PASSWORD") %>
+  port: <%= ENV.fetch("VT_PORT") %>
