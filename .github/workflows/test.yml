@@ -29,6 +29,7 @@ jobs:
           KEYSPACES: test
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
+      options: --health-cmd="mysqladmin ping -h127.0.0.1 -P27381" --health-interval=5s --health-timeout=2s --health-retries=3
     strategy:
       fail-fast: false
       max-parallel: 1
