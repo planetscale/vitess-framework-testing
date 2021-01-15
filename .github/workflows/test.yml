@@ -24,12 +24,13 @@ jobs:
       vttestserver:
         image: vitess/vttestserver:mysql57
         ports:
-          - 33577:27381
+          - 33577:33577
         env:
+          PORT: 33574
           KEYSPACES: test
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
-        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P27381" --health-interval=5s --health-timeout=2s --health-retries=5
+        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
     strategy:
       fail-fast: false
       max-parallel: 1
