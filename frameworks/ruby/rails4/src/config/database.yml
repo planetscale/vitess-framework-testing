@@ -15,6 +15,5 @@ development:
 
 production:
   <<: *default
-  database: <%= ENV['PRODUCTION_DATABASE'] %>
-  username: <%= ENV['PRODUCTION_DATABASE_USERNAME'] %>
-  password: <%= ENV['PRODUCTION_DATABASE_PASSWORD'] %>
+  database: <%= ENV['VT_DATABASE'] %>
+
