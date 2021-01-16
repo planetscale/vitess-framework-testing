@@ -20,7 +20,17 @@ jobs:
         env:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
+      vttestserver:
+        image: vitess/vttestserver:mysql57
+        ports:
+          - 33577:33577
+        env:
+          PORT: 33574
+          KEYSPACES: test
+          NUM_SHARDS: "1"
+          MYSQL_BIND_HOST: "0.0.0.0"
+        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -88,6 +98,31 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
 
+      - name: Run changed tests against vttestserver
+        if: contains(steps.frameworks.outputs.changed, matrix.framework)
+        run: |
+          # TODO:  Reuse image from previous step instead of building it again
+          ./run.sh build_image "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33577
+
+      - name: Run unchanged tests against vttestserver
+        if: contains(steps.frameworks.outputs.changed, matrix.framework) != true
+        run: |
+          ./run.sh pull_image "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33577
+
       - name: Run changed tests against PSDB
         if: contains(steps.frameworks.outputs.changed, matrix.framework)
         run: |
@@ -117,7 +152,7 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:
-          images: 'mysql:5.7'
+          images: 'mysql:5.7,vitess/vttestserver:mysql57'
 
       - id: push
         name: Push container images for changed tests
