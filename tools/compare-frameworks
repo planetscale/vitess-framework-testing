@@ -32,15 +32,15 @@ def compare_for_workflow(workflow_file):
     missing_from_workflow = missing(on_disk, in_workflow)
     missing_from_disk = missing(in_workflow, on_disk)
 
-    exit = True
+    success = True
     print("Workflow", workflow_file)
     if len(missing_from_workflow) > 0:
-        exit = False
+        success = False
         print("  Missing from workflow:", missing_from_workflow)
     if len(missing_from_disk) > 0:
-        exit = False
+        success = False
         print("  Missing from disk:", missing_from_disk)
-    return exit
+    return success
 
 exit = 0
 if(not compare_for_workflow("test.yml")):
