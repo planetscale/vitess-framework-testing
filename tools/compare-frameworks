@@ -18,34 +18,44 @@ def frameworks_on_disk():
     return sorted(frameworks)
 
 def frameworks_in_workflow(workflow_file):
-    with open(os.path.join(".github", "workflows", workflow_file)) as workflow:
+    with open(workflow_file) as workflow:
          config = yaml.load(workflow, Loader=yaml.SafeLoader)
          configured_frameworks = \
                 config['jobs']['run_tests']['strategy']['matrix']['framework']
 
     return sorted(configured_frameworks)
 
-def compare_for_workflow(workflow_file):
-    on_disk = frameworks_on_disk()
-    in_workflow = frameworks_in_workflow(workflow_file)
+def frameworks_in_config(config_file):
+    with open(config_file) as conf:
+        config = yaml.load(conf, Loader=yaml.SafeLoader)
+        configured_frameworks = config['frameworks']
+    return sorted(configured_frameworks)
 
-    missing_from_workflow = missing(on_disk, in_workflow)
-    missing_from_disk = missing(in_workflow, on_disk)
+def compare(name, configured):
+    on_disk = frameworks_on_disk()
+    missing_from_config = missing(on_disk, configured)
+    missing_from_disk = missing(configured, on_disk)
 
     success = True
-    print("Workflow", workflow_file)
-    if len(missing_from_workflow) > 0:
+    print(name)
+    if len(missing_from_config) > 0:
         success = False
-        print("  Missing from workflow:", missing_from_workflow)
+        print("  Missing from config:", missing_from_config)
     if len(missing_from_disk) > 0:
         success = False
         print("  Missing from disk:", missing_from_disk)
     return success
 
+def compare_for_workflow(workflow_file):
+    in_workflow = frameworks_in_workflow(workflow_file)
+    return compare('Workflow ' + workflow_file, in_workflow)
+
+def compare_for_config(config_file):
+    configured = frameworks_in_config(config_file)
+    return compare('Config ' + config_file, configured)
+
 exit = 0
-if(not compare_for_workflow("test.yml")):
-    exit = 1
-if(not compare_for_workflow("test-master.yml")):
+if(not compare_for_config(".github/frameworks.yaml")):
     exit = 1
 
 sys.exit(exit)
