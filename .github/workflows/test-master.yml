@@ -5,6 +5,16 @@ on:
       - master
 
 jobs:
+  determine_frameworks:
+    name: Get work
+    runs-on: ubuntu-latest
+    outputs:
+      frameworks: ${{ steps.frameworks.outputs.frameworks }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: frameworks
+        run: ./tools/get-frameworks
+
   run_tests:
     name: Frameworks
     runs-on: ubuntu-latest
@@ -32,26 +42,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        framework:
-          - 'go/gorm'
-          - 'haskell/mysql-haskell'
-          - 'haskell/mysql-simple'
-          - 'haskell/persistent-mysql'
-          - 'java/jdbc'
-          - 'java/spring'
-          - 'javascript/sequelize'
-          - 'javascript/typeorm'
-          - 'mysqldump/export'
-          - 'php/laravel'
-          - 'python/django'
-          - 'python/PyMySQL'
-          - 'python/mysqlclient'
-          - 'python/sqlalchemy'
-          - 'ruby/rails6'
-          - 'rust/diesel'
-          - 'rust/mysql'
-          - 'rust/mysql_async'
-          - 'rust/sqlx'
+        framework: ${{fromJSON(needs.determine_frameworks.outputs.frameworks)}}
     steps:
       - uses: actions/checkout@v2
         with:
