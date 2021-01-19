@@ -13,6 +13,7 @@ with open('.github/frameworks.yaml') as conf:
 if(os.environ.get('FILTER_FROM_STDIN') != None):
     filter_frameworks = {}
     files = json.load(sys.stdin)
+    print(json.dumps(files, indent = 4))
     for f in files:
         path = f.split(os.path.sep)
         if(len(path) < 3):
