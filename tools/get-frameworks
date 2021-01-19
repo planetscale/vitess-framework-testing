@@ -12,8 +12,9 @@ with open('.github/frameworks.yaml') as conf:
 
 if(os.environ.get('FILTER_FROM_STDIN') != None):
     filter_frameworks = {}
-    for line in sys.stdin:
-        path = line.rstrip().split(os.path.sep)
+    files = json.load(sys.stdin)
+    for f in files:
+        path = f.split(os.path.sep)
         if(len(path) < 3):
             continue
         if(path[0] != 'frameworks'):
