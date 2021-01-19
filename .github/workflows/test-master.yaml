@@ -8,7 +8,8 @@ jobs:
   determine_frameworks:
     name: Get work
     runs-on: ubuntu-latest
-
+    outputs:
+      frameworks: ${{ steps.frameworks.outputs.frameworks }}
     steps:
       - uses: actions/checkout@v2
       - id: frameworks
