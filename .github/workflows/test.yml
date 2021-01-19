@@ -11,7 +11,8 @@ jobs:
     outputs:
       frameworks: ${{ steps.frameworks.outputs.frameworks }}
     steps:
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: files
         uses: jitterbit/get-changed-files@v1
         with:
@@ -51,13 +52,15 @@ jobs:
       matrix:
         framework: ${{fromJSON(needs.determine_frameworks.outputs.frameworks)}}
     steps:
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
 
-      - id: build
+      - id: run-mysql57
         name: Build changed tests and run against upstream MySQL 5.7
         run: |
+          # TODO:  Once we figure out how to reuse images across steps, build in a separate step
           ./run.sh build_image "${{ matrix.framework }}"
           ./run.sh run_test "${{ matrix.framework }}"
         env:
@@ -66,8 +69,9 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
-    
-      - name: Run changed tests against vttestserver
+
+      - id: run-vttestserver
+        name: Run changed tests against vttestserver
         run: |
           # TODO:  Reuse image from previous step instead of building it again
           ./run.sh build_image "${{ matrix.framework }}"
@@ -79,7 +83,8 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
 
-      - name: Run changed tests against PSDB
+      - id: run-psdb
+        name: Run changed tests against PSDB
         run: |
           # TODO:  Reuse image from previous step instead of building it again
           ./run.sh build_image "${{ matrix.framework }}"
@@ -91,7 +96,8 @@ jobs:
           VT_HOST: ${{ secrets.VT_HOST }}
           VT_PORT: 3306
 
-      - name: Dump docker logs on failure
+      - id: logs
+        name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:

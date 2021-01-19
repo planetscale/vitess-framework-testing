@@ -11,7 +11,8 @@ jobs:
     outputs:
       frameworks: ${{ steps.frameworks.outputs.frameworks }}
     steps:
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: frameworks
         run: ./tools/get-frameworks
 
@@ -44,11 +45,12 @@ jobs:
       matrix:
         framework: ${{fromJSON(needs.determine_frameworks.outputs.frameworks)}}
     steps:
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
 
-      - id: run
+      - id: run-mysql57
         name: Run tests against upstream MySQL 5.7
         run: |
           ./run.sh pull_image "${{ matrix.framework }}"
@@ -60,7 +62,8 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
 
-      - name: Run tests against vttestserver
+      - id: run-vttestserver
+        name: Run tests against vttestserver
         run: |
           ./run.sh pull_image "${{ matrix.framework }}"
           ./run.sh run_test "${{ matrix.framework }}"
@@ -71,7 +74,8 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
 
-      - name: Run tests against PSDB
+      - id: run-psdb
+        name: Run tests against PSDB
         run: |
           # TODO:  Reuse image from previous step instead of building it again
           ./run.sh build_image "${{ matrix.framework }}"
@@ -83,7 +87,8 @@ jobs:
           VT_HOST: ${{ secrets.VT_HOST }}
           VT_PORT: 3306
 
-      - name: Dump docker logs on failure
+      - id: logs
+        name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:
