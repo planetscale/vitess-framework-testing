@@ -45,7 +45,7 @@ tests c = do
             \?     ,\
             \?     ,\
             \?)"
-            (replicate 50000
+            (replicate 9999
                 [ MySQLInt32 0
                 , MySQLBit 255
                 , MySQLInt8 (-128)
@@ -78,4 +78,4 @@ tests c = do
                 , MySQLText "foo,bar"
                 ]
             )
-    assertEqual "executeMany affected rows" (sum $ map okAffectedRows oks) 50000
+    assertEqual "executeMany affected rows" (sum $ map okAffectedRows oks) 9999
