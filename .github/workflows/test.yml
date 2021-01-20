@@ -56,12 +56,13 @@ jobs:
         with:
           submodules: true
 
+      - id: build
+        name: Build changed tests
+        run: ./run.sh build_image "${{ matrix.framework }}"
+
       - id: run-mysql57
         name: Build changed tests and run against upstream MySQL 5.7
-        run: |
-          # TODO:  Once we figure out how to reuse images across steps, build in a separate step
-          ./run.sh build_image "${{ matrix.framework }}"
-          ./run.sh run_test "${{ matrix.framework }}"
+        run: ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: root
           VT_PASSWORD: root
@@ -71,10 +72,7 @@ jobs:
 
       - id: run-vttestserver
         name: Run changed tests against vttestserver
-        run: |
-          # TODO:  Reuse image from previous step instead of building it again
-          ./run.sh build_image "${{ matrix.framework }}"
-          ./run.sh run_test "${{ matrix.framework }}"
+        run: ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: test
           VT_PASSWORD: test
