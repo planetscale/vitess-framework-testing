@@ -13,6 +13,7 @@ frameworks:
   - 'python/PyMySQL'
   - 'python/mysqlclient'
   - 'python/sqlalchemy'
+  - 'ruby/rails5'
   - 'ruby/rails6'
   - 'rust/diesel'
   - 'rust/mysql'
