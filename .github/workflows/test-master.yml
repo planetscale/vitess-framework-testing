@@ -42,7 +42,6 @@ jobs:
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         framework: ${{ fromJSON(needs.determine_frameworks.outputs.frameworks) }}
     steps:
@@ -75,23 +74,17 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
 
-      - id: run-psdb
-        name: Run tests against PSDB
-        run: |
-          # TODO:  Reuse image from previous step instead of building it again
-          ./run.sh build_image "${{ matrix.framework }}"
-          ./run.sh run_test "${{ matrix.framework }}"
-        env:
-          VT_USERNAME: actions
-          VT_PASSWORD: ${{ secrets.VT_PASSWORD }}
-          VT_DATABASE: itest
-          VT_HOST: ${{ secrets.VT_HOST }}
-          VT_PORT: 3306
-
       - id: logs
         name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:
           images: 'mysql:5.7,vitess/vttestserver:mysql57'
+
+      - id: push
+        name: Push container images for changed tests
+        if: success() || failure()
+        run: |
+          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
+          docker push "$(./run.sh generate_image_name "${{ matrix.framework }}")"
 
