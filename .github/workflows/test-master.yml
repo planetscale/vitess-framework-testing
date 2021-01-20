@@ -10,11 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frameworks: ${{ steps.frameworks.outputs.frameworks }}
+      changed_frameworks: ${{ fromJSON(steps.changed_frameworks.outputs.frameworks) }}
     steps:
       - id: checkout
         uses: actions/checkout@v2
       - id: frameworks
         run: ./tools/get-frameworks
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: 'json'
+      - id: changed_frameworks
+        env:
+          FILTER_FROM_STDIN: "1"
+        run: ./tools/get-frameworks <<<'${{ steps.files.outputs.all }}'
 
   run_tests:
     name: Frameworks
@@ -50,8 +59,22 @@ jobs:
         with:
           submodules: true
 
+      - id: build
+        name: Build changed tests and run them against against upstream MySQL 5.7
+        if: contains(needs.determine_frameworks.outputs.changed_frameworks)
+        run: |
+          ./run.sh build_image "${{ matrix.framework }}"
+          ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: root
+          VT_PASSWORD: root
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 3306
+
       - id: run-mysql57
-        name: Run tests against upstream MySQL 5.7
+        name: Run unchanged tests against upstream MySQL 5.7
+        if: contains(needs.determine_frameworks.outputs.changed_frameworks) != true
         run: |
           ./run.sh pull_image "${{ matrix.framework }}"
           ./run.sh run_test "${{ matrix.framework }}"
@@ -83,7 +106,7 @@ jobs:
 
       - id: push
         name: Push container images for changed tests
-        if: success() || failure()
+        if: (success() || failure()) && contains(steps.frameworks.outputs.changed, matrix.framework)
         run: |
           echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
           docker push "$(./run.sh generate_image_name "${{ matrix.framework }}")"
