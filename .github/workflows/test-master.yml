@@ -1,6 +1,6 @@
-name: Integration tests
+name: Full suite of integration tests
 on:
-  pull_request:
+  push:
     branches:
       - master
 
@@ -13,14 +13,8 @@ jobs:
     steps:
       - id: checkout
         uses: actions/checkout@v2
-      - id: files
-        uses: jitterbit/get-changed-files@v1
-        with:
-          format: 'json'
       - id: frameworks
-        env:
-          FILTER_FROM_STDIN: "1"
-        run: ./tools/get-frameworks <<<'${{ steps.files.outputs.all }}'
+        run: ./tools/get-frameworks
 
   run_tests:
     name: Frameworks
@@ -58,10 +52,9 @@ jobs:
           submodules: true
 
       - id: run-mysql57
-        name: Build changed tests and run against upstream MySQL 5.7
+        name: Run tests against upstream MySQL 5.7
         run: |
-          # TODO:  Once we figure out how to reuse images across steps, build in a separate step
-          ./run.sh build_image "${{ matrix.framework }}"
+          ./run.sh pull_image "${{ matrix.framework }}"
           ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: root
@@ -71,10 +64,9 @@ jobs:
           VT_PORT: 33576
 
       - id: run-vttestserver
-        name: Run changed tests against vttestserver
+        name: Run tests against vttestserver
         run: |
-          # TODO:  Reuse image from previous step instead of building it again
-          ./run.sh build_image "${{ matrix.framework }}"
+          ./run.sh pull_image "${{ matrix.framework }}"
           ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: test
@@ -84,7 +76,7 @@ jobs:
           VT_PORT: 33577
 
       - id: run-psdb
-        name: Run changed tests against PSDB
+        name: Run tests against PSDB
         run: |
           # TODO:  Reuse image from previous step instead of building it again
           ./run.sh build_image "${{ matrix.framework }}"
@@ -102,11 +94,4 @@ jobs:
         uses: jwalton/gh-docker-logs@v1
         with:
           images: 'mysql:5.7,vitess/vttestserver:mysql57'
-
-      - id: push
-        name: Push container images for changed tests
-        if: (success() || failure()) && github.ref == 'refs/heads/master' && contains(steps.frameworks.outputs.changed, matrix.framework)
-        run: |
-          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
-          docker push "$(./run.sh generate_image_name "${{ matrix.framework }}")"
 
