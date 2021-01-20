@@ -48,7 +48,6 @@ jobs:
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         framework: ${{ fromJSON(needs.determine_frameworks.outputs.frameworks) }}
     steps:
@@ -82,19 +81,6 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
-
-      - id: run-psdb
-        name: Run changed tests against PSDB
-        run: |
-          # TODO:  Reuse image from previous step instead of building it again
-          ./run.sh build_image "${{ matrix.framework }}"
-          ./run.sh run_test "${{ matrix.framework }}"
-        env:
-          VT_USERNAME: actions
-          VT_PASSWORD: ${{ secrets.VT_PASSWORD }}
-          VT_DATABASE: itest
-          VT_HOST: ${{ secrets.VT_HOST }}
-          VT_PORT: 3306
 
       - id: logs
         name: Dump docker logs on failure
