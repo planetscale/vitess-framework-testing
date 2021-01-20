@@ -89,10 +89,3 @@ jobs:
         with:
           images: 'mysql:5.7,vitess/vttestserver:mysql57'
 
-      - id: push
-        name: Push container images for changed tests
-        if: (success() || failure()) && github.ref == 'refs/heads/master' && contains(steps.frameworks.outputs.changed, matrix.framework)
-        run: |
-          echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
-          docker push "$(./run.sh generate_image_name "${{ matrix.framework }}")"
-
