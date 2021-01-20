@@ -61,7 +61,7 @@ jobs:
         run: ./run.sh build_image "${{ matrix.framework }}"
 
       - id: run-mysql57
-        name: Build changed tests and run against upstream MySQL 5.7
+        name: Run changed tests against upstream MySQL 5.7
         run: ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: root
