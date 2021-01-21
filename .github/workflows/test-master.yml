@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frameworks: ${{ steps.frameworks.outputs.frameworks }}
-      changed_frameworks: ${{ fromJSON(steps.changed_frameworks.outputs.frameworks) }}
+      changed_frameworks: ${{ steps.changed_frameworks.outputs.frameworks }}
     steps:
       - id: checkout
         uses: actions/checkout@v2
@@ -23,6 +23,7 @@ jobs:
       - id: changed_frameworks
         env:
           FILTER_FROM_STDIN: "1"
+          OUTPUT: plain
         run: ./tools/get-frameworks <<<'${{ steps.files.outputs.all }}'
 
   run_tests:
