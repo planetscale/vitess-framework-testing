@@ -61,12 +61,12 @@ jobs:
 
       - id: build
         name: Build changed tests
-        if: contains(needs.determine_frameworks.outputs.changed_frameworks)
+        if: contains(needs.determine_frameworks.outputs.changed_frameworks, matrix.framework)
         run: ./run.sh build_image "${{ matrix.framework }}"
 
       - id: pull
         name: Pull unchanged tests
-        if: contains(needs.determine_frameworks.outputs.changed_frameworks) != true
+        if: contains(needs.determine_frameworks.outputs.changed_frameworks, matrix.framework) != true
         run: ./run.sh pull_image "${{ matrix.framework }}"
 
       - id: run-mysql57
