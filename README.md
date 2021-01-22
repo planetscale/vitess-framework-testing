@@ -28,6 +28,26 @@ export VT_DATABASE=test
 ./alltests.sh # Runs the entire test suite
 ```
 
+#### Testing local changes
+
+To test local changes to a test, there are two steps - build the test's container image, and run it.
+* To build, simply run `./run.sh build_image "$language/$framework", e.g. `./run.sh build_image rust/mysql_async`
+* To run, follow the instructions under "Running the tests", above.
+
+##### Example
+
+Using vttestserver as an example:
+```bash
+docker run --name=vttestserver -d -e PORT=33574 -e KEYSPACES=test -e NUM_SHARDS=1 -e MYSQL_BIND_HOST=0.0.0.0 vitess/vttestserver:mysql57
+export VT_HOST="$(docker inspect vttestserver | jq -r '.[].NetworkSettings.IPAddress')"
+export VT_PORT=3306
+export VT_USERNAME=root
+export VT_PASSWORD=testpassword
+export VT_DATABASE=test
+./run.sh run_test ruby/rails6
+./alltests.sh
+```
+
 #### Introducing a new framework
 
 New frameworks, languages, or tools can get added for testing by introducing the following directory structure:
