@@ -46,18 +46,18 @@ function run_test() {
   language="$(echo "$1" | cut -d'/' -f1)"
   framework="$(echo "$1" | cut -d'/' -f2)"
 
-  pushd "frameworks/${language}/${framework}" >/dev/null || return
-
   if [[ $2 == "build" ]]; then
     build_image "${language}/${framework}"
   fi
 
+  pushd "frameworks/${language}/${framework}" >/dev/null || return
+
   tag="$(generate_image_name "${language}/${framework}")"
 
   if ! [ -z "${QUIET}" ]; then
-   docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
   else
-   docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
   fi;
 
   result="$?"
