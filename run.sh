@@ -34,30 +34,25 @@ function pull_image() {
 
 # usage: build_iamge "$language/$frameowrk"
 function build_image() {
-  docker build -t "$(generate_image_name "${1}")" "./frameworks/${1}/"
+  docker build -t "$(generate_image_name "${1}")" "frameworks/${1}"
 }
-
 
 # usage: run_test language/framework
 #    if $2 is set to "build", test image for that framework will be built instead of pulling from gcr.io
 function run_test() {
   validate_environment
+
   local language framework
   language="$(echo "$1" | cut -d'/' -f1)"
   framework="$(echo "$1" | cut -d'/' -f2)"
 
   pushd "frameworks/${language}/${framework}" >/dev/null || return
 
-  if [[ $2 == "build" ]]; then
-    build_image "${language}/${framework}"
-  fi
-
   tag="$(generate_image_name "${language}/${framework}")"
-
   if ! [ -z "${QUIET}" ]; then
-   docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
   else
-   docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
   fi;
 
   result="$?"
