@@ -15,3 +15,14 @@ Displays all frameworks available
 ```
 --list_frameworks or -listf
 ```
+
+Displays are docker images built with tag prefix vft-
+```
+--list_images or -listi
+```
+
+Displays all docker containers with tag prefix vft-
+```
+--list_contianers or -listc
+```
+ 
