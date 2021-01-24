@@ -59,4 +59,3 @@ if(not compare_for_config(".github/frameworks.yaml")):
     exit = 1
 
 sys.exit(exit)
-

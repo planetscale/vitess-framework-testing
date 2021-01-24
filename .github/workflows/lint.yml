@@ -29,4 +29,4 @@ jobs:
           submodules: true
 
       - name: Compare on-disk to test.yml
-        run: ./tools/compare-frameworks
+        run: ./tools/workflow/compare_frameworks
