@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Runs each of the frameworks using a ClI
-TODO: Add a verbose mode
+All builds are done locally 
 '''
 
 import click
@@ -35,6 +35,10 @@ def main(runall,list_frameworks,run_framework,list_images,list_contianers):
     # Lists all docker images build
     elif list_images:
         images_on_disk()
+
+    # Lists all continers running
+    elif list_contianers:
+        containers_on_disk()
 
     # Display --help information when no flag is called
     else:

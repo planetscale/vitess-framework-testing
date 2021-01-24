@@ -1,8 +1,8 @@
 '''
 List Information
    - Frameworks avaliable
-   - Docker Containers Build
-   - Docker Containers Running
+   - Docker Images
+   - Docker Containers
 '''
 import glob
 import pathlib
@@ -40,4 +40,13 @@ def images_on_disk():
 
 # Print containers that only belong with prefix vft-
 def containers_on_disk():
-    print(client.continers.list())
+    # Shape [[Docker tag, Name, status,ports],..n]
+    containers_output = []
+
+    for i in client.containers.list():
+        if i.image.tags[0].startswith("vft-"):
+           containers_output.append([i.image.tags[0],i.name,i.status,i.ports])
+    print(containers_output)
+
+    #Prints in table format
+    print(tabulate(containers_output, ["Docker Tag","Name","Status","Port"], tablefmt="pretty"))
