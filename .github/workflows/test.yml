@@ -20,7 +20,7 @@ jobs:
       - id: frameworks
         env:
           FILTER_FROM_STDIN: "1"
-        run: ./tools/get-frameworks <<<'${{ steps.files.outputs.all }}'
+        run: ./tools/workflow/get-frameworks <<<'${{ steps.files.outputs.all }}'
 
   run_tests:
     name: Frameworks
@@ -86,4 +86,3 @@ jobs:
         uses: jwalton/gh-docker-logs@v1
         with:
           images: 'mysql:5.7,vitess/vttestserver:mysql57'
-
