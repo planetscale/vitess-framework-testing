@@ -39,21 +39,57 @@ def rails_generate_migration(migration_name):
     else:
         sys.exit("Did not find filename in rails output:"+railsOutput)
 
-# writeToFile writes to a file
-def writeToFile(fileName, textToWrite):
+# rails_command_with_timestamp  is used to run a rails command and return its timestamp
+def rails_command_with_timestamp(command):
+    railsOutput = command_with_ouput(command)
+    
+    isPresent = re.search('db/migrate/([0-9]*)',railsOutput)
+    if isPresent:
+        return isPresent.group(1)
+    else:
+        sys.exit("Did not find filename in rails output:"+railsOutput)
+
+def revert_to_timestamp(revert_timestamp):
+    command("rake db:migrate VERSION="+revert_timestamp)
+    ls_output = command_with_ouput("ls db/migrate")
+    files = ls_output.split('\n')
+    for filename in files:
+        timestamp = get_timestamp_from_filename(filename)
+        if timestamp == "" or timestamp <= revert_timestamp:
+            continue
+        command("rm db/migrate/"+filename)
+
+def revert_before_timestamp(revert_timestamp):
+    command("rake db:migrate VERSION="+revert_timestamp)
+    command("rake db:rollback")
+    ls_output = command_with_ouput("ls db/migrate")
+    files = ls_output.split('\n')
+    for filename in files:
+        timestamp = get_timestamp_from_filename(filename)
+        if timestamp == "" or timestamp < revert_timestamp:
+            continue
+        command("rm db/migrate/"+filename)
+
+def get_timestamp_from_filename(filename):
+    if len(filename) < 14:
+        return ""
+    return filename[0:14]
+
+# write_to_file writes to a file
+def write_to_file(fileName, textToWrite):
     with open(fileName,"w") as f:
         f.write(textToWrite)
 
-# Migration Overview
+# 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
-command("rails generate model product name:string description:text")
+initial_timestamp = rails_command_with_timestamp("rails generate migration CreateProducts name:string description:text")
 rake_migrate()
 # Implicit in the guide
 command("rails generate migration add_price_to_product price:integer")
 rake_migrate()
 # Change Product Size
 filename = rails_generate_migration("ChangeProductsPrice")
-writeToFile(filename,"""class ChangeProductsPrice < ActiveRecord::Migration[6.0]
+write_to_file(filename,"""class ChangeProductsPrice < ActiveRecord::Migration[6.0]
   def change
     reversible do |dir|
       change_table :products do |t|
@@ -65,3 +101,28 @@ writeToFile(filename,"""class ChangeProductsPrice < ActiveRecord::Migration[6.0]
 end""")
 rake_migrate()
 
+# 2. Creating a Migration
+# https://guides.rubyonrails.org/active_record_migrations.html#creating-a-migration
+# 2.1 Creating a Standalone Migration
+# https://guides.rubyonrails.org/active_record_migrations.html#creating-a-standalone-migration
+command("rails generate migration AddPartNumberToProducts part_number:string")
+rake_migrate()
+command("rails generate migration RemovePartNumberFromProducts part_number:string")
+rake_migrate()
+# Revert to initial timestamp to add a migration with the same filename as before
+revert_to_timestamp(initial_timestamp)
+command("rails generate migration AddPartNumberToProducts part_number:string:index")
+rake_migrate()
+# Revert to initial timestamp to add a column that we have already added
+revert_to_timestamp(initial_timestamp)
+rake_migrate()
+command("rails generate migration AddDetailsToProducts part_number:string price:decimal")
+rake_migrate()
+# revert before the initial timestamp to remove the products table and create it again
+revert_before_timestamp(initial_timestamp)
+command("rails generate migration CreateProducts name:string part_number:string")
+rake_migrate()
+command("rails generate migration AddUserRefToProducts user:references")
+rake_migrate()
+command("rails generate migration CreateJoinTableCustomerProduct customer product")
+rake_migrate()
