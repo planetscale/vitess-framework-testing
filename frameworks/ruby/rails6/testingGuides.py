@@ -120,9 +120,15 @@ command("rails generate migration AddDetailsToProducts part_number:string price:
 rake_migrate()
 # revert before the initial timestamp to remove the products table and create it again
 revert_before_timestamp(initial_timestamp)
-command("rails generate migration CreateProducts name:string part_number:string")
+initial_timestamp = rails_command_with_timestamp("rails generate migration CreateProducts name:string part_number:string")
 rake_migrate()
 command("rails generate migration AddUserRefToProducts user:references")
 rake_migrate()
 command("rails generate migration CreateJoinTableCustomerProduct customer product")
 rake_migrate()
+
+# 2.2 Model Generators
+# https://guides.rubyonrails.org/active_record_migrations.html#model-generators
+# Revert the previous creation of migration for product, since it is going to be done now
+revert_before_timestamp(initial_timestamp)
+command("rails generate model Product name:string description:text")
