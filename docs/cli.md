@@ -25,4 +25,3 @@ Displays all docker containers with tag prefix vft-
 ```
 --list_contianers or -listc
 ```
- 

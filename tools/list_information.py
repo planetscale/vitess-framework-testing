@@ -20,7 +20,7 @@ def frameworks_on_disk():
 
     # Prints all frameworks avaliable
     for framework in sorted(frameworks):
-        print(sorted(frameworks))
+        print(framework)
 
     #return sorted(frameworks)
 

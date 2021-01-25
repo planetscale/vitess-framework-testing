@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 '''
 Runs each of the frameworks using a ClI
-All builds are done locally 
+All builds are done locally
 '''
 
 import click
 import sys
 
 sys.path.insert(1, 'tools/')
+
 from list_information import *
+from run_framework import *
 
 
 @click.command()
@@ -26,7 +28,7 @@ def main(runall,list_frameworks,run_framework,list_images,list_contianers):
 
     # Runs specific framework
     elif run_framework:
-        print("run specific framework")
+        build_run_framework(run_framework)
 
     # Lists all frameworks avaliable
     elif list_frameworks:
