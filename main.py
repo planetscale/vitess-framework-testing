@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 '''
-Runs each of the frameworks using a ClI
-All builds are done locally
+--------------------------------------------------------------------------------------------------------------
+- Runs each of the frameworks using a ClI
+- All builds are done locally
+- View more -> docs/cli.md
+--------------------------------------------------------------------------------------------------------------
 '''
 
 import click
@@ -12,6 +15,7 @@ sys.path.insert(1, 'tools/')
 from list_information import *
 from run_framework import *
 
+# ----------------------------------------------- CLI flags --------------------------------------------------------
 
 @click.command()
 @click.option("--runall", is_flag=True, help="runs all framework tests and does a local build of each docker container")
@@ -20,11 +24,15 @@ from run_framework import *
 @click.option("--list_images", "-listi", is_flag=True, help="Lists all docker images")
 @click.option("--list_contianers", "-listc", is_flag=True, help="Lists all docker list_contianers")
 
+# -------------------------------------------------------------------------------------------------------------------
+# -------------------------------------- Actions when flags are called ----------------------------------------------
+
 def main(runall,list_frameworks,run_framework,list_images,list_contianers):
 
     # Runs all the frameworks
     if runall:
-        print("run all frameworks")
+        for i in frameworks_on_disk():
+            build_run_framework(i)
 
     # Runs specific framework
     elif run_framework:
@@ -46,6 +54,8 @@ def main(runall,list_frameworks,run_framework,list_images,list_contianers):
     else:
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
+
+# -------------------------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     main()

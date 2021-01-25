@@ -1,8 +1,10 @@
 '''
+--------------------------------------------------------------------------------------------------------------
 List Information
    - Frameworks avaliable
    - Docker Images
    - Docker Containers
+--------------------------------------------------------------------------------------------------------------
 '''
 import glob
 import pathlib
@@ -11,6 +13,8 @@ from tabulate import tabulate
 
 # Get docker information from environment variables
 client = docker.from_env()
+
+# ----------------------------- Listing information about frameworks avalaible --------------------------------
 
 def frameworks_on_disk():
     frameworks = []
@@ -22,9 +26,11 @@ def frameworks_on_disk():
     for framework in sorted(frameworks):
         print(framework)
 
-    #return sorted(frameworks)
+    return sorted(frameworks)
 
-# Prints images that only belong with prefix vft-
+# --------------------------------------------------------------------------------------------------------------
+# -------------------------- Prints images that only belong with prefix vft- -----------------------------------
+
 def images_on_disk():
     # Shape [[Docker tag, short id],..n]
     images_output = []
@@ -38,7 +44,9 @@ def images_on_disk():
     # Prints in table format
     print(tabulate(images_output, ["Tag name","Short ID"], tablefmt="pretty"))
 
-# Print containers that only belong with prefix vft-
+# ---------------------------------------------------------------------------------------------------------------
+# -------------------------- Print containers that only belong with prefix vft- ---------------------------------
+
 def containers_on_disk():
     # Shape [[Docker tag, Name, status,ports],..n]
     containers_output = []
@@ -46,7 +54,8 @@ def containers_on_disk():
     for i in client.containers.list():
         if i.image.tags[0].startswith("vft-"):
            containers_output.append([i.image.tags[0],i.name,i.status,i.ports])
-    print(containers_output)
 
     #Prints in table format
     print(tabulate(containers_output, ["Docker Tag","Name","Status","Port"], tablefmt="pretty"))
+
+# ---------------------------------------------------------------------------------------------------------------
