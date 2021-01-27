@@ -1,5 +1,6 @@
 import os
 import sys
+import shlex
 import subprocess
 import re
 import mysql.connector
@@ -10,22 +11,29 @@ from mysql.connector import Error
 
 # commamd is used to run bash commands and check that they succeeded
 def command(cmd):
-    sp = subprocess.run(cmd.split(" "))
+    sp = subprocess.run(shlex.split(cmd))
     if sp.returncode != 0 :
         sys.exit(sp.returncode)
 
 # commamd_with_ouput is used to run bash commands and return their outputs
 def command_with_ouput(cmd):
+<<<<<<< HEAD
     sp = subprocess.run(cmd.split(" "), capture_output=True, text = True)
 
+=======
+    sp = subprocess.run(shlex.split(cmd), capture_output=True, text = True)
+>>>>>>> 4e4be3e48ce210e424b7d97e4b75fb920f98bc85
     if sp.returncode != 0:
         print(sp.stderr)
         sys.exit(sp.returncode)
     return sp.stdout
 
-# rake_migrate runs the db:migrate command from rake
-def rake_migrate():
-    command("rake db:migrate")
+# rake_migrate runs the db:migrate command from rake. It also adds the VERSION argument if it is passed
+def rake_migrate(version=""):
+    if version == "":
+        command("rails db:migrate")
+    else:
+        command("rails db:migrate VERSION="+version)
 
 # rails_generate_model  is used to generate a model file with the given name
 def rails_generate_model(model_name):
@@ -136,7 +144,7 @@ def check_create_products_migration():
     # create the migration file
     filename = rails_generate_migration("CreateProduct1s")
     # update the migration file as in the guide
-    write_to_file(filename,"""class CreateProduct1s < ActiveRecord::Migration[6.0]
+    write_to_file(filename,"""class CreateProduct1s < ActiveRecord::Migration[6.1]
     def change
         create_table :product1s do |t|
             t.string :name
@@ -163,7 +171,7 @@ def check_change_product_price_type():
     assert_select_ouput("select id,name,description,price from product1s",[(1, 'RGT', 'Rails Guide Testing Migration Overview',100)])
     # Change Product Size
     filename = rails_generate_migration("ChangeProduct1sPrice")
-    write_to_file(filename,"""class ChangeProduct1sPrice < ActiveRecord::Migration[6.0]
+    write_to_file(filename,"""class ChangeProduct1sPrice < ActiveRecord::Migration[6.1]
       def change
         reversible do |dir|
           change_table :product1s do |t|
@@ -180,16 +188,7 @@ def check_change_product_price_type():
 # create_new_product_table is used to create a new product table with the given id
 def create_new_product_table(id):
     # create the migration file
-    filename = rails_generate_migration("CreateProduct"+id+"s")
-    write_to_file(filename,"class CreateProduct"+id+"""s < ActiveRecord::Migration[6.0]
-    def change
-        create_table :product"""+id+"""s do |t|
-            t.string :name
-
-            t.timestamps
-        end
-    end
-end""")
+    command("rails generate migration CreateProduct"+id+"s name:string")
     rake_migrate()
 
 # check_add_and_remove_partnumber_to_products checks the addition and deletion of a column part_number
@@ -238,13 +237,10 @@ def check_add_products_table():
     # Add the product table as a single migration
     command("rails generate migration CreateProduct5s name:string part_number:string")
     rake_migrate()
-    # NOTE - The generated file from the above command is different from what the docs specify in rails 6.0.
-    # The line 't.timestamps' is not generated leading to the columns created_at and updated_at not being created.
-    # Please refer to https://github.com/rails/rails/issues/28706 for more information
-    # The issue is fixed in rails 6.1 by https://github.com/rails/rails/pull/28707
-    dml_mysql("insert into product5s(name,part_number) values ('Single Migration for adding table','2.1')")
+    # insert into the table a row
+    dml_mysql("insert into product5s(name,part_number,created_at,updated_at) values ('Single Migration for adding table','2.1',NOW(),NOW())")
     # read from the table and assert that the output matches the expected output
-    assert_select_ouput("select * from product5s",[(1,'Single Migration for adding table','2.1')])
+    assert_select_ouput("select id,name,part_number from product5s",[(1,'Single Migration for adding table','2.1')])
 
 # check_add_reference_column checks that a column that is a reference can be added
 def check_add_reference_column():
@@ -264,6 +260,7 @@ def check_join_table():
     # assert the creation of the join table
     assert_select_ouput("describe customers_products",[('customer_id', 'bigint(20)', 'NO', '', None, ''), ('product_id', 'bigint(20)', 'NO', '', None, '')])
 
+<<<<<<< HEAD
 # 3.1 Creating a Table
 def check_create_table_product():
     filename = rails_generate_migration("Products")
@@ -315,6 +312,81 @@ end""")
 
 
 
+=======
+# check_migration_from_model checks the migration constructed from the model
+def check_migration_from_model():
+    # create the model
+    command("rails generate model Product7 name:string description:text")
+    rake_migrate()
+    # insert into the table a row
+    dml_mysql("insert into product7s(name,description,created_at,updated_at) values ('RGT','Rails Guide Testing Model Generators',NOW(),NOW())")
+    # read from the table and assert that the output matches the expected output
+    assert_select_ouput("select id,name,description from product7s",[(1, 'RGT', 'Rails Guide Testing Model Generators')])
+
+# check_passing_modifiers checks that passing modifiers to rails generate migration commands work
+def check_passing_modifiers():
+    # create a table first
+    create_new_product_table('8')
+    # create a migration while passing modifiers
+    command("rails generate migration AddDetailsToProduct8s 'price:decimal{5,2}' supplier:references{polymorphic}")
+    rake_migrate()
+    # assert the tables description
+    assert_select_ouput("describe product8s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('price', 'decimal(5,2)', 'YES', '', None, ''), ('supplier_type', 'varchar(255)', 'NO', 'MUL', None, ''), ('supplier_id', 'bigint(20)', 'NO', '', None, '')])
+
+# check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
+def check_migrate_to_version():
+    command("rails generate migration CreateProduct9s name:string")
+    timestamp2 = rails_command_with_timestamp("rails generate migration AddPartNumberToProduct9s part_number:int")
+    command("rails generate migration AddDescriptionToProduct9s description:string")
+    command("rails generate migration RemovePartNumberFromProduct9s part_number:int")
+    rake_migrate()
+    # assert the table structure after the 4 commands
+    assert_select_ouput("describe product9s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
+    # migrate to a previous version
+    rake_migrate(timestamp2)
+    # assert that the structure of table is the way we want -> part_number is added back and description is removed
+    assert_select_ouput("describe product9s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('part_number', 'int(11)', 'YES', '', None, '')])
+
+# check_rollback_and_redo checks that the rollback and redo commands work
+def check_rollback_and_redo():
+    command("rails generate migration CreateProduct10s name:string")
+    command("rails generate migration AddPartNumberToProduct10s part_number:int")
+    command("rails generate migration AddDescriptionToProduct10s description:string")
+    command("rails generate migration RemovePartNumberFromProduct10s part_number:int")
+    rake_migrate()
+    # assert the table structure after the 4 commands
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
+    # migrate to a step back
+    command("rails db:rollback")
+    # assert that the structure of table is the way we want -> part_number is added back
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, ''), ('part_number', 'int(11)', 'YES', '', None, '')])
+    rake_migrate()
+    # migrate to 3 steps back
+    command("rails db:rollback STEP=3")
+    # assert that the structure of table is the way we want -> part_number and description are removed
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, '')])
+    rake_migrate()
+    # redo 3 steps
+    command("rails db:migrate:redo STEP=3")
+    # assert that the structure of table is the way we want that is after all migrations
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
+
+# check_setup_database checks the rails db:setup command
+def check_setup_database():
+    # dump the schema so that the schema.rb file used in db:setup is upto date.
+    command("rake db:schema:dump")
+    # check that the command succeeds though it would not do anything
+    command("rails db:setup")
+
+# check_reset_database checks the rails db:reset command
+def check_reset_database():
+    # dump the schema so that the schema.rb file used in db:setup is upto date.
+    command("rake db:schema:dump")
+    # reset the database
+    command("rails db:reset")
+    # assert that all the tables were reconstructed
+    assert_select_ouput("show tables",[('active_storage_attachments',), ('active_storage_blobs',), ('ar_internal_metadata',), ('customers_products',), ('microposts',), ('product10s',), ('product1s',), ('product2s',), ('product3s',), ('product4s',), ('product5s',), ('product6s',), ('product7s',), ('product8s',), ('product9s',), ('relationships',), ('schema_migrations',), ('users',)])
+>>>>>>> 4e4be3e48ce210e424b7d97e4b75fb920f98bc85
 
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
@@ -335,5 +407,24 @@ end""")
 # https://guides.rubyonrails.org/active_record_migrations.html#model-generators
 #command("rails generate model Product name:string description:text")
 
+
+check_migration_from_model()
+# 2.3 Passing Modifiers
+# https://guides.rubyonrails.org/active_record_migrations.html#passing-modifiers
+check_passing_modifiers()
+
 # 3. Writing a Migration
 check_create_table_product()
+
+# 4. Running Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
+check_migrate_to_version()
+# 4.1 Rolling Back
+# https://guides.rubyonrails.org/active_record_migrations.html#rolling-back
+check_rollback_and_redo()
+# 4.2 Setup the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#setup-the-database
+check_setup_database()
+# 4.3 Resetting the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#resetting-the-database
+check_reset_database()

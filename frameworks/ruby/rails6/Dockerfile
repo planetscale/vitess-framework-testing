@@ -22,6 +22,7 @@ RUN pip3 install --no-cache --upgrade pip setuptools
 RUN pip3 install --no-cache mysql-connector
 
 ENV RAILS_ENV=production
+ENV DISABLE_DATABASE_ENVIRONMENT_CHECK=1
 ADD run.sh /
 ADD testingGuides.py /src/
 
