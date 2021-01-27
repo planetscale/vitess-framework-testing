@@ -313,7 +313,21 @@ def check_rollback_and_redo():
     # assert that the structure of table is the way we want that is after all migrations
     assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
     
+# check_setup_database checks the rails db:setup command
+def check_setup_database():
+    # dump the schema so that the schema.rb file used in db:setup is upto date.
+    command("rake db:schema:dump")
+    # check that the command succeeds though it would not do anything
+    command("rails db:setup")
 
+# check_reset_database checks the rails db:reset command
+def check_reset_database():
+    # dump the schema so that the schema.rb file used in db:setup is upto date.
+    command("rake db:schema:dump")
+    # reset the database
+    command("rails db:reset")
+    # assert that all the tables were reconstructed
+    assert_select_ouput("show tables",[('active_storage_attachments',), ('active_storage_blobs',), ('ar_internal_metadata',), ('customers_products',), ('microposts',), ('product10s',), ('product1s',), ('product2s',), ('product3s',), ('product4s',), ('product5s',), ('product6s',), ('product7s',), ('product8s',), ('product9s',), ('relationships',), ('schema_migrations',), ('users',)])
 
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
@@ -343,3 +357,9 @@ check_migrate_to_version()
 # 4.1 Rolling Back
 # https://guides.rubyonrails.org/active_record_migrations.html#rolling-back
 check_rollback_and_redo()
+# 4.2 Setup the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#setup-the-database
+check_setup_database()
+# 4.3 Resetting the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#resetting-the-database
+check_reset_database()
