@@ -1,5 +1,6 @@
 import os
 import sys
+import shlex
 import subprocess
 import re
 import mysql.connector
@@ -10,14 +11,13 @@ from mysql.connector import Error
 
 # commamd is used to run bash commands and check that they succeeded
 def command(cmd):
-    sp = subprocess.run(cmd.split(" "))
+    sp = subprocess.run(shlex.split(cmd))
     if sp.returncode != 0 :
         sys.exit(sp.returncode)
 
 # commamd_with_ouput is used to run bash commands and return their outputs
 def command_with_ouput(cmd):
-    sp = subprocess.run(cmd.split(" "), capture_output=True, text = True)
-    
+    sp = subprocess.run(shlex.split(cmd), capture_output=True, text = True)
     if sp.returncode != 0:
         print(sp.stderr)
         sys.exit(sp.returncode)
@@ -261,6 +261,25 @@ def check_join_table():
     # assert the creation of the join table
     assert_select_ouput("describe customers_products",[('customer_id', 'bigint(20)', 'NO', '', None, ''), ('product_id', 'bigint(20)', 'NO', '', None, '')])
 
+# check_migration_from_model checks the migration constructed from the model
+def check_migration_from_model():
+    # create the model
+    command("rails generate model Product7 name:string description:text")
+    rake_migrate()
+    # insert into the table a row
+    dml_mysql("insert into product7s(name,description,created_at,updated_at) values ('RGT','Rails Guide Testing Model Generators',NOW(),NOW())")
+    # read from the table and assert that the output matches the expected output
+    assert_select_ouput("select id,name,description from product7s",[(1, 'RGT', 'Rails Guide Testing Model Generators')])
+
+def check_passing_modifiers():
+    # create a table first
+    create_new_product_table('8')
+    # create a migration while passing modifiers
+    command("rails generate migration AddDetailsToProduct8s 'price:decimal{5,2}' supplier:references{polymorphic}")
+    rake_migrate()
+    # assert the tables description
+    assert_select_ouput("describe product8s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('price', 'decimal(5,2)', 'YES', '', None, ''), ('supplier_type', 'varchar(255)', 'NO', 'MUL', None, ''), ('supplier_id', 'bigint(20)', 'NO', '', None, '')])
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
 check_create_products_migration()
@@ -278,4 +297,7 @@ check_add_reference_column()
 check_join_table()
 # 2.2 Model Generators
 # https://guides.rubyonrails.org/active_record_migrations.html#model-generators
-command("rails generate model Product name:string description:text")
+check_migration_from_model()
+# 2.3 Passing Modifiers
+# https://guides.rubyonrails.org/active_record_migrations.html#passing-modifiers
+check_passing_modifiers()
