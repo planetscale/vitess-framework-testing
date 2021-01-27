@@ -136,7 +136,7 @@ def check_create_products_migration():
     # create the migration file
     filename = rails_generate_migration("CreateProduct1s")
     # update the migration file as in the guide
-    write_to_file(filename,"""class CreateProduct1s < ActiveRecord::Migration[6.0]
+    write_to_file(filename,"""class CreateProduct1s < ActiveRecord::Migration[6.1]
     def change
         create_table :product1s do |t|
             t.string :name
@@ -163,7 +163,7 @@ def check_change_product_price_type():
     assert_select_ouput("select id,name,description,price from product1s",[(1, 'RGT', 'Rails Guide Testing Migration Overview',100)])
     # Change Product Size
     filename = rails_generate_migration("ChangeProduct1sPrice")
-    write_to_file(filename,"""class ChangeProduct1sPrice < ActiveRecord::Migration[6.0]
+    write_to_file(filename,"""class ChangeProduct1sPrice < ActiveRecord::Migration[6.1]
       def change
         reversible do |dir|
           change_table :product1s do |t|
@@ -181,7 +181,7 @@ def check_change_product_price_type():
 def create_new_product_table(id):
     # create the migration file
     filename = rails_generate_migration("CreateProduct"+id+"s")
-    write_to_file(filename,"class CreateProduct"+id+"""s < ActiveRecord::Migration[6.0]
+    write_to_file(filename,"class CreateProduct"+id+"""s < ActiveRecord::Migration[6.1]
     def change
         create_table :product"""+id+"""s do |t|
             t.string :name
@@ -238,13 +238,10 @@ def check_add_products_table():
     # Add the product table as a single migration
     command("rails generate migration CreateProduct5s name:string part_number:string")
     rake_migrate()
-    # NOTE - The generated file from the above command is different from what the docs specify in rails 6.0. 
-    # The line 't.timestamps' is not generated leading to the columns created_at and updated_at not being created.
-    # Please refer to https://github.com/rails/rails/issues/28706 for more information
-    # The issue is fixed in rails 6.1 by https://github.com/rails/rails/pull/28707
-    dml_mysql("insert into product5s(name,part_number) values ('Single Migration for adding table','2.1')")
+    # insert into the table a row
+    dml_mysql("insert into product5s(name,part_number,created_at,updated_at) values ('Single Migration for adding table','2.1',NOW(),NOW())")
     # read from the table and assert that the output matches the expected output
-    assert_select_ouput("select * from product5s",[(1,'Single Migration for adding table','2.1')])
+    assert_select_ouput("select id,name,part_number from product5s",[(1,'Single Migration for adding table','2.1')])
 
 # check_add_reference_column checks that a column that is a reference can be added
 def check_add_reference_column():
