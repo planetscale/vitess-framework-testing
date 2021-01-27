@@ -17,7 +17,7 @@ def command(cmd):
 # commamd_with_ouput is used to run bash commands and return their outputs
 def command_with_ouput(cmd):
     sp = subprocess.run(cmd.split(" "), capture_output=True, text = True)
-    
+
     if sp.returncode != 0:
         print(sp.stderr)
         sys.exit(sp.returncode)
@@ -34,7 +34,7 @@ def rails_generate_model(model_name):
 # rails_generate_migration  is used to generate a migration file with the given name and return its name
 def rails_generate_migration(migration_name):
     railsOutput = command_with_ouput("rails generate migration "+migration_name)
-    
+
     isPresent = re.search('(db/migrate/.*)',railsOutput)
     if isPresent:
         return isPresent.group(1)
@@ -44,7 +44,7 @@ def rails_generate_migration(migration_name):
 # rails_command_with_timestamp  is used to run a rails command and return its timestamp
 def rails_command_with_timestamp(command):
     railsOutput = command_with_ouput(command)
-    
+
     isPresent = re.search('db/migrate/([0-9]*)',railsOutput)
     if isPresent:
         return isPresent.group(1)
@@ -238,7 +238,7 @@ def check_add_products_table():
     # Add the product table as a single migration
     command("rails generate migration CreateProduct5s name:string part_number:string")
     rake_migrate()
-    # NOTE - The generated file from the above command is different from what the docs specify in rails 6.0. 
+    # NOTE - The generated file from the above command is different from what the docs specify in rails 6.0.
     # The line 't.timestamps' is not generated leading to the columns created_at and updated_at not being created.
     # Please refer to https://github.com/rails/rails/issues/28706 for more information
     # The issue is fixed in rails 6.1 by https://github.com/rails/rails/pull/28707
@@ -264,21 +264,76 @@ def check_join_table():
     # assert the creation of the join table
     assert_select_ouput("describe customers_products",[('customer_id', 'bigint(20)', 'NO', '', None, ''), ('product_id', 'bigint(20)', 'NO', '', None, '')])
 
+# 3.1 Creating a Table
+def check_create_table_product():
+    filename = rails_generate_migration("Products")
+    # creates a single table called products and migrates the table
+    write_to_file(filename,"""class Products < ActiveRecord::Migration[6.0]
+    def change
+        create_table :products do |t|
+          t.string :name
+        end
+    end
+end""")
+    rake_migrate()
+
+    # checks shape of table
+    assert_select_ouput("describe products",[('name', 'varchar', 'NO', '', None, '')])
+
+# By default, create_table will create a primary key called id. You can change the name of the primary key with the
+#:primary_key option (don't forget to update the corresponding model) or, if you don't want a primary key at all,
+#you can pass the option id: false. If you need to pass database specific options you can place an SQL fragment in the :options option.
+def check_create_table_products_not_null_blackhole():
+    filename = rails_generate_migration("Products_not_null_blackhole")
+    # creates a single table called products and migrates the table
+    write_to_file(filename,"""class Products_not_null_blackhole < ActiveRecord::Migration[6.0]
+    def change
+        create_table :products_not_null , options: "ENGINE=BLACKHOLE" do |t|
+          t.string :name, null: false
+        end
+    end
+end""")
+    rake_migrate()
+
+    # checks shape of table
+    assert_select_ouput("describe products_not_null",[('name', 'varchar', 'NO', '', None, '')])
+
+def check_join_table():
+    filename = rails_generate_migration("Products_Categories")
+    # creates a single table called products and migrates the table
+    write_to_file(filename,"""Products_Categories < ActiveRecord::Migration[6.0]
+    def change
+        create_join_table :products, :categories
+    end
+end""")
+    rake_migrate()
+
+    # checks shape of table
+    assert_select_ouput("describe products",[('name', 'varchar', 'NO', '', None, '')])
+
+
+
+
+
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
-check_create_products_migration()
-check_change_product_price_type()
+#check_create_products_migration()
+#check_change_product_price_type()
 
 # 2. Creating a Migration
 # https://guides.rubyonrails.org/active_record_migrations.html#creating-a-migration
 # 2.1 Creating a Standalone Migration
 # https://guides.rubyonrails.org/active_record_migrations.html#creating-a-standalone-migration
-check_add_and_remove_partnumber_to_products()
-check_add_partnumber_and_index_to_products()
-check_add_multiple_columns_to_products()
-check_add_products_table()
-check_add_reference_column()
-check_join_table()
+#check_add_and_remove_partnumber_to_products()
+#check_add_partnumber_and_index_to_products()
+#check_add_multiple_columns_to_products()
+#check_add_products_table()
+#check_add_reference_column()
+#check_join_table()
 # 2.2 Model Generators
 # https://guides.rubyonrails.org/active_record_migrations.html#model-generators
-command("rails generate model Product name:string description:text")
+#command("rails generate model Product name:string description:text")
+
+# 3. Writing a Migration
+check_create_table_product()
