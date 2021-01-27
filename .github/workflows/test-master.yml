@@ -1,4 +1,4 @@
-name: Full suite of integration tests
+name: Post-merge integration tests
 on:
   push:
     branches:
