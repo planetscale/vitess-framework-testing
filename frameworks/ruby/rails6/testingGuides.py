@@ -23,9 +23,12 @@ def command_with_ouput(cmd):
         sys.exit(sp.returncode)
     return sp.stdout
 
-# rake_migrate runs the db:migrate command from rake
-def rake_migrate():
-    command("rake db:migrate")
+# rake_migrate runs the db:migrate command from rake. It also adds the VERSION argument if it is passed
+def rake_migrate(version=""):
+    if version == "":
+        command("rails db:migrate")
+    else:
+        command("rails db:migrate VERSION="+version)
 
 # rails_generate_model  is used to generate a model file with the given name
 def rails_generate_model(model_name):
@@ -180,16 +183,7 @@ def check_change_product_price_type():
 # create_new_product_table is used to create a new product table with the given id
 def create_new_product_table(id):
     # create the migration file
-    filename = rails_generate_migration("CreateProduct"+id+"s")
-    write_to_file(filename,"class CreateProduct"+id+"""s < ActiveRecord::Migration[6.1]
-    def change
-        create_table :product"""+id+"""s do |t|
-            t.string :name
-
-            t.timestamps
-        end
-    end
-end""")
+    command("rails generate migration CreateProduct"+id+"s name:string")
     rake_migrate()
 
 # check_add_and_remove_partnumber_to_products checks the addition and deletion of a column part_number
@@ -271,6 +265,7 @@ def check_migration_from_model():
     # read from the table and assert that the output matches the expected output
     assert_select_ouput("select id,name,description from product7s",[(1, 'RGT', 'Rails Guide Testing Model Generators')])
 
+# check_passing_modifiers checks that passing modifiers to rails generate migration commands work
 def check_passing_modifiers():
     # create a table first
     create_new_product_table('8')
@@ -279,6 +274,46 @@ def check_passing_modifiers():
     rake_migrate()
     # assert the tables description
     assert_select_ouput("describe product8s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('price', 'decimal(5,2)', 'YES', '', None, ''), ('supplier_type', 'varchar(255)', 'NO', 'MUL', None, ''), ('supplier_id', 'bigint(20)', 'NO', '', None, '')])
+
+# check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
+def check_migrate_to_version():
+    command("rails generate migration CreateProduct9s name:string")
+    timestamp2 = rails_command_with_timestamp("rails generate migration AddPartNumberToProduct9s part_number:int")
+    command("rails generate migration AddDescriptionToProduct9s description:string")
+    command("rails generate migration RemovePartNumberFromProduct9s part_number:int")
+    rake_migrate()
+    # assert the table structure after the 4 commands
+    assert_select_ouput("describe product9s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
+    # migrate to a previous version
+    rake_migrate(timestamp2)
+    # assert that the structure of table is the way we want -> part_number is added back and description is removed
+    assert_select_ouput("describe product9s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('part_number', 'int(11)', 'YES', '', None, '')])
+
+# check_rollback_and_redo checks that the rollback and redo commands work
+def check_rollback_and_redo():
+    command("rails generate migration CreateProduct10s name:string")
+    command("rails generate migration AddPartNumberToProduct10s part_number:int")
+    command("rails generate migration AddDescriptionToProduct10s description:string")
+    command("rails generate migration RemovePartNumberFromProduct10s part_number:int")
+    rake_migrate()
+    # assert the table structure after the 4 commands
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
+    # migrate to a step back
+    command("rails db:rollback")
+    # assert that the structure of table is the way we want -> part_number is added back
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, ''), ('part_number', 'int(11)', 'YES', '', None, '')])
+    rake_migrate()
+    # migrate to 3 steps back
+    command("rails db:rollback STEP=3")
+    # assert that the structure of table is the way we want -> part_number and description are removed
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, '')])
+    rake_migrate()
+    # redo 3 steps
+    command("rails db:migrate:redo STEP=3")
+    # assert that the structure of table is the way we want that is after all migrations
+    assert_select_ouput("describe product10s",[('id', 'bigint(20)', 'NO', 'PRI', None, 'auto_increment'), ('name', 'varchar(255)', 'YES', '', None, ''), ('created_at', 'datetime(6)', 'NO', '', None, ''), ('updated_at', 'datetime(6)', 'NO', '', None, ''), ('description', 'varchar(255)', 'YES', '', None, '')])
+    
+
 
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
@@ -301,3 +336,10 @@ check_migration_from_model()
 # 2.3 Passing Modifiers
 # https://guides.rubyonrails.org/active_record_migrations.html#passing-modifiers
 check_passing_modifiers()
+
+# 4. Running Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
+check_migrate_to_version()
+# 4.1 Rolling Back
+# https://guides.rubyonrails.org/active_record_migrations.html#rolling-back
+check_rollback_and_redo()
