@@ -1,4 +1,4 @@
-name: Full suite of integration tests
+name: Post-merge integration tests
 on:
   push:
     branches:
@@ -99,7 +99,7 @@ jobs:
 
       - id: push
         name: Push container images for changed tests
-        if: (success() || failure()) && contains(steps.frameworks.outputs.changed, matrix.framework)
+        if: (success() || failure()) && contains(needs.determine_frameworks.outputs.changed_frameworks, matrix.framework)
         run: |
           echo '${{ secrets.GCLOUD_SERVICE_KEY }}' | docker login -u _json_key --password-stdin https://gcr.io/
           docker push "$(./run.sh generate_image_name "${{ matrix.framework }}")"
