@@ -24,6 +24,19 @@ function rails_generate_migration(){
   echo $file_name
 }
 
+# rails_command_with_timestamp  is used to run a rails command and return its timestamp
+function rails_command_with_timestamp(){
+  # $1 is the rails command to run
+  rails_output=$($1)
+  timestamp=$(echo "$rails_output" | grep -o "db/migrate/.*" | grep -oE '[0-9]+')
+  if [ -z "$timestamp" ]
+  then
+    echo "Couldn't find the timestamp when running the rails command"
+    exit 1
+  fi
+  echo $timestamp
+}
+
 # write_to_file writes to a file
 function write_to_file(){
   # $1 file name

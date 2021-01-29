@@ -154,6 +154,64 @@ function check_passing_modifiers(){
   assert_mysql_output "describe product8s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price decimal(5,2) YES NULL supplier_type varchar(255) NO MUL NULL supplier_id bigint(20) NO NULL"
 }
 
+# check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
+function check_migrate_to_version(){
+  rails generate migration CreateProduct9s name:string
+  timestamp2=$(rails_command_with_timestamp "rails generate migration AddPartNumberToProduct9s part_number:int")
+  rails generate migration AddDescriptionToProduct9s description:string
+  rails generate migration RemovePartNumberFromProduct9s part_number:int
+  rake_migrate
+  # assert the table structure after the 4 commands
+  assert_mysql_output "describe product9s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  # migrate to a previous version
+  rake_migrate $timestamp2
+  # assert that the structure of table is the way we want -> part_number is added back and description is removed
+  assert_mysql_output "describe product9s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number int(11) YES NULL"
+}
+
+# check_rollback_and_redo checks that the rollback and redo commands work
+function check_rollback_and_redo(){
+  rails generate migration CreateProduct10s name:string
+  rails generate migration AddPartNumberToProduct10s part_number:int
+  rails generate migration AddDescriptionToProduct10s description:string
+  rails generate migration RemovePartNumberFromProduct10s part_number:int
+  rake_migrate
+  # assert the table structure after the 4 commands
+  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  # migrate to a step back
+  rails db:rollback
+  # assert that the structure of table is the way we want -> part_number is added back
+  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL part_number int(11) YES NULL"
+  rake_migrate
+  # migrate to 3 steps back
+  rails db:rollback STEP=3
+  # assert that the structure of table is the way we want -> part_number and description are removed
+  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  rake_migrate
+  # redo 3 steps
+  rails db:migrate:redo STEP=3
+  # assert that the structure of table is the way we want that is after all migrations
+  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+}
+
+# check_setup_database checks the rails db:setup command
+function check_setup_database(){
+  # dump the schema so that the schema.rb file used in db:setup is upto date.
+  rake db:schema:dump
+  # check that the command succeeds though it would not do anything
+  rails db:setup
+}
+
+# check_reset_database checks the rails db:reset command
+function check_reset_database(){
+  # dump the schema so that the schema.rb file used in db:setup is upto date.
+  rake db:schema:dump
+  # reset the database
+  rails db:reset
+  # assert that all the tables were reconstructed
+  assert_mysql_output "show tables" "active_storage_attachments active_storage_blobs ar_internal_metadata customers_products microposts product10s product1s product2s product3s product4s product5s product6s product7s product8s product9s relationships schema_migrations users"
+}
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
 check_create_products_migration
@@ -175,3 +233,16 @@ check_migration_from_model
 # 2.3 Passing Modifiers
 # https://guides.rubyonrails.org/active_record_migrations.html#passing-modifiers
 check_passing_modifiers
+
+# 4. Running Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
+check_migrate_to_version
+# 4.1 Rolling Back
+# https://guides.rubyonrails.org/active_record_migrations.html#rolling-back
+check_rollback_and_redo
+# 4.2 Setup the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#setup-the-database
+check_setup_database
+# 4.3 Resetting the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#resetting-the-database
+check_reset_database
