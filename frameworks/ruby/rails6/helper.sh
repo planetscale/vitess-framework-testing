@@ -26,14 +26,22 @@ function rails_generate_migration(){
 
 # write_to_file writes to a file
 function write_to_file(){
-  #$1 file name
-  #$2 content to write
+  # $1 file name
+  # $2 content to write
   echo "$2" > $1
+}
+
+# rails_generate_migration_with_content  is used to generate a migration file with the given name and write into it the content provided
+function rails_generate_migration_with_content(){
+  # $1 file name
+  # $2 content to write
+  filename=$(rails_generate_migration $1)
+  write_to_file $filename "$2"
 }
 
 # mysql_run is used to run a query in mysql and return its result
 function mysql_run(){
-  #$1 Query to execute
+  # $1 Query to execute
   query_output=$(mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -rsNe "$1")
   echo $query_output
 }
