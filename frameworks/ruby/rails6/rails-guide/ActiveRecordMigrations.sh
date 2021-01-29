@@ -1,3 +1,5 @@
+#!/bin/sh -e
+
 # Rails Guide on Active Records
 # https://guides.rubyonrails.org/active_record_migrations.html
 
