@@ -32,13 +32,13 @@ function pull_image() {
   docker pull "$(generate_image_name "${1}")"
 }
 
-# usage: build_iamge "$language/$frameowrk"
+# usage: build_image "$language/$framework"
 function build_image() {
   docker build -t "$(generate_image_name "${1}")" "frameworks/${1}"
 }
 
 # usage: run_test language/framework
-#    if $2 is set to "build", test image for that framework will be built instead of pulling from gcr.io
+#    To rebuild a framework's container image for testing during local development, use build_image "$language/$framework"
 function run_test() {
   validate_environment
 
