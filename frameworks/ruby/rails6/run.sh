@@ -18,4 +18,5 @@ rake user:create_fail || true
 rake user:list | tail
 
 ./ActiveRecordMigrations.sh
+./ActiveRecordValidations.sh
 
