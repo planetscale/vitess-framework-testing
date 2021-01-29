@@ -3,6 +3,7 @@ import sys
 import shlex
 import subprocess
 import re
+from rails import *
 import mysql.connector
 from mysql.connector import Error
 
@@ -17,12 +18,7 @@ def command(cmd):
 
 # commamd_with_ouput is used to run bash commands and return their outputs
 def command_with_ouput(cmd):
-<<<<<<< HEAD
-    sp = subprocess.run(cmd.split(" "), capture_output=True, text = True)
-
-=======
     sp = subprocess.run(shlex.split(cmd), capture_output=True, text = True)
->>>>>>> 4e4be3e48ce210e424b7d97e4b75fb920f98bc85
     if sp.returncode != 0:
         print(sp.stderr)
         sys.exit(sp.returncode)
@@ -260,7 +256,6 @@ def check_join_table():
     # assert the creation of the join table
     assert_select_ouput("describe customers_products",[('customer_id', 'bigint(20)', 'NO', '', None, ''), ('product_id', 'bigint(20)', 'NO', '', None, '')])
 
-<<<<<<< HEAD
 # 3.1 Creating a Table
 def check_create_table_product():
     filename = rails_generate_migration("Products")
@@ -312,7 +307,6 @@ end""")
 
 
 
-=======
 # check_migration_from_model checks the migration constructed from the model
 def check_migration_from_model():
     # create the model
@@ -386,7 +380,6 @@ def check_reset_database():
     command("rails db:reset")
     # assert that all the tables were reconstructed
     assert_select_ouput("show tables",[('active_storage_attachments',), ('active_storage_blobs',), ('ar_internal_metadata',), ('customers_products',), ('microposts',), ('product10s',), ('product1s',), ('product2s',), ('product3s',), ('product4s',), ('product5s',), ('product6s',), ('product7s',), ('product8s',), ('product9s',), ('relationships',), ('schema_migrations',), ('users',)])
->>>>>>> 4e4be3e48ce210e424b7d97e4b75fb920f98bc85
 
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
@@ -415,6 +408,8 @@ check_passing_modifiers()
 
 # 3. Writing a Migration
 check_create_table_product()
+
+
 
 # 4. Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
