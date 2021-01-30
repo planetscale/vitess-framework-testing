@@ -240,13 +240,12 @@ check_migrate_to_version
 # 4.1 Rolling Back
 # https://guides.rubyonrails.org/active_record_migrations.html#rolling-back
 check_rollback_and_redo
+# 4.2 Setup the Database
+# https://guides.rubyonrails.org/active_record_migrations.html#setup-the-database
+check_setup_database
+# 4.3 Resetting the Database
 # https://guides.rubyonrails.org/active_record_migrations.html#resetting-the-database
 # NOTE - Vitess does not support drop/create database commands as it requires changing the vschema
 # rails db:reset will try to drop the database but that wont work with vitess and requires manual intervention
-# rails db:setup will try to create the database
 # therefore the next test is commented out.
-# 4.2 Setup the Database
-# https://guides.rubyonrails.org/active_record_migrations.html#setup-the-database
-# check_setup_database
-# 4.3 Resetting the Database
 # check_reset_database
