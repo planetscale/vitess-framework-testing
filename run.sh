@@ -41,6 +41,7 @@ function build_image() {
 #    if $2 is set to "build", test image for that framework will be built instead of pulling from gcr.io
 function run_test() {
   validate_environment
+  cleanup_tables
 
   local language framework
   language="$(echo "$1" | cut -d'/' -f1)"
@@ -78,4 +79,3 @@ cmd="${1}"
 shift
 
 "${cmd}" "$@"
-
