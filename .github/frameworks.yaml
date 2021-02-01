@@ -8,6 +8,7 @@ frameworks:
   - 'javascript/sequelize'
   - 'javascript/typeorm'
   - 'mysqldump/export'
+  - 'mysqldump/import'
   - 'php/laravel'
   - 'python/django'
   - 'python/PyMySQL'
