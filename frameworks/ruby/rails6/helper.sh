@@ -28,7 +28,7 @@ function rails_generate_migration(){
 function rails_command_with_timestamp(){
   # $1 is the rails command to run
   rails_output=$($1)
-  timestamp=$(echo "$rails_output" | grep -o "db/migrate/.*" | grep -oE '[0-9]+')
+  timestamp=$(echo "$rails_output" | grep -o "db/migrate/.*" | grep -oE '[0-9]+' | head -1)
   if [ -z "$timestamp" ]
   then
     echo "Couldn't find the timestamp when running the rails command"
@@ -66,7 +66,7 @@ function assert_mysql_output(){
   query_output=$(mysql_run "$1")
   if [[ "$query_output" != "$2" ]]
   then
-    echo "Query: $1 got wrong output \nExpected: $2 \nGot: $query_output"
+    echo -e "Query: $1 got wrong output \nExpected: $2 \nGot: $query_output"
     exit 1
   fi
 }

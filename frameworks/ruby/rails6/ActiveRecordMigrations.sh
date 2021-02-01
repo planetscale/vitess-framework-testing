@@ -212,6 +212,65 @@ function check_reset_database(){
   assert_mysql_output "show tables" "active_storage_attachments active_storage_blobs ar_internal_metadata customers_products microposts product10s product1s product2s product3s product4s product5s product6s product7s product8s product9s relationships schema_migrations users"
 }
 
+# check_run_specific_migrations checks the running of a specific migration given its timestamp
+function check_run_specific_migrations(){
+  rails generate migration CreateProduct11s name:string
+  timestamp=$(rails_command_with_timestamp "rails generate migration AddPartNumberToProduct11s part_number:int")
+  rails generate migration AddDescriptionToProduct11s description:string
+  rails generate migration RemovePartNumberFromProduct11s part_number:int
+  rake_migrate
+  # assert the table structure after the 4 commands
+  assert_mysql_output "describe product11s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  # migrate to a previous version
+  rails db:rollback STEP=3
+  # run the up migration from the given timestamp
+  rails db:migrate:up VERSION=$timestamp 
+  # assert that the structure of table is the way we want -> part_number is added back and description is removed
+  assert_mysql_output "describe product11s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number int(11) YES NULL"
+}
+
+# check_run_migrations_different_environment checks running migrations for different environments
+function check_run_migrations_different_environment(){
+  # check that passing the environment variable works correctly
+  rails db:migrate RAILS_ENV=production
+}
+
+# check_changing_output_migrations checks that changing the output of running migrations works
+function check_changing_output_migrations(){
+  # Create a migration along with commands to change the output
+  rails_generate_migration_with_content "CreateProduct12s" "class CreateProduct12s < ActiveRecord::Migration[6.1]
+    def change
+    suppress_messages do
+      create_table :product12s do |t|
+        t.string :name
+        t.text :description
+        t.timestamps
+      end
+    end
+
+    say \"Created a table\"
+
+    suppress_messages {add_index :product12s, :name}
+    say \"and an index!\", true
+
+    say_with_time 'Waiting for a while' do
+      sleep 10
+      250
+    end
+  end
+end"
+  # run the migration
+  rake_migrate
+  # Also check that there is no output when we call migration with false VERBOSE
+  rails generate migration AddPriceToProduct12s price:int
+  rails_output=$(rails db:migrate VERBOSE=false)
+  if [ ! -z "$rails_output" ]
+  then 
+    echo "There should be no output when VERBOSE = false"
+    exit 1
+  fi
+}
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
 check_create_products_migration
@@ -249,3 +308,12 @@ check_setup_database
 # rails db:reset will try to drop the database but that wont work with vitess and requires manual intervention
 # therefore the next test is commented out.
 # check_reset_database
+# 4.4 Running Specific Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#running-specific-migrations
+check_run_specific_migrations
+# 4.5 Running Migrations in Different Environments
+# https://guides.rubyonrails.org/active_record_migrations.html#running-migrations-in-different-environments
+check_run_migrations_different_environment
+# 4.6 Changing the Output of Running Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#changing-the-output-of-running-migrations
+check_changing_output_migrations
