@@ -336,6 +336,116 @@ function check_reset_database(){
   assert_mysql_output "show tables" "active_storage_attachments active_storage_blobs ar_internal_metadata customers_products microposts product10s product1s product2s product3s product4s product5s product6s product7s product8s product9s relationships schema_migrations users"
 }
 
+# check_run_specific_migrations checks the running of a specific migration given its timestamp
+function check_run_specific_migrations(){
+  rails generate migration CreateProduct11s name:string
+  timestamp=$(rails_command_with_timestamp "rails generate migration AddPartNumberToProduct11s part_number:int")
+  rails generate migration AddDescriptionToProduct11s description:string
+  rails generate migration RemovePartNumberFromProduct11s part_number:int
+  rake_migrate
+  # assert the table structure after the 4 commands
+  assert_mysql_output "describe product11s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  # migrate to a previous version
+  rails db:rollback STEP=3
+  # run the up migration from the given timestamp
+  rails db:migrate:up VERSION=$timestamp 
+  # assert that the structure of table is the way we want -> part_number is added back and description is removed
+  assert_mysql_output "describe product11s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number int(11) YES NULL"
+}
+
+# check_run_migrations_different_environment checks running migrations for different environments
+function check_run_migrations_different_environment(){
+  # check that passing the environment variable works correctly
+  rails db:migrate RAILS_ENV=production
+}
+
+# check_changing_output_migrations checks that changing the output of running migrations works
+function check_changing_output_migrations(){
+  # Create a migration along with commands to change the output
+  rails_generate_migration_with_content "CreateProduct12s" "class CreateProduct12s < ActiveRecord::Migration[6.1]
+    def change
+    suppress_messages do
+      create_table :product12s do |t|
+        t.string :name
+        t.text :description
+        t.timestamps
+      end
+    end
+
+    say \"Created a table\"
+
+    suppress_messages {add_index :product12s, :name}
+    say \"and an index!\", true
+
+    say_with_time 'Waiting for a while' do
+      sleep 10
+      250
+    end
+  end
+end"
+  # run the migration
+  rake_migrate
+  # Also check that there is no output when we call migration with false VERBOSE
+  rails generate migration AddPriceToProduct12s price:int
+  rails_output=$(rails db:migrate VERBOSE=false)
+  if [ ! -z "$rails_output" ]
+  then 
+    echo "There should be no output when VERBOSE = false"
+    exit 1
+  fi
+}
+
+# check_schema_dump checks the mysql and rails schema dumps
+function check_schema_dump(){
+  create_new_product_table "13"
+  # check if schema dump works. We do not need to check its output since it is not dependent on the database
+  rake db:schema:dump
+  # sqldump is a new task defined in the file /lib/tasks/my_task.rake.
+  rake db:sqldump
+  # find the structure of product13s table in the structure.sql file
+  structure_output=$(grep -A 6 -oF "CREATE TABLE \`product13s\` (" ./db/structure.sql)
+  create_definition="CREATE TABLE \`product13s\` (
+  \`id\` bigint(20) NOT NULL AUTO_INCREMENT,
+  \`name\` varchar(255) DEFAULT NULL,
+  \`created_at\` datetime(6) NOT NULL,
+  \`updated_at\` datetime(6) NOT NULL,
+  PRIMARY KEY (\`id\`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;"
+  # check if the create table statement for product13s matches the expectation or not
+  if [[ "$structure_output" != "$create_definition" ]]
+  then
+    echo -e "The structure of product13s table does not match the expectation.\nExpectation: $create_definition\nGot:$structure_output"
+    exit 1
+  fi
+}
+
+# check_add_data_via_migration checks that we can add data via a migration
+function check_add_data_via_migration(){
+  # create the model
+  rails generate model Product14 name:string description:text
+  # Create a migration that adds data to the table
+  rails_generate_migration_with_content "AddInitialProduct14s" "class AddInitialProduct14s < ActiveRecord::Migration[6.1]
+  def up
+    5.times do |i|
+      Product14.create(name: \"Product ##{i}\", description: \"A product.\")
+    end
+  end
+
+  def down
+    Product14.delete_all
+  end
+end"
+  # run the migration
+  rake_migrate
+  # assert that the data is inserted into the table
+  assert_mysql_output "select id, name, description from product14s" "1 Product #0 A product. 2 Product #1 A product. 3 Product #2 A product. 4 Product #3 A product. 5 Product #4 A product."
+}
+
+# check_migration_status checks that the migration status command works
+function check_migration_status(){
+  rails db:migrate:status
+}
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
 check_create_products_migration
@@ -384,4 +494,46 @@ check_setup_database
 # NOTE - Vitess does not support drop/create database commands as it requires changing the vschema
 # rails db:reset will try to drop the database but that wont work with vitess and requires manual intervention
 # therefore the next test is commented out.
+<<<<<<< HEAD
 check_reset_database
+=======
+# check_reset_database
+# 4.4 Running Specific Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#running-specific-migrations
+check_run_specific_migrations
+# 4.5 Running Migrations in Different Environments
+# https://guides.rubyonrails.org/active_record_migrations.html#running-migrations-in-different-environments
+check_run_migrations_different_environment
+# 4.6 Changing the Output of Running Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#changing-the-output-of-running-migrations
+check_changing_output_migrations
+
+# 5. Changing Existing Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#changing-existing-migrations
+# NOTE - There are no new commands to test in this part.
+
+# 6. Schema Dumping and You
+# https://guides.rubyonrails.org/active_record_migrations.html#schema-dumping-and-you
+# 6.1 What are Schema Files for?
+# https://guides.rubyonrails.org/active_record_migrations.html#what-are-schema-files-for-questionmark
+# NOTE - There are no new commands to test in this part.
+# 6.2 Types of Schema Dumps
+# https://guides.rubyonrails.org/active_record_migrations.html#types-of-schema-dumps
+check_schema_dump
+# 6.3 Schema Dumps and Source Control
+# https://guides.rubyonrails.org/active_record_migrations.html#schema-dumps-and-source-control
+# NOTE - There are no new commands to test in this part.
+
+# 7. Active Record and Referential Integrity
+# https://guides.rubyonrails.org/active_record_migrations.html#active-record-and-referential-integrity
+# NOTE - There are no new commands to test in this part.
+
+# 8. Migrations and Seed Data
+# https://guides.rubyonrails.org/active_record_migrations.html#migrations-and-seed-data
+check_add_data_via_migration
+# check of db:seed has already be done as part of the tests of the base application
+
+# 9. Old Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#old-migrations
+check_migration_status
+>>>>>>> c0856e1f87c6136474c354f66b2163fb12b5784c
