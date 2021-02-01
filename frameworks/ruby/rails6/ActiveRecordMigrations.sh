@@ -271,6 +271,30 @@ end"
   fi
 }
 
+# check_schema_dump checks the mysql and rails schema dumps
+function check_schema_dump(){
+  create_new_product_table "13"
+  # check if schema dump works. We do not need to check its output since it is not dependent on the database
+  rake db:schema:dump
+  # sqldump is a new task defined in the file /lib/tasks/my_task.rake.
+  rake db:sqldump
+  # find the structure of product13s table in the structure.sql file
+  structure_output=$(grep -A 6 -oF "CREATE TABLE \`product13s\` (" ./db/structure.sql)
+  create_definition="CREATE TABLE \`product13s\` (
+  \`id\` bigint(20) NOT NULL AUTO_INCREMENT,
+  \`name\` varchar(255) DEFAULT NULL,
+  \`created_at\` datetime(6) NOT NULL,
+  \`updated_at\` datetime(6) NOT NULL,
+  PRIMARY KEY (\`id\`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;"
+  # check if the create table statement for product13s matches the expectation or not
+  if [[ "$structure_output" != "$create_definition" ]]
+  then
+    echo -e "The structure of product13s table does not match the expectation.\nExpectation: $create_definition\nGot:$structure_output"
+    exit 1
+  fi
+}
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
 check_create_products_migration
@@ -317,3 +341,19 @@ check_run_migrations_different_environment
 # 4.6 Changing the Output of Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#changing-the-output-of-running-migrations
 check_changing_output_migrations
+
+# 5. Changing Existing Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#changing-existing-migrations
+# NOTE - There are no new commands to test in this part.
+
+# 6. Schema Dumping and You
+# https://guides.rubyonrails.org/active_record_migrations.html#schema-dumping-and-you
+# 6.1 What are Schema Files for?
+# https://guides.rubyonrails.org/active_record_migrations.html#what-are-schema-files-for-questionmark
+# NOTE - There are no new commands to test in this part.
+# 6.2 Types of Schema Dumps
+# https://guides.rubyonrails.org/active_record_migrations.html#types-of-schema-dumps
+check_schema_dump
+# 6.3 Schema Dumps and Source Control
+# https://guides.rubyonrails.org/active_record_migrations.html#schema-dumps-and-source-control
+# NOTE - There are no new commands to test in this part.
