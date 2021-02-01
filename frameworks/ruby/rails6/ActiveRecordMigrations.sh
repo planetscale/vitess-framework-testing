@@ -295,6 +295,33 @@ function check_schema_dump(){
   fi
 }
 
+# check_add_data_via_migration checks that we can add data via a migration
+function check_add_data_via_migration(){
+  # create the model
+  rails generate model Product14 name:string description:text
+  # Create a migration that adds data to the table
+  rails_generate_migration_with_content "AddInitialProduct14s" "class AddInitialProduct14s < ActiveRecord::Migration[6.1]
+  def up
+    5.times do |i|
+      Product14.create(name: \"Product ##{i}\", description: \"A product.\")
+    end
+  end
+
+  def down
+    Product14.delete_all
+  end
+end"
+  # run the migration
+  rake_migrate
+  # assert that the data is inserted into the table
+  assert_mysql_output "select id, name, description from product14s" "1 Product #0 A product. 2 Product #1 A product. 3 Product #2 A product. 4 Product #3 A product. 5 Product #4 A product."
+}
+
+# check_migration_status checks that the migration status command works
+function check_migration_status(){
+  rails db:migrate:status
+}
+
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
 check_create_products_migration
@@ -357,3 +384,16 @@ check_schema_dump
 # 6.3 Schema Dumps and Source Control
 # https://guides.rubyonrails.org/active_record_migrations.html#schema-dumps-and-source-control
 # NOTE - There are no new commands to test in this part.
+
+# 7. Active Record and Referential Integrity
+# https://guides.rubyonrails.org/active_record_migrations.html#active-record-and-referential-integrity
+# NOTE - There are no new commands to test in this part.
+
+# 8. Migrations and Seed Data
+# https://guides.rubyonrails.org/active_record_migrations.html#migrations-and-seed-data
+check_add_data_via_migration
+# check of db:seed has already be done as part of the tests of the base application
+
+# 9. Old Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#old-migrations
+check_migration_status
