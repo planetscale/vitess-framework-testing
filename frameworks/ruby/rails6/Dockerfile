@@ -1,6 +1,6 @@
 FROM ruby:2.6.5-alpine
 
-RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata
+RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata mysql-client
 RUN gem update bundler
 
 ADD src/Gemfile /src/Gemfile
@@ -15,7 +15,6 @@ RUN \
 	find vendor/bundle/ruby/*/gems -name '*.c' -or -name '*.o' -print -delete
 ADD src /src
 RUN yarn install --check-files
-RUN apk add mysql-client
 
 ENV RAILS_ENV=production
 ENV DISABLE_DATABASE_ENVIRONMENT_CHECK=1
