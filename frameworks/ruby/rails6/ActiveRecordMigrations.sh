@@ -410,7 +410,7 @@ function check_schema_dump(){
   \`created_at\` datetime(6) NOT NULL,
   \`updated_at\` datetime(6) NOT NULL,
   PRIMARY KEY (\`id\`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;"
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
   # check if the create table statement for product13s matches the expectation or not
   if [[ "$structure_output" != "$create_definition" ]]
   then
@@ -445,6 +445,9 @@ end"
 function check_migration_status(){
   rails db:migrate:status
 }
+
+# Change the default character set
+mysql_run "ALTER DATABASE ${VT_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci;"
 
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview
