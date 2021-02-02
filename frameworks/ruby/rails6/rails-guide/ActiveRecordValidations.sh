@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 rails generate migration CreatePerson name:string
-rake db:migrate
+rails db:migrate
 
 # 1 Validations Overview
 rake guide_validation:step_1
