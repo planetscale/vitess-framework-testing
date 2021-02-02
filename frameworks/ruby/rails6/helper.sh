@@ -79,8 +79,8 @@ function get_mysql_version(){
 
 # setup_mysql_attributes sets up the mysql attributes like the default charactersets
 function setup_mysql_attributes(){
-  # Change the default character set
-  mysql_run "ALTER DATABASE ${VT_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci;"
+  # get the default character set
+  DEFAULT_CHARSET=$(mysql_run "SELECT default_character_set_name FROM information_schema.SCHEMATA WHERE schema_name = '${VT_DATABASE}';")
 
   # get the mysql version
   mysql_version=$(get_mysql_version)

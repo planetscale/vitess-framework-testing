@@ -410,7 +410,7 @@ function check_schema_dump(){
   \`created_at\` datetime(6) NOT NULL,
   \`updated_at\` datetime(6) NOT NULL,
   PRIMARY KEY (\`id\`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+) ENGINE=InnoDB DEFAULT CHARSET=$DEFAULT_CHARSET;"
   # check if the create table statement for product13s matches the expectation or not
   if [[ "$structure_output" != "$create_definition" ]]
   then
