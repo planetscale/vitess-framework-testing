@@ -89,8 +89,10 @@ function setup_mysql_attributes(){
   then
     BIGINT="bigint"
     INT="int"
+    TINYINT="tinyint"
   else
     BIGINT="bigint(20)"
     INT="int(11)"
+    TINYINT="tinyint(1)"
   fi
 }

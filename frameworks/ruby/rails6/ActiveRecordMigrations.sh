@@ -157,7 +157,8 @@ function check_passing_modifiers(){
 # ------------------------ Task 3 -------------------------------
 
 # 3.1 create tables
-function create_table(){
+# check_create_table checks that the create table construct works
+function check_create_table(){
   rails_generate_migration_with_content "CreateTable" "class CreateTable < ActiveRecord::Migration[6.1]
     def change
        create_table :products101 do |t|
@@ -170,7 +171,8 @@ function create_table(){
   assert_mysql_output "describe products101" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL"
 }
 
-function create_table_option_blackhole(){
+# check_create_table_option_blackhole checks that blackhole engine works with create table statement
+function check_create_table_option_blackhole(){
   rails_generate_migration_with_content "CreateTableBlackhole" "class CreateTableBlackhole < ActiveRecord::Migration[6.1]
     def change
        create_table :products102, options: 'ENGINE=BLACKHOLE' do |t|
@@ -184,7 +186,8 @@ function create_table_option_blackhole(){
 }
 
 # 3.2 creating a join table
-function create_join_table(){
+# check_create_join_table checks that the create join table construct works
+function check_create_join_table(){
   rails_generate_migration_with_content "CreateJoinTable" "class CreateJoinTable < ActiveRecord::Migration[6.1]
     def change
        create_join_table :products103, :categories103
@@ -195,7 +198,8 @@ function create_join_table(){
   assert_mysql_output "describe categories103_products103" "products103_id $BIGINT NO NULL categories103_id $BIGINT NO NULL"
 }
 
-function create_join_table_null_true(){
+# check_create_join_table_null_true checks that a column can have null values in join table construct
+function check_create_join_table_null_true(){
   rails_generate_migration_with_content "CreateJoinTable1" "class CreateJoinTable1 < ActiveRecord::Migration[6.1]
     def change
         create_join_table :products104, :categories104, column_options: { null: true }
@@ -206,7 +210,8 @@ function create_join_table_null_true(){
   assert_mysql_output "describe categories104_products104" "products104_id $BIGINT YES NULL categories104_id $BIGINT YES NULL"
 }
 
-function create_join_table_and_name_categorization(){
+# check_create_join_table_and_name_categorization checks that the characterization works with join tables
+function check_create_join_table_and_name_categorization(){
   rails_generate_migration_with_content "CreateJoinTable2" "class CreateJoinTable2 < ActiveRecord::Migration[6.1]
     def change
        create_join_table :products105, :categories105, table_name: :categorization
@@ -217,7 +222,8 @@ function create_join_table_and_name_categorization(){
   assert_mysql_output "describe categorization" "products105_id $BIGINT NO NULL categories105_id $BIGINT NO NULL"
 }
 
-function create_join_table_index(){
+# check_create_join_table_index checks that the indexes works with join tables
+function check_create_join_table_index(){
   rails_generate_migration_with_content "CreateJoinTable3" "class CreateJoinTable3 < ActiveRecord::Migration[6.1]
     def change
        create_join_table :products106, :categories106 do |t|
@@ -232,21 +238,8 @@ function create_join_table_index(){
 }
 
 # 3.3 Changing Tables
-function change_table_index(){
-  rails_generate_migration_with_content "CreateJoinTable3" "class CreateJoinTable3 < ActiveRecord::Migration[6.1]
-    def change
-       create_join_table :products106, :categories106 do |t|
-          t.index :products106_id
-          t.index :categories106_id
-       end
-    end
-  end"
-  rake_migrate
-
-  assert_mysql_output "describe categories106_products106" "products106_id $BIGINT NO MUL NULL categories106_id $BIGINT NO MUL NULL"
-}
-
-function change_table_products(){
+# check_change_table_products checks that the change table construct works
+function check_change_table_products(){
   # Create table
   rails_generate_migration_with_content "CreateJoinTable4" "class CreateJoinTable4 < ActiveRecord::Migration[6.1]
     def change
@@ -275,6 +268,48 @@ function change_table_products(){
   rake_migrate
 
   assert_mysql_output "describe products_change" "id $BIGINT NO PRI NULL auto_increment upc_code varchar(255) YES NULL part_number varchar(255) YES MUL NULL"
+}
+
+# 3.4 Changing Columns
+# check_change_column checks that change_column works
+function check_change_column(){
+  # create a new table with name and part_number columns
+  rails generate migration CreateProduct107s name:string part_number:integer
+  # run the migration
+  rake_migrate
+  # assert that the table is created
+  assert_mysql_output "describe product107s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number $INT YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  # generate a migration for changing the part_number to text
+  rails_generate_migration_with_content "ChangeColumnPartNumberProduct107s" "class ChangeColumnPartNumberProduct107s < ActiveRecord::Migration[6.1]
+    def change
+      change_column :product107s, :part_number, :text
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # assert that the tables structure has changed
+  assert_mysql_output "describe product107s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number text YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+}
+
+# check_change_column_null_default checks that change_column_null and change_column_default works
+function check_change_column_null_default(){
+  # create a new table with name and approved columns
+  rails generate migration CreateProduct108s name:string approved:boolean
+  # run the migration
+  rake_migrate
+  # assert that the table is created
+  assert_mysql_output "describe product108s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL approved $TINYINT YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  # generate a migration for changing the columns
+  rails_generate_migration_with_content "ChangeColumnsProduct108s" "class ChangeColumnsProduct108s < ActiveRecord::Migration[6.1]
+    def change
+      change_column_null :product108s, :name, false
+      change_column_default :product108s, :approved, from: true, to: false
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # assert that the tables structure has changed
+  assert_mysql_output "describe product108s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) NO NULL approved $TINYINT YES 0 created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
 }
 # ---------------------------------------------------------------
 
@@ -464,24 +499,33 @@ check_add_multiple_columns_to_products
 check_add_products_table
 check_add_reference_column
 check_join_table
-#2.2 Model Generators
+# 2.2 Model Generators
 # https://guides.rubyonrails.org/active_record_migrations.html#model-generators
 check_migration_from_model
-#2.3 Passing Modifiers
+# 2.3 Passing Modifiers
 # https://guides.rubyonrails.org/active_record_migrations.html#passing-modifiers
 check_passing_modifiers
 
-#3.1 create table
-create_table
+# 3 Writing a Migration
+# https://guides.rubyonrails.org/active_record_migrations.html#writing-a-migration
+# 3.1 Create a Table
+# https://guides.rubyonrails.org/active_record_migrations.html#creating-a-table
+check_create_table
 # create table with option blackhole and null set to false
-create_table_option_blackhole
-# 3.2 creating a join table
-create_join_table
-create_join_table_null_true
-create_join_table_and_name_categorization
-create_join_table_index
-#3.3 changing tables
-change_table_products
+check_create_table_option_blackhole
+# 3.2 Creating a Join Table
+# https://guides.rubyonrails.org/active_record_migrations.html#creating-a-join-table
+check_create_join_table
+check_create_join_table_null_true
+check_create_join_table_and_name_categorization
+check_create_join_table_index
+# 3.3 Changing Tables
+# https://guides.rubyonrails.org/active_record_migrations.html#changing-tables
+check_change_table_products
+# 3.4 Changing Columns
+# https://guides.rubyonrails.org/active_record_migrations.html#changing-columns
+check_change_column
+check_change_column_null_default
 
 # 4. Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
