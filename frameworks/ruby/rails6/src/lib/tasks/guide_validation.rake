@@ -16,7 +16,7 @@ namespace :guide_validation do
 	end
 
 	task :step_1_3 do
-		# There are no code snippers; should we write some oureslves tha tuse the functions mentioned?
+		# There are no code snippets; should we write some ourselves that use the functions mentioned?
 	end
 
 	task :step_1_4 do
