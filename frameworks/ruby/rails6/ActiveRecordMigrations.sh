@@ -45,7 +45,7 @@ function check_change_product_price_type(){
   end"
   rake_migrate
   # assert that the price is now a string
-  assert_mysql_output "describe product1s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL description text YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price varchar(255) YES NULL"
+  assert_mysql_output "describe product1s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL description text YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price varchar(255) YES NULL"
 }
 
 # create_new_product_table is used to create a new product table with the given id
@@ -72,7 +72,7 @@ function check_add_and_remove_partnumber_to_products(){
   rails generate migration RemovePartNumberFromProduct2s part_number:string
   rake_migrate
   # verify that the column is indeed dropped
-  assert_mysql_output "describe product2s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  assert_mysql_output "describe product2s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # verify that the row is still available
   assert_mysql_output "select id,name from product2s" "1 Rails Guide"
 }
@@ -85,7 +85,7 @@ function check_add_partnumber_and_index_to_products(){
   rails generate migration AddPartNumberToProduct3s part_number:string:index
   rake_migrate
   # verify that their is a index on the part_number column.
-  assert_mysql_output "describe product3s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number varchar(255) YES MUL NULL"
+  assert_mysql_output "describe product3s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number varchar(255) YES MUL NULL"
 }
 
 # check_add_multiple_columns_to_products checks the addition of multiple columns
@@ -129,7 +129,7 @@ function check_join_table(){
   rails generate migration CreateJoinTableCustomerProduct customer product
   rake_migrate
   # assert the creation of the join table
-  assert_mysql_output "describe customers_products" "customer_id bigint(20) NO NULL product_id bigint(20) NO NULL"
+  assert_mysql_output "describe customers_products" "customer_id $BIGINT NO NULL product_id $BIGINT NO NULL"
 }
 
 # check_migration_from_model checks the migration constructed from the model
@@ -151,7 +151,7 @@ function check_passing_modifiers(){
   rails generate migration AddDetailsToProduct8s 'price:decimal{5,2}' supplier:references{polymorphic}
   rake_migrate
   # assert the tables description
-  assert_mysql_output "describe product8s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price decimal(5,2) YES NULL supplier_type varchar(255) NO MUL NULL supplier_id bigint(20) NO NULL"
+  assert_mysql_output "describe product8s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price decimal(5,2) YES NULL supplier_type varchar(255) NO MUL NULL supplier_id $BIGINT NO NULL"
 }
 
 # ------------------------ Task 3 -------------------------------
@@ -167,7 +167,7 @@ function create_table(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe products101" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL"
+  assert_mysql_output "describe products101" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL"
 }
 
 function create_table_option_blackhole(){
@@ -180,7 +180,7 @@ function create_table_option_blackhole(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe products102" "id bigint(20) NO PRI NULL auto_increment name varchar(255) NO NULL"
+  assert_mysql_output "describe products102" "id $BIGINT NO PRI NULL auto_increment name varchar(255) NO NULL"
 }
 
 # 3.2 creating a join table
@@ -192,7 +192,7 @@ function create_join_table(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe categories103_products103" "products103_id bigint(20) NO NULL categories103_id bigint(20) NO NULL"
+  assert_mysql_output "describe categories103_products103" "products103_id $BIGINT NO NULL categories103_id $BIGINT NO NULL"
 }
 
 function create_join_table_null_true(){
@@ -203,7 +203,7 @@ function create_join_table_null_true(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe categories104_products104" "products104_id bigint(20) YES NULL categories104_id bigint(20) YES NULL"
+  assert_mysql_output "describe categories104_products104" "products104_id $BIGINT YES NULL categories104_id $BIGINT YES NULL"
 }
 
 function create_join_table_and_name_categorization(){
@@ -214,7 +214,7 @@ function create_join_table_and_name_categorization(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe categorization" "products105_id bigint(20) NO NULL categories105_id bigint(20) NO NULL"
+  assert_mysql_output "describe categorization" "products105_id $BIGINT NO NULL categories105_id $BIGINT NO NULL"
 }
 
 function create_join_table_index(){
@@ -228,7 +228,7 @@ function create_join_table_index(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe categories106_products106" "products106_id bigint(20) NO MUL NULL categories106_id bigint(20) NO MUL NULL"
+  assert_mysql_output "describe categories106_products106" "products106_id $BIGINT NO MUL NULL categories106_id $BIGINT NO MUL NULL"
 }
 
 # 3.3 Changing Tables
@@ -243,7 +243,7 @@ function change_table_index(){
   end"
   rake_migrate
 
-  assert_mysql_output "describe categories106_products106" "products106_id bigint(20) NO MUL NULL categories106_id bigint(20) NO MUL NULL"
+  assert_mysql_output "describe categories106_products106" "products106_id $BIGINT NO MUL NULL categories106_id $BIGINT NO MUL NULL"
 }
 
 function change_table_products(){
@@ -274,7 +274,7 @@ function change_table_products(){
 
   rake_migrate
 
-  assert_mysql_output "describe products_change" "id bigint(20) NO PRI NULL auto_increment upc_code varchar(255) YES NULL part_number varchar(255) YES MUL NULL"
+  assert_mysql_output "describe products_change" "id $BIGINT NO PRI NULL auto_increment upc_code varchar(255) YES NULL part_number varchar(255) YES MUL NULL"
 }
 # ---------------------------------------------------------------
 
@@ -286,11 +286,11 @@ function check_migrate_to_version(){
   rails generate migration RemovePartNumberFromProduct9s part_number:int
   rake_migrate
   # assert the table structure after the 4 commands
-  assert_mysql_output "describe product9s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  assert_mysql_output "describe product9s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
   # migrate to a previous version
   rake_migrate $timestamp2
   # assert that the structure of table is the way we want -> part_number is added back and description is removed
-  assert_mysql_output "describe product9s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number int(11) YES NULL"
+  assert_mysql_output "describe product9s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number $INT YES NULL"
 }
 
 # check_rollback_and_redo checks that the rollback and redo commands work
@@ -301,21 +301,21 @@ function check_rollback_and_redo(){
   rails generate migration RemovePartNumberFromProduct10s part_number:int
   rake_migrate
   # assert the table structure after the 4 commands
-  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  assert_mysql_output "describe product10s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
   # migrate to a step back
   rails db:rollback
   # assert that the structure of table is the way we want -> part_number is added back
-  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL part_number int(11) YES NULL"
+  assert_mysql_output "describe product10s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL part_number $INT YES NULL"
   rake_migrate
   # migrate to 3 steps back
   rails db:rollback STEP=3
   # assert that the structure of table is the way we want -> part_number and description are removed
-  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  assert_mysql_output "describe product10s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   rake_migrate
   # redo 3 steps
   rails db:migrate:redo STEP=3
   # assert that the structure of table is the way we want that is after all migrations
-  assert_mysql_output "describe product10s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  assert_mysql_output "describe product10s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
 }
 
 # check_setup_database checks the rails db:setup command
@@ -344,13 +344,13 @@ function check_run_specific_migrations(){
   rails generate migration RemovePartNumberFromProduct11s part_number:int
   rake_migrate
   # assert the table structure after the 4 commands
-  assert_mysql_output "describe product11s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
+  assert_mysql_output "describe product11s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
   # migrate to a previous version
   rails db:rollback STEP=3
   # run the up migration from the given timestamp
   rails db:migrate:up VERSION=$timestamp 
   # assert that the structure of table is the way we want -> part_number is added back and description is removed
-  assert_mysql_output "describe product11s" "id bigint(20) NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number int(11) YES NULL"
+  assert_mysql_output "describe product11s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number $INT YES NULL"
 }
 
 # check_run_migrations_different_environment checks running migrations for different environments
@@ -405,7 +405,7 @@ function check_schema_dump(){
   # find the structure of product13s table in the structure.sql file
   structure_output=$(grep -A 6 -oF "CREATE TABLE \`product13s\` (" ./db/structure.sql)
   create_definition="CREATE TABLE \`product13s\` (
-  \`id\` bigint(20) NOT NULL AUTO_INCREMENT,
+  \`id\` $BIGINT NOT NULL AUTO_INCREMENT,
   \`name\` varchar(255) DEFAULT NULL,
   \`created_at\` datetime(6) NOT NULL,
   \`updated_at\` datetime(6) NOT NULL,
@@ -446,8 +446,8 @@ function check_migration_status(){
   rails db:migrate:status
 }
 
-# Change the default character set
-mysql_run "ALTER DATABASE ${VT_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci;"
+# setup_mysql_attributes will setup the mysql attributes
+setup_mysql_attributes
 
 # 1. Migration Overview
 # https://guides.rubyonrails.org/active_record_migrations.html#migration-overview

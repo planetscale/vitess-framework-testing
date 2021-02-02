@@ -70,3 +70,27 @@ function assert_mysql_output(){
     exit 1
   fi
 }
+
+# get_mysql_version gets the mysql version
+function get_mysql_version(){
+  version=$(mysql_run "SELECT @@version")
+  echo "$version"
+}
+
+# setup_mysql_attributes sets up the mysql attributes like the default charactersets
+function setup_mysql_attributes(){
+  # Change the default character set
+  mysql_run "ALTER DATABASE ${VT_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci;"
+
+  # get the mysql version
+  mysql_version=$(get_mysql_version)
+  # Set the BIGINT variable so that while asserting the outputs of `DESCRIBE <table>` and `SHOW CREATE TABLE <table>` it can be used since mysql 5.7 and mysql 8.0 differ in this respect
+  if echo "$mysql_version" | grep -o "8.0" 
+  then
+    BIGINT="bigint"
+    INT="int"
+  else
+    BIGINT="bigint(20)"
+    INT="int(11)"
+  fi
+}
