@@ -494,9 +494,6 @@ check_setup_database
 # NOTE - Vitess does not support drop/create database commands as it requires changing the vschema
 # rails db:reset will try to drop the database but that wont work with vitess and requires manual intervention
 # therefore the next test is commented out.
-<<<<<<< HEAD
-check_reset_database
-=======
 # check_reset_database
 # 4.4 Running Specific Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-specific-migrations
@@ -536,4 +533,3 @@ check_add_data_via_migration
 # 9. Old Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#old-migrations
 check_migration_status
->>>>>>> c0856e1f87c6136474c354f66b2163fb12b5784c
