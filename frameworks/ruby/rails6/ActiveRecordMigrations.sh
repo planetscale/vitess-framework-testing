@@ -469,7 +469,8 @@ function check_schema_dump(){
   # sqldump is a new task defined in the file /lib/tasks/my_task.rake.
   rake db:sqldump
   # find the structure of product13s table in the structure.sql file
-  structure_output=$(grep -A 6 -oF "CREATE TABLE \`product13s\` (" ./db/structure.sql)
+  # the final sed command removes the collate part from the show create table statement because it is printed only in mysql 8.0
+  structure_output=$(grep -A 6 -oF "CREATE TABLE \`product13s\` (" ./db/structure.sql | sed -E "s/ COLLATE[^;]*//")
   create_definition="CREATE TABLE \`product13s\` (
   \`id\` $BIGINT NOT NULL AUTO_INCREMENT,
   \`name\` varchar(255) DEFAULT NULL,
