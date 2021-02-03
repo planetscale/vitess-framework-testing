@@ -378,6 +378,94 @@ function check_foreign_keys(){
   # assert that the foreign key exists
   assert_mysql_output "SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product112s'" ""
 }
+
+# 3.7 When Helpers aren't enough
+# check_runner_execute checks that the execute works
+function check_runner_execute(){
+  # create a product model
+  rails generate model Product114 name:string price:string
+  # run the migration
+  rake_migrate
+  # insert data into the table
+  mysql_run "insert into product114s (name, price, created_at, updated_at) values ('Rails Active Migration Guide 3.7','100',NOW(), NOW())"
+  # Run the execute command
+  rails runner 'Product114.connection.execute("UPDATE product114s SET price = '"'"'free'"'"'WHERE 1=1")'
+  # assert that the data has changed
+  assert_mysql_output "select id, name, price from product114s" "1 Rails Active Migration Guide 3.7 free"
+}
+
+# 3.8 Using the change Method
+# check_change_method checks that all constructs for the change method work
+function check_change_method(){
+  # create 2 product tables
+  create_new_product_table "115"
+  create_new_product_table "116"
+  # use constructs of the change method - add_column, add_foreign_key, add_index, add_references, change_column_default, change_column_null, create_table, create_join_table, remove_timestamps
+  rails_generate_migration_with_content "ChangeStructureOfProduct115s" "class ChangeStructureOfProduct115s < ActiveRecord::Migration[6.1]
+    def change
+      add_column :product115s, :product115_id2, :bigint
+      add_foreign_key :product115s, :product116s, column: :product115_id2
+      add_column :product115s, :part_number, :string
+      add_index :product115s, :part_number, name: :custom_index_name 
+      add_reference :product115s, :product116s, index: false
+      change_column_default :product115s, :part_number, from: nil, to: '0'
+      change_column_null :product115s, :part_number, false
+      remove_timestamps :product115s
+      create_table :product117s do |t|
+        t.string :name
+      end
+      create_join_table :product115s, :product117s, table_name: :join_table_115_117
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # check the structure of product115s table
+  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL product115_id2 $BIGINT YES MUL NULL part_number varchar(255) NO MUL 0 product116s_id $BIGINT YES NULL"
+  # check that the tables product117s and join_table_115_117 are created
+  assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
+  # check the names of the indices created
+  assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
+
+  # use constructs of the change method - add_timestamps, drop_table, drop_join_table, remove_index, remove_foreign_key, remove_column, rename_column, rename_index, rename_table
+  rails_generate_migration_with_content "ChangeStructureOfProduct115sAgain" "class ChangeStructureOfProduct115sAgain < ActiveRecord::Migration[6.1]
+    def change
+      add_timestamps :product115s
+      drop_table :product117s do |t|
+        t.string :name
+      end
+      drop_join_table :product115s, :product117s, table_name: :join_table_115_117
+      rename_index :product115s, :custom_index_name, :new_custom_index_name
+      remove_index :product115s, :part_number, name: :new_custom_index_name
+      remove_foreign_key :product115s, :product116s, column: :product115_id2
+      remove_column :product115s, :product115_id2, :bigint
+      remove_reference :product115s, :product116s, index: false
+      rename_table :product116s, :new_product116s
+      rename_column :product115s, :part_number, :version_number
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # check the structure of product115s table
+  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL version_number varchar(255) NO 0 created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  # check that the tables product117s and join_table_115_117 are deleted and new_product116s is created
+  assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117' or TABLE_NAME='new_product116s');" "new_product116s"
+  # check the names of the indices created
+  assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s'" "0 PRIMARY id BTREE"
+
+  # check that the changes are reversible by doing a rollback
+  rails db:rollback
+  # run the same checks as before
+  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) NO MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
+  assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
+  assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
+
+  # rollback once again
+  rails db:rollback
+  # check the structure of the table product115s
+  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  # check that the created tables are also removed
+  assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" ""
+}
 # ---------------------------------------------------------------
 
 # check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
@@ -600,7 +688,12 @@ check_column_modifiers
 # 3.6 Foreign Keys
 # https://guides.rubyonrails.org/active_record_migrations.html#foreign-keys
 check_foreign_keys
-
+# 3.7 When Helpers aren't Enough
+# https://guides.rubyonrails.org/active_record_migrations.html#when-helpers-aren-t-enough
+check_runner_execute
+# 3.8 Using the Change Method
+# https://guides.rubyonrails.org/active_record_migrations.html#using-the-change-method
+check_change_method
 
 # 4. Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
