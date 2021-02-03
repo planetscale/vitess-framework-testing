@@ -466,6 +466,230 @@ function check_change_method(){
   # check that the created tables are also removed
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" ""
 }
+
+# 3.9 Using reversible
+# check_reversible checks reversible in migrations
+function check_reversible(){
+  # create a user table
+  rails generate migration CreateUser1s email:string
+  # generate a migration with reversible
+  rails_generate_migration_with_content "CheckReversibleMigration" "class CheckReversibleMigration < ActiveRecord::Migration[6.1]
+    def change
+      create_table :distributor1s do |t|
+        t.string :zipcode
+      end
+
+      reversible do |dir|
+        dir.up do
+          # add a CHECK constraint
+          execute <<-SQL
+            ALTER TABLE distributor1s
+              ADD CONSTRAINT zipchk1
+                CHECK (char_length(zipcode) = 5);
+          SQL
+        end
+        dir.down do
+          execute <<-SQL
+            ALTER TABLE distributor1s
+              DROP CONSTRAINT zipchk1
+          SQL
+        end
+      end
+
+      add_column :user1s, :home_page_url, :string
+      rename_column :user1s, :email, :email_address
+    end
+  end
+  "
+  # run the migration
+  rake_migrate
+  # check the structure of the two tables
+  assert_mysql_output "describe distributor1s" "id $BIGINT NO PRI NULL auto_increment zipcode varchar(255) YES NULL"
+  assert_mysql_output "describe user1s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
+  # check constraints are not supported in mysql 5.7 as part of alter tables. They are parsed but are ignored
+  # so the next check is only done for mysql 8.0
+  if echo "$mysql_version" | grep -o "8.0" 
+  then
+    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor1s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk1 CHECK"
+    # rollback to check that the migration is indeed reversible
+    rails db:rollback
+    # assert the structure of the user1s table
+    assert_mysql_output "describe user1s" "id $BIGINT NO PRI NULL auto_increment email varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+    # check that distributor1s is also removed
+    assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and TABLE_NAME = 'distributor1s';" ""
+  fi
+}
+
+# 3.10 Using the up/down methods
+# check_up_down_methods checks up and down methods in migrations
+function check_up_down_methods(){
+  # create a user table
+  rails generate migration CreateUser2s email:string
+  # generate a migration with up down methods
+  rails_generate_migration_with_content "CheckUpDownMethods" "class CheckUpDownMethods < ActiveRecord::Migration[6.1]
+    def up
+      create_table :distributor2s do |t|
+        t.string :zipcode
+      end
+
+      # add a CHECK constraint
+      execute <<-SQL
+        ALTER TABLE distributor2s
+          ADD CONSTRAINT zipchk2
+          CHECK (char_length(zipcode) = 5);
+      SQL
+
+      add_column :user2s, :home_page_url, :string
+      rename_column :user2s, :email, :email_address
+    end
+
+    def down
+      rename_column :user2s, :email_address, :email
+      remove_column :user2s, :home_page_url
+
+      execute <<-SQL
+        ALTER TABLE distributor2s
+          DROP CONSTRAINT zipchk2
+      SQL
+
+      drop_table :distributor2s
+    end
+  end
+  "
+  # run the migration
+  rake_migrate
+  # check the structure of the two tables
+  assert_mysql_output "describe distributor2s" "id $BIGINT NO PRI NULL auto_increment zipcode varchar(255) YES NULL"
+  assert_mysql_output "describe user2s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
+  # check constraints are not supported in mysql 5.7 as part of alter tables. They are parsed but are ignored
+  # so the next check is only done for mysql 8.0
+  if echo "$mysql_version" | grep -o "8.0" 
+  then
+    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor2s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk2 CHECK"
+    # rollback to check that the migration is indeed reversible
+    rails db:rollback
+    # assert the structure of the user2s table
+    assert_mysql_output "describe user2s" "id $BIGINT NO PRI NULL auto_increment email varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+    # check that distributor2s is also removed
+    assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and TABLE_NAME = 'distributor2s';" ""
+  fi
+}
+
+# 3.11 Reverting Previous Migrations
+# check_reverting_previous_migrations checks the capability of reverting previous migrations
+function check_reverting_previous_migrations(){
+  # create a new table
+  filename=$(rails_generate_migration "CreateProduct118s")
+  write_to_file $filename "class CreateProduct118s < ActiveRecord::Migration[6.1]
+    def change
+        create_table :product118s do |t|
+            t.string :name
+        end
+    end
+  end"
+  rake_migrate
+  # get the relative filename from filename
+  relative_filename=$(echo $filename | sed -E "s/db\/migrate\///")
+  # revert the previous migration and add a new table
+  rails_generate_migration_with_content "RevertingProduct118sCreation" "
+  require_relative \"$relative_filename\"
+
+  class RevertingProduct118sCreation < ActiveRecord::Migration[6.1]
+    def change
+      revert CreateProduct118s
+
+      create_table(:apple1s) do |t|
+        t.string :variety
+      end
+    end
+  end
+  "
+  # run the migration
+  rake_migrate
+  # check that product118s table is removed and apple1s added
+  assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'apple1s' or TABLE_NAME = 'product118s');" "apple1s"
+}
+
+# check_revert_block checks that the revert command also accepts a block
+function check_revert_block(){
+  # create a user table
+  rails generate migration CreateUser3s email:string
+  # generate a migration with up down methods
+  rails_generate_migration_with_content "CheckRevertBlockMigrations" "class CheckRevertBlockMigrations < ActiveRecord::Migration[6.1]
+    def up
+      create_table :distributor3s do |t|
+        t.string :zipcode
+      end
+
+      # add a CHECK constraint
+      execute <<-SQL
+        ALTER TABLE distributor3s
+          ADD CONSTRAINT zipchk3
+          CHECK (char_length(zipcode) = 5);
+      SQL
+
+      add_column :user3s, :home_page_url, :string
+      rename_column :user3s, :email, :email_address
+    end
+
+    def down
+      rename_column :user3s, :email_address, :email
+      remove_column :user3s, :home_page_url
+
+      execute <<-SQL
+        ALTER TABLE distributor3s
+          DROP CONSTRAINT zipchk3
+      SQL
+
+      drop_table :distributor3s
+    end
+  end
+  "
+  # run the migration
+  rake_migrate
+  # check the structure of the two tables
+  assert_mysql_output "describe distributor3s" "id $BIGINT NO PRI NULL auto_increment zipcode varchar(255) YES NULL"
+  assert_mysql_output "describe user3s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
+  # check constraints are not supported in mysql 5.7 as part of alter tables. They are parsed but are ignored
+  # so the next check is only done for mysql 8.0
+  if echo "$mysql_version" | grep -o "8.0" 
+  then
+    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk3 CHECK"
+    # generate a migration for reverting some of these changes
+    rails_generate_migration_with_content "DontUseConstraintForZipcodeValidationMigration" "class DontUseConstraintForZipcodeValidationMigration < ActiveRecord::Migration[6.1]
+      def change
+        revert do
+          # copy-pasted code from previous migration
+          reversible do |dir|
+            dir.up do
+              # add a CHECK constraint
+              execute <<-SQL
+                ALTER TABLE distributor3s
+                  ADD CONSTRAINT zipchk3
+                    CHECK (char_length(zipcode) = 5);
+              SQL
+            end
+            dir.down do
+              execute <<-SQL
+                ALTER TABLE distributor3s
+                  DROP CONSTRAINT zipchk3
+              SQL
+            end
+          end
+
+          # The rest of the migration was ok
+        end
+      end
+    end
+    "
+    # run the migration
+    rake_migrate
+    # check the structure of the two tables
+    assert_mysql_output "describe distributor3s" "id $BIGINT NO PRI NULL auto_increment zipcode varchar(255) YES NULL"
+    assert_mysql_output "describe user3s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
+    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY"
+  fi
+}
 # ---------------------------------------------------------------
 
 # check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
@@ -694,6 +918,16 @@ check_runner_execute
 # 3.8 Using the Change Method
 # https://guides.rubyonrails.org/active_record_migrations.html#using-the-change-method
 check_change_method
+# 3.9 Using reversible
+# https://guides.rubyonrails.org/active_record_migrations.html#using-reversible
+check_reversible
+# 3.10 Using up/down Methods
+# https://guides.rubyonrails.org/active_record_migrations.html#using-the-up-down-methods
+check_up_down_methods
+# 3.11 Reverting Previous Migrations
+# https://guides.rubyonrails.org/active_record_migrations.html#reverting-previous-migrations
+check_reverting_previous_migrations
+check_revert_block
 
 # 4. Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
