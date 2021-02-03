@@ -3,6 +3,7 @@
 
 source helper.sh
 
+# 1. Migration Overview
 # check_create_products_migration checks that the create product migration works correctly
 function check_create_products_migration(){
   # create the migration file and write the content
@@ -48,6 +49,8 @@ function check_change_product_price_type(){
   assert_mysql_output "describe product1s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL description text YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price varchar(255) YES NULL"
 }
 
+# 2. Creating a Migration
+# 2.1 Creating a Standalone Migration
 # create_new_product_table is used to create a new product table with the given id
 function create_new_product_table() {
   # $1 is the id to use for the table name
@@ -132,6 +135,7 @@ function check_join_table(){
   assert_mysql_output "describe customers_products" "customer_id $BIGINT NO NULL product_id $BIGINT NO NULL"
 }
 
+# 2.2 Model Generators
 # check_migration_from_model checks the migration constructed from the model
 function check_migration_from_model(){
   # create the model
@@ -143,6 +147,7 @@ function check_migration_from_model(){
   assert_mysql_output "select id,name,description from product7s" "1 RGT Rails Guide Testing Model Generators"
 }
 
+# 2.3 Passing Modifiers
 # check_passing_modifiers checks that passing modifiers to rails generate migration commands work
 function check_passing_modifiers(){
   # create a table first
@@ -154,8 +159,7 @@ function check_passing_modifiers(){
   assert_mysql_output "describe product8s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL price decimal(5,2) YES NULL supplier_type varchar(255) NO MUL NULL supplier_id $BIGINT NO NULL"
 }
 
-# ------------------------ Task 3 -------------------------------
-
+# 3 Writing a Migration
 # 3.1 create tables
 # check_create_table checks that the create table construct works
 function check_create_table(){
@@ -690,8 +694,8 @@ function check_revert_block(){
     assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY"
   fi
 }
-# ---------------------------------------------------------------
 
+# 4. Running Migrations
 # check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
 function check_migrate_to_version(){
   rails generate migration CreateProduct9s name:string
@@ -707,6 +711,7 @@ function check_migrate_to_version(){
   assert_mysql_output "describe product9s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number $INT YES NULL"
 }
 
+# 4.1 Rolling Back
 # check_rollback_and_redo checks that the rollback and redo commands work
 function check_rollback_and_redo(){
   rails generate migration CreateProduct10s name:string
@@ -732,6 +737,7 @@ function check_rollback_and_redo(){
   assert_mysql_output "describe product10s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL description varchar(255) YES NULL"
 }
 
+# 4.2 Setup the Database
 # check_setup_database checks the rails db:setup command
 function check_setup_database(){
   # dump the schema so that the schema.rb file used in db:setup is upto date.
@@ -740,6 +746,7 @@ function check_setup_database(){
   rails db:setup
 }
 
+# 4.3 Resetting the Database
 # check_reset_database checks the rails db:reset command
 function check_reset_database(){
   # dump the schema so that the schema.rb file used in db:setup is upto date.
@@ -750,6 +757,7 @@ function check_reset_database(){
   assert_mysql_output "show tables" "active_storage_attachments active_storage_blobs ar_internal_metadata customers_products microposts product10s product1s product2s product3s product4s product5s product6s product7s product8s product9s relationships schema_migrations users"
 }
 
+# 4.4 Running Specific Migrations
 # check_run_specific_migrations checks the running of a specific migration given its timestamp
 function check_run_specific_migrations(){
   rails generate migration CreateProduct11s name:string
@@ -767,12 +775,14 @@ function check_run_specific_migrations(){
   assert_mysql_output "describe product11s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number $INT YES NULL"
 }
 
+# 4.5 Running Migrations in Different Environments
 # check_run_migrations_different_environment checks running migrations for different environments
 function check_run_migrations_different_environment(){
   # check that passing the environment variable works correctly
   rails db:migrate RAILS_ENV=production
 }
 
+# 4.6 Changing the Output of Running Migrations
 # check_changing_output_migrations checks that changing the output of running migrations works
 function check_changing_output_migrations(){
   # Create a migration along with commands to change the output
@@ -809,6 +819,8 @@ end"
   fi
 }
 
+# 6. Schema Dumping and You
+# 6.2 Types of Schema Dumps
 # check_schema_dump checks the mysql and rails schema dumps
 function check_schema_dump(){
   create_new_product_table "13"
@@ -834,6 +846,7 @@ function check_schema_dump(){
   fi
 }
 
+# 8. Migrations and Seed Data
 # check_add_data_via_migration checks that we can add data via a migration
 function check_add_data_via_migration(){
   # create the model
@@ -856,6 +869,7 @@ end"
   assert_mysql_output "select id, name, description from product14s" "1 Product #0 A product. 2 Product #1 A product. 3 Product #2 A product. 4 Product #3 A product. 5 Product #4 A product."
 }
 
+# 9. Old Migrations
 # check_migration_status checks that the migration status command works
 function check_migration_status(){
   rails db:migrate:status
