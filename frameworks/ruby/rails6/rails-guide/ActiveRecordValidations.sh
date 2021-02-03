@@ -31,3 +31,14 @@ rake guide_validation:step_2_11 # uniqueness
 rake guide_validation:step_2_12 # validates_with
 rake guide_validation:step_2_13 # validates_each
 
+# 3 Common Validation Options
+rails generate migration CreateCoffee size:string
+rails generate migration CreateTopic title:string
+rails generate migration CreatePerson5 name:string age:integer username:string
+rails generate migration CreatePerson6 email:string age:integer name:string
+rails db:migrate
+rake guide_validation:step_3_1 # :allow_nil
+rake guide_validation:step_3_2 # :allow_blank
+rake guide_validation:step_3_3 # :message
+rake guide_validation:step_3_4 # :on
+
