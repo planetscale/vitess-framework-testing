@@ -342,6 +342,42 @@ function check_column_modifiers() {
   # assert the table structure
   assert_mysql_output "select column_name, is_nullable, column_default, column_comment from information_schema.COLUMNS where table_name = 'product111s' and table_schema='$VT_DATABASE'" "id NO NULL name_with_modifiers NO rails testing Explanatory comment"
 }
+
+# 3.6 Foreign Keys
+# check_foreign_keys checks that adding a foreign key works
+function check_foreign_keys(){
+  # create 2 product tables
+  create_new_product_table "112"
+  create_new_product_table "113"
+  # add foreign keys
+  rails_generate_migration_with_content "AddForeignKeysToProduct112s" "class AddForeignKeysToProduct112s < ActiveRecord::Migration[6.1]
+    def change
+      add_column :product112s, :product113_id, :bigint
+      add_column :product112s, :product113_id2, :bigint
+      add_column :product112s, :product113_id3, :bigint
+      add_foreign_key :product112s, :product113s
+      add_foreign_key :product112s, :product113s, column: :product113_id2
+      add_foreign_key :product112s, :product113s, column: :product113_id3, primary_key: :id
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # assert that the foreign key exists
+  assert_mysql_output "SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product112s' ORDER BY CONSTRAINT_NAME;" "fk_rails_597a50398e product112s product113_id3 product113s id fk_rails_ca97e6b679 product112s product113_id product113s id fk_rails_cc95aff6e8 product112s product113_id2 product113s id"
+
+  # remove the foreign keys
+  rails_generate_migration_with_content "RemoveForeignKeysToProduct112s" "class RemoveForeignKeysToProduct112s < ActiveRecord::Migration[6.1]
+    def change
+      remove_foreign_key :product112s, name: :fk_rails_597a50398e
+      remove_foreign_key :product112s, column: :product113_id2
+      remove_foreign_key :product112s, :product113s
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # assert that the foreign key exists
+  assert_mysql_output "SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product112s'" ""
+}
 # ---------------------------------------------------------------
 
 # check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
@@ -561,6 +597,10 @@ check_change_column_null_default
 # 3.5 Column Modifiers
 # https://guides.rubyonrails.org/active_record_migrations.html#column-modifiers
 check_column_modifiers
+# 3.6 Foreign Keys
+# https://guides.rubyonrails.org/active_record_migrations.html#foreign-keys
+check_foreign_keys
+
 
 # 4. Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-migrations
