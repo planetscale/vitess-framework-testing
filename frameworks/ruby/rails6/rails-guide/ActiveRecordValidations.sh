@@ -42,3 +42,8 @@ rake guide_validation:step_3_2 # :allow_blank
 rake guide_validation:step_3_3 # :message
 rake guide_validation:step_3_4 # :on
 
+# 4 Strict Validations
+# We can't test this without properly pulling in Test::Unit::Assertions for
+#    assert_raise; it shouldn't be doing anything with the database that hasn't
+#    already been tested in previous chapters, though.
+
