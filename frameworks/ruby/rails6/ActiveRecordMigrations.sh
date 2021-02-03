@@ -311,6 +311,37 @@ function check_change_column_null_default(){
   # assert that the tables structure has changed
   assert_mysql_output "describe product108s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) NO NULL approved $TINYINT YES 0 created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
 }
+
+# 3.5 Column Modifiers
+# check_column_modifiers checks that the column modifiers work
+function check_column_modifiers() {
+  # generate a migration with column modifier - limit
+  rails generate migration CreateProduct109s string_with_limit:string{100} text_with_limit:text{100} binary_with_limit:binary{100} integer_with_limit:integer{2}
+  # run the migration
+  rake_migrate
+  # assert the table structure
+  assert_mysql_output "describe product109s" "id $BIGINT NO PRI NULL auto_increment string_with_limit varchar(100) YES NULL text_with_limit tinytext YES NULL binary_with_limit varbinary(100) YES NULL integer_with_limit $SMALLINT YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+
+  # generate a migration with column modifiers - precision, scale and polymorphic
+  rails generate migration CreateProduct110s decimal_with_modifiers:decimal{9,4} ref_with_polymorphic:references{polymorphic}
+  # run the migration
+  rake_migrate
+  # assert the table structure
+  assert_mysql_output "describe product110s" "id $BIGINT NO PRI NULL auto_increment decimal_with_modifiers decimal(9,4) YES NULL ref_with_polymorphic_type varchar(255) NO MUL NULL ref_with_polymorphic_id $BIGINT NO NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
+  
+  # generate a migration with column modifiers - null, default and comment
+  rails_generate_migration_with_content "CreateProduct111s" "class CreateProduct111s < ActiveRecord::Migration[6.1]
+    def change
+      create_table :product111s do |t|
+        t.string :name_with_modifiers, null: false, default: 'rails testing', :comment => 'Explanatory comment'
+      end
+    end
+  end"
+  # run the migration
+  rake_migrate
+  # assert the table structure
+  assert_mysql_output "select column_name, is_nullable, column_default, column_comment from information_schema.COLUMNS where table_name = 'product111s' and table_schema='$VT_DATABASE'" "id NO NULL name_with_modifiers NO rails testing Explanatory comment"
+}
 # ---------------------------------------------------------------
 
 # check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
@@ -526,6 +557,9 @@ check_change_table_products
 # https://guides.rubyonrails.org/active_record_migrations.html#changing-columns
 check_change_column
 check_change_column_null_default
+# 3.5 Column Modifiers
+# https://guides.rubyonrails.org/active_record_migrations.html#column-modifiers
+check_column_modifiers
 
 # 4. Running Migrations
 # https://guides.rubyonrails.org/active_record_migrations.html#running-migrations

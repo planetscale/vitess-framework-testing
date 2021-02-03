@@ -90,9 +90,11 @@ function setup_mysql_attributes(){
     BIGINT="bigint"
     INT="int"
     TINYINT="tinyint"
+    SMALLINT="smallint"
   else
     BIGINT="bigint(20)"
     INT="int(11)"
     TINYINT="tinyint(1)"
+    SMALLINT="smallint(6)"
   fi
 }
