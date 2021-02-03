@@ -154,5 +154,60 @@ namespace :guide_validation do
 		p = Person3.new(email: "good@ema.il", email_confirmation: "good@ema.il")
 		raise "should be valid" unless p.valid?
 	end
+
+
+	task :step_3_1 do
+		c = Coffee.new(size: "something")
+		raise "should be invalid" if c.valid?
+		c = Coffee.new(size: "small")
+		raise "should be valid 1" unless c.valid?
+		c = Coffee.new()
+		raise "should be valid 2" unless c.valid?
+	end
+
+	task :step_3_2 do
+		t = Topic.new(title: "something")
+		raise "should be invalid" if t.valid?
+		t = Topic.new(title: "thing")
+		raise "should be valid 1" unless t.valid?
+		t = Topic.new(title: "")
+		raise "should be valid 2" unless t.valid?
+		t = Topic.new(title: nil)
+		raise "should be valid 3" unless t.valid?
+		t = Topic.new()
+		raise "should be valid 4" unless t.valid?
+	end
+
+	task :step_3_3 do
+		p = Person5.create(name: "Somebody", age: 30, username: "somebody")
+		raise "should be valid" unless p.valid?
+		p = Person5.new(age: 30, username: "nobody")
+		raise "should be invalid 1" if p.valid?
+		p = Person5.new(name: "Nobody", age: "thirty", username: "nobody")
+		raise "should ve invalid 2" if p.valid?
+		p = Person5.new(name: "Nobody", age: 30, username: "somebody")
+		raise "should be invalid 3" if p.valid?
+	end
+
+	task :step_3_4 do
+		p = Person6.create(email: "test@ema.il", age: 30, name: "Somebody")
+		raise "should be valid 1" unless p.valid?
+		p = Person6.new(email: "test@ema.il", age: 30, name: "Somebody")
+		raise "should be invalid 1" if p.valid?
+		p = Person6.create(email: "test2@ema.il", age: 30, name: "Somebody")
+		raise "should be valid 2" unless p.valid?
+		p.email = "test@ema.il"
+		p.save()
+		raise "should be valid 3" unless p.valid?
+		p = Person6.new(email: "test2@ema.il", age: "thirty", name: "Somebody")
+		raise "should be valid 4" unless p.valid?
+		p.age = 30
+		p.save()
+		raise "should be valid 5" unless p.valid?
+		p.age = "thirty"
+		raise "should be invalid 2" if p.valid?
+		p = Person6.new(email: "test3@ema.il", age: 30)
+		raise "should be invalid 3" if p.valid?
+	end
 end
 
