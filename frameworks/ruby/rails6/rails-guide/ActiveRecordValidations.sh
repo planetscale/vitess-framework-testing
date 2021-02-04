@@ -1,9 +1,8 @@
 #!/bin/sh -ex
 
+# 1 Validations Overview
 rails generate migration CreatePerson name:string
 rails db:migrate
-
-# 1 Validations Overview
 rake guide_validation:step_1
 rake guide_validation:step_1_1 # Why Use Validations?
 rake guide_validation:step_1_2 # When Does Validation Happen?
