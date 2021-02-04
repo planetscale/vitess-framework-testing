@@ -209,5 +209,57 @@ namespace :guide_validation do
 		p = Person6.new(email: "test3@ema.il", age: 30)
 		raise "should be invalid 3" if p.valid?
 	end
+
+	task :step_5_1 do
+		o = Order.new(payment_type: "cash")
+		raise "should be valid 1" unless o.valid?
+		o = Order.new(payment_type: "card", card_number: 1234)
+		raise "should be valid 2" unless o.valid?
+		o = Order.new(payment_type: "card")
+		raise "should be invalid 1" if o.valid?
+	end
+
+	task :step_5_2 do
+		a = Account.new()
+		raise "should be valid 1" unless a.valid?
+		a = Account.new(password: "something", password_confirmation: "something")
+		raise "should be valid 2" unless a.valid?
+		# a = Account.new(password: "something")
+		# raise "should be invalid 1" if a.valid?
+		a = Account.new(password: "something", password_confirmation: "something else")
+		raise "should be invalid 2" if a.valid?
+	end
+
+	task :step_5_3 do
+		u = User2.new(is_admin: false)
+		raise "should be valid 1" unless u.valid?
+		u = User2.new(is_admin: false, password: "something long")
+		raise "should be valid 2" unless u.valid?
+		u = User2.new(is_admin: false, email: "te@s.t")
+		raise "should be valid 3" unless u.valid?
+		u = User2.new(is_admin: false, email: "te@s.t", password: "something long")
+		raise "should be valid 4" unless u.valid?
+		u = User2.new(is_admin: true, email: "te@s.t", password: "something long")
+		raise "should be valid 5" unless u.valid?
+		u = User2.new(is_admin: true)
+		raise "should be invalid 1" if u.valid?
+		u = User2.new(is_admin: true, password: "something long")
+		raise "should be invalid 2" if u.valid?
+		u = User2.new(is_admin: true, email: "te@s.t")
+		raise "should be invalid 3" if u.valid?
+	end
+
+	task :step_5_4 do
+		c = Computer.new(mouse: "3-button", market: Market.new(retail: true), trackpad: Trackpad.new(present: false))
+		raise "should be valid 1" unless c.valid?
+		c = Computer.new(mouse: "3-button", market: Market.new(retail: false), trackpad: Trackpad.new(present: true))
+		raise "should be valid 2" unless c.valid?
+		c = Computer.new(market: Market.new(retail: true), trackpad: Trackpad.new(present: false))
+		raise "should be invalid 1" if c.valid?
+		c = Computer.new(market: Market.new(retail: false), trackpad: Trackpad.new(present: true))
+		raise "should be valid 3" unless c.valid?
+		c = Computer.new(market: Market.new(retail: true), trackpad: Trackpad.new(present: true))
+		raise "should be valid 4" unless c.valid?
+	end
 end
 
