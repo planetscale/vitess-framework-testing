@@ -49,7 +49,7 @@ rake guide_validation:step_3_4 # :on
 # 5 Conditional Validation
 rails generate migration CreateOrder card_number:integer payment_type:string
 rails generate migration CreateAccount password:string
-rails generate migration CreateUser2 email:string password:string is_admin:boolean
+rails generate migration CreateUser4 email:string password:string is_admin:boolean
 rails db:migrate
 rake guide_validation:step_5_1 # Using a Symbol with :if and :unless
 rake guide_validation:step_5_2 # Using a Proc with :if and :unless

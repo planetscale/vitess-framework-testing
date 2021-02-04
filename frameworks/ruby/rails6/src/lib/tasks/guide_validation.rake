@@ -231,21 +231,21 @@ namespace :guide_validation do
 	end
 
 	task :step_5_3 do
-		u = User2.new(is_admin: false)
+		u = User4.new(is_admin: false)
 		raise "should be valid 1" unless u.valid?
-		u = User2.new(is_admin: false, password: "something long")
+		u = User4.new(is_admin: false, password: "something long")
 		raise "should be valid 2" unless u.valid?
-		u = User2.new(is_admin: false, email: "te@s.t")
+		u = User4.new(is_admin: false, email: "te@s.t")
 		raise "should be valid 3" unless u.valid?
-		u = User2.new(is_admin: false, email: "te@s.t", password: "something long")
+		u = User4.new(is_admin: false, email: "te@s.t", password: "something long")
 		raise "should be valid 4" unless u.valid?
-		u = User2.new(is_admin: true, email: "te@s.t", password: "something long")
+		u = User4.new(is_admin: true, email: "te@s.t", password: "something long")
 		raise "should be valid 5" unless u.valid?
-		u = User2.new(is_admin: true)
+		u = User4.new(is_admin: true)
 		raise "should be invalid 1" if u.valid?
-		u = User2.new(is_admin: true, password: "something long")
+		u = User4.new(is_admin: true, password: "something long")
 		raise "should be invalid 2" if u.valid?
-		u = User2.new(is_admin: true, email: "te@s.t")
+		u = User4.new(is_admin: true, email: "te@s.t")
 		raise "should be invalid 3" if u.valid?
 	end
 
