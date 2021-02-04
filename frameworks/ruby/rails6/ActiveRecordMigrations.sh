@@ -332,7 +332,7 @@ function check_column_modifiers() {
   rake_migrate
   # assert the table structure
   assert_mysql_output "describe product110s" "id $BIGINT NO PRI NULL auto_increment decimal_with_modifiers decimal(9,4) YES NULL ref_with_polymorphic_type varchar(255) NO MUL NULL ref_with_polymorphic_id $BIGINT NO NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
-  
+
   # generate a migration with column modifiers - null, default and comment
   rails_generate_migration_with_content "CreateProduct111s" "class CreateProduct111s < ActiveRecord::Migration[6.1]
     def change
@@ -410,7 +410,7 @@ function check_change_method(){
       add_column :product115s, :product115_id2, :bigint
       add_foreign_key :product115s, :product116s, column: :product115_id2
       add_column :product115s, :part_number, :string
-      add_index :product115s, :part_number, name: :custom_index_name 
+      add_index :product115s, :part_number, name: :custom_index_name
       add_reference :product115s, :product116s, index: false
       change_column_default :product115s, :part_number, from: nil, to: '0'
       change_column_null :product115s, :part_number, false
@@ -459,7 +459,7 @@ function check_change_method(){
   # check that the changes are reversible by doing a rollback
   rails db:rollback
   # run the same checks as before
-  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) NO MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
+  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) YES MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
   assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
 
@@ -512,7 +512,7 @@ function check_reversible(){
   assert_mysql_output "describe user1s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
   # check constraints are not supported in mysql 5.7 as part of alter tables. They are parsed but are ignored
   # so the next check is only done for mysql 8.0
-  if echo "$mysql_version" | grep -o "8.0" 
+  if echo "$mysql_version" | grep -o "8.0"
   then
     assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor1s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk1 CHECK"
     # rollback to check that the migration is indeed reversible
@@ -567,7 +567,7 @@ function check_up_down_methods(){
   assert_mysql_output "describe user2s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
   # check constraints are not supported in mysql 5.7 as part of alter tables. They are parsed but are ignored
   # so the next check is only done for mysql 8.0
-  if echo "$mysql_version" | grep -o "8.0" 
+  if echo "$mysql_version" | grep -o "8.0"
   then
     assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor2s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk2 CHECK"
     # rollback to check that the migration is indeed reversible
@@ -656,7 +656,7 @@ function check_revert_block(){
   assert_mysql_output "describe user3s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
   # check constraints are not supported in mysql 5.7 as part of alter tables. They are parsed but are ignored
   # so the next check is only done for mysql 8.0
-  if echo "$mysql_version" | grep -o "8.0" 
+  if echo "$mysql_version" | grep -o "8.0"
   then
     assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk3 CHECK"
     # generate a migration for reverting some of these changes
@@ -770,7 +770,7 @@ function check_run_specific_migrations(){
   # migrate to a previous version
   rails db:rollback STEP=3
   # run the up migration from the given timestamp
-  rails db:migrate:up VERSION=$timestamp 
+  rails db:migrate:up VERSION=$timestamp
   # assert that the structure of table is the way we want -> part_number is added back and description is removed
   assert_mysql_output "describe product11s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL part_number $INT YES NULL"
 }
@@ -813,7 +813,7 @@ end"
   rails generate migration AddPriceToProduct12s price:int
   rails_output=$(rails db:migrate VERBOSE=false)
   if [ ! -z "$rails_output" ]
-  then 
+  then
     echo "There should be no output when VERBOSE = false"
     exit 1
   fi
