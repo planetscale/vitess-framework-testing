@@ -41,6 +41,7 @@ function build_image() {
 #    To rebuild a framework's container image for testing during local development, use build_image "$language/$framework"
 function run_test() {
   validate_environment
+  cleanup_tables
 
   local language framework
   language="$(echo "$1" | cut -d'/' -f1)"
@@ -59,7 +60,7 @@ function run_test() {
   echo "${language}/${framework}: $result"
   popd >/dev/null || return
 
-  cleanup_tables
+  #cleanup_tables
   return $result
 }
 
@@ -78,4 +79,3 @@ cmd="${1}"
 shift
 
 "${cmd}" "$@"
-
