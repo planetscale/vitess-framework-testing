@@ -281,5 +281,71 @@ namespace :guide_validation do
 		i = Invoice.new(customer: Customer.new(name: "somebody", active: true), expiration_date: Date.today, discount: 10, total_value: 1)
 		raise "should be invalid 3" if i.valid?
 	end
+
+	task :step_7_1 do
+		p = Person8.new
+		raise "should be invalid" if p.valid?
+		raise "errors wrong" if p.errors.full_messages != ["Name can't be blank", "Name is too short (minimum is 3 characters)"]
+		p = Person8.new(name: "John Doe")
+		raise "should be valid" unless p.valid?
+		raise "errors non-empty" if p.errors.full_messages != []
+	end
+
+	task :step_7_2 do
+		p = Person8.new(name: "John Doe")
+		raise "should be valid" unless p.valid?
+		raise "errors non-empty" if p.errors[:name] != []
+		p = Person8.new(name: "JD")
+		raise "should be invalid 1" if p.valid?
+		raise "errors wrong 1" if p.errors[:name] != ["is too short (minimum is 3 characters)"]
+		p = Person8.new
+		raise "should be invalid 2" if p.valid?
+		raise "errors wrong 2" if p.errors[:name] != ["can't be blank", "is too short (minimum is 3 characters)"]
+	end
+
+	task :step_7_3 do
+		p = Person8.new
+		raise "should be invalid" if p.valid?
+		raise "errors wrong 1" if (p.errors.where(:name).map do |e| e.message end) != ["can't be blank", "is too short (minimum is 3 characters)"]
+		raise "errors wrong 2" if (p.errors.where(:name, :too_short).map do |e| e.message end) != ["is too short (minimum is 3 characters)"]
+		e = p.errors.where(:name).last
+		raise "attribute wrong" if e.attribute != :name
+		raise "type wrong" if e.type != :too_short
+		raise "count wrong" if e.options[:count] != 3
+		raise "message wrong" if e.message != "is too short (minimum is 3 characters)"
+		raise "full_mesage wrong" if e.full_message != "Name is too short (minimum is 3 characters)"
+	end
+
+	task :step_7_4 do
+		p = Person9.create
+		raise "should be invalid" if p.valid?
+		raise "type wrong" if p.errors.where(:name).first.type != :too_plain
+		raise "full_message wrong" if p.errors.where(:name).first.full_message != "Name is not cool enough"
+	end
+
+	task :step_7_5 do
+		p = Person10.create
+		raise "should be invalid" if p.valid?
+		raise "full_message wrong" if p.errors.where(:base).first.full_message != "This person is invalid because ..."
+	end
+
+	task :step_7_6 do
+		p = Person8.new
+		raise "should be invalid" if p.valid?
+		raise "should have errors 1" if p.errors.empty?
+		p.errors.clear
+		raise "should not have errors" unless p.errors.empty?
+		raise "save should fail" if p.save
+		raise "should have errors 2" if p.errors.empty?
+	end
+
+	task :step_7_7 do
+		p = Person8.new
+		raise "should be invalid" if p.valid?
+		raise "should have 2 errors" if p.errors.size != 2
+		p = Person8.new(name: "Andrea", email: "andrea@example.com")
+		raise "should be valid" unless p.valid?
+		raise "should have 0 errors" if p.errors.size != 0
+	end
 end
 
