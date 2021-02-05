@@ -56,3 +56,9 @@ rake guide_validation:step_5_2 # Using a Proc with :if and :unless
 rake guide_validation:step_5_3 # Grouping Conditional validations
 rake guide_validation:step_5_4 # Combining Validation Conditions
 
+# 6 Performing Custom Validations
+rails generate migration CreatePerson7 email:string
+rails db:migrate
+rake guide_validation:step_6_1 # Custom Validators
+rake guide_validation:step_6_2 # Custom Methods
+
