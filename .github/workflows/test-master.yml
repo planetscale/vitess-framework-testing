@@ -134,7 +134,7 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:
-          images: 'mysql:5.7,vitess/vttestserver:mysql57,vitess/vttestserver:mysql80'
+          images: 'mysql:5.7,mysql:8.0,vitess/vttestserver:mysql57,vitess/vttestserver:mysql80'
 
       - id: push
         name: Push container images for changed tests
