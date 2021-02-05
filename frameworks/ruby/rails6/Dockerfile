@@ -13,8 +13,11 @@ RUN \
 	apk del .build-deps && \
 	rm -Rvf vendor/bundle/ruby/*/cache/*.gem && \
 	find vendor/bundle/ruby/*/gems -name '*.c' -or -name '*.o' -print -delete
-ADD src /src
+
+ADD src/app src/babel.config.js src/config src/package.json src/yarn.lock src/postcss.config.js /src/
 RUN yarn install --check-files
+
+ADD src /src
 
 ENV RAILS_ENV=production
 ENV DISABLE_DATABASE_ENVIRONMENT_CHECK=1
