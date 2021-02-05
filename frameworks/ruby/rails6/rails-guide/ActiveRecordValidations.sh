@@ -75,3 +75,7 @@ rake guide_validation:step_7_5 # errors[:base]
 rake guide_validation:step_7_6 # errors.clear
 rake guide_validation:step_7_7 # errors.size
 
+# 8 Displaying Validation Errors in Views
+# This is entirely a presentation layer thing, so we don't include it in a
+#    data access layer test
+
