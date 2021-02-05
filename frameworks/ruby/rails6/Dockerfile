@@ -13,8 +13,11 @@ RUN \
 	apk del .build-deps && \
 	rm -Rvf vendor/bundle/ruby/*/cache/*.gem && \
 	find vendor/bundle/ruby/*/gems -name '*.c' -or -name '*.o' -print -delete
-ADD src /src
+
+ADD src/app src/babel.config.js src/config src/package.json src/yarn.lock src/postcss.config.js /src/
 RUN yarn install --check-files
+
+ADD src /src
 
 RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 RUN python3 -m ensurepip
