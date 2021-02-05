@@ -36,6 +36,14 @@ jobs:
           MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: root
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
+      mysql80:
+        image: mysql:8.0
+        ports:
+          - 33578:3306
+        env:
+          MYSQL_DATABASE: test
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
       vttestserver57:
         image: vitess/vttestserver:mysql57
         ports:
@@ -80,6 +88,16 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
+
+      - id: run-mysql80
+        name: Run changed tests against upstream MySQL 8.0
+        run: ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: root
+          VT_PASSWORD: root
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33578
 
       - id: run-vttestserver57
         name: Run changed tests against vttestserver:mysql57
