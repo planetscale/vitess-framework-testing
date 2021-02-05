@@ -62,3 +62,16 @@ rails db:migrate
 rake guide_validation:step_6_1 # Custom Validators
 rake guide_validation:step_6_2 # Custom Methods
 
+# 7 Working with Validation Errors
+rails generate migration CreatePerson8 name:string email:string
+rails generate migration CreatePerson9 name:string
+rails generate migration CreatePerson10 name:string
+rails db:migrate
+rake guide_validation:step_7_1 # errors
+rake guide_validation:step_7_2 # errors[]
+rake guide_validation:step_7_3 # errors.where and error object
+rake guide_validation:step_7_4 # errors.add
+rake guide_validation:step_7_5 # errors[:base]
+rake guide_validation:step_7_6 # errors.clear
+rake guide_validation:step_7_7 # errors.size
+
