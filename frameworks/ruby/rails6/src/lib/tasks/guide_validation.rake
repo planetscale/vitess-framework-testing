@@ -261,5 +261,25 @@ namespace :guide_validation do
 		c = Computer.new(market: Market.new(retail: true), trackpad: Trackpad.new(present: true))
 		raise "should be valid 4" unless c.valid?
 	end
+
+	task :step_6_1 do
+		p = Person7.new(email: "test@te.st")
+		raise "should be valid" unless p.valid?
+		p = Person7.new(email: "test")
+		raise "should be invalid 1" if p.valid?
+		p = Person7.new()
+		raise "should be invalid 2" if p.valid?
+	end
+
+	task :step_6_2 do
+		i = Invoice.new(customer: Customer.new(name: "somebody", active: true), expiration_date: Date.today, discount: 1, total_value: 10)
+		raise "should be valid" unless i.valid?
+		i = Invoice.new(customer: Customer.new(name: "somebody", active: false), expiration_date: Date.today, discount: 1, total_value: 10)
+		raise "should be invalid 1" if i.valid?
+		i = Invoice.new(customer: Customer.new(name: "somebody", active: true), expiration_date: Date.ordinal(2001), discount: 1, total_value: 10)
+		raise "should be invalid 2" if i.valid?
+		i = Invoice.new(customer: Customer.new(name: "somebody", active: true), expiration_date: Date.today, discount: 10, total_value: 1)
+		raise "should be invalid 3" if i.valid?
+	end
 end
 
