@@ -459,7 +459,7 @@ function check_change_method(){
   # check that the changes are reversible by doing a rollback
   rails db:rollback
   # run the same checks as before
-  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) YES MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
+  assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) NO MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
   assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
 
