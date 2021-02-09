@@ -88,6 +88,34 @@ function check_normalize_name_and_set_location(){
   assert_mysql_output "select id, name, location from user102s" "1 RAILSUSER customLoc" 
 }
 
+# 3. Available Callbacks
+# check_before_validation checks the callback before_validation
+function check_before_validation(){
+  # create a user model
+  rails generate model User103s name:string login:string email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method ensure_login_has_a_value
+  write_to_file "app/models/user103.rb" "class User103 < ApplicationRecord
+  validates :login, :email, presence: true
+
+  before_validation :set_login
+
+  private
+    def set_login
+      self.login = name
+    end
+  end"
+  
+  # check that an empty login value works because of the pre-validation function
+  rails runner 'User103.create!(:name => "RailsUser", :email => "rails@vitess.in")'
+  # check that the data is inserted into the table and login is the same as the email
+  assert_mysql_output "select id, name, login, email from user103s" "1 RailsUser RailsUser rails@vitess.in"
+  # changing the name should also change the login
+  rails runner 'User103.find(1).update!(:name => "NewName")'
+  assert_mysql_output "select id, name, login, email from user103s" "1 NewName NewName rails@vitess.in"
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -102,3 +130,7 @@ setup_mysql_attributes
 check_ensure_login_has_a_value
 check_name_login_capitalization
 check_normalize_name_and_set_location
+
+# 3. Available Callbacks
+# https://guides.rubyonrails.org/active_record_callbacks.html#available-callbacks
+check_before_validation
