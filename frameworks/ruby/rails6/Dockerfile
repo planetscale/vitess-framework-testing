@@ -1,6 +1,6 @@
 FROM ruby:2.6.5-alpine
 
-RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata
+RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata mysql-client
 RUN gem update bundler
 
 ADD src/Gemfile /src/Gemfile
@@ -19,13 +19,10 @@ RUN yarn install --check-files
 
 ADD src /src
 
-RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
-RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade pip setuptools
-
 ENV RAILS_ENV=production
+ENV DISABLE_DATABASE_ENVIRONMENT_CHECK=1
 ADD run.sh /
-ADD testingGuides.py /src/
+ADD helper.sh /src/
+ADD ActiveRecordMigrations.sh /src/
 
 ENTRYPOINT ["/run.sh"]
-
