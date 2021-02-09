@@ -1,4 +1,4 @@
 class Market < ApplicationRecord
-	belongs_to :computer
+  belongs_to :computer
 end
 

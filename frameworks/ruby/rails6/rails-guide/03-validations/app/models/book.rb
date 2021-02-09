@@ -1,4 +1,4 @@
 class Book < ApplicationRecord
-	belongs_to :library
+  belongs_to :library
 end
 
