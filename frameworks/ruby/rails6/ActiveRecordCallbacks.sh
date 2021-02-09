@@ -35,6 +35,58 @@ function check_ensure_login_has_a_value(){
   assert_mysql_output "select id, name, login, email from user100s" "1 RailsUser rails@vitess.in rails@vitess.in"  
 }
 
+# check_name_login_capitalization checks that the callback function for setting name to login.capitalize works
+function check_name_login_capitalization(){
+  # create a user model
+  rails generate model User101s name:string login:string email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method ensure_login_has_a_value
+  write_to_file "app/models/user101.rb" "class User101 < ApplicationRecord
+    validates :login, :email, presence: true
+
+    before_create do
+      self.name = login.capitalize if name.blank?
+    end
+  end
+  "
+  # check that an empty name value works because of the pre-validation function
+  rails runner 'User101.create!(:email => "rails@vitess.in", :login => "railsuser")'
+  # check that the data is inserted into the table and name is set to captial of login
+  assert_mysql_output "select id, name, login, email from user101s" "1 Railsuser railsuser rails@vitess.in"  
+}
+
+# check_normalize_name_and_set_location checks that normalize_name and set_location works
+function check_normalize_name_and_set_location(){
+  # create a user model
+  rails generate model User102s name:string location:string
+  # run the migration
+  rake_migrate
+  # implement the callback methods
+  write_to_file "app/models/user102.rb" "class User102 < ApplicationRecord
+    before_validation :normalize_name, on: :create
+
+    # :on takes an array as well
+    after_validation :set_location, on: [ :create, :update ]
+
+    private
+      def normalize_name
+        self.name = name.downcase.titleize
+      end
+
+      def set_location
+        self.location = 'customLoc'
+      end
+  end"
+  # create a new user
+  rails runner 'User102.create!(:name => "RAILSUSER", :location => "loc")'
+  # check that the row is created with location customLoc and name is downcased
+  assert_mysql_output "select id, name, location from user102s" "1 Railsuser customLoc"  
+  # update the user record
+  rails runner 'User102.find(1).update!(:name => "RAILSUSER", :location => "loc")'
+  # check that the row is created with location customLoc but the name is as is
+  assert_mysql_output "select id, name, location from user102s" "1 RAILSUSER customLoc" 
+}
 
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
@@ -48,3 +100,5 @@ setup_mysql_attributes
 # 2.1 Callback Registration
 # https://guides.rubyonrails.org/active_record_callbacks.html#callback-registration
 check_ensure_login_has_a_value
+check_name_login_capitalization
+check_normalize_name_and_set_location
