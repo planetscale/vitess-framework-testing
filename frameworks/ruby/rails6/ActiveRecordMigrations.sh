@@ -8,15 +8,15 @@ source helper.sh
 function check_create_products_migration(){
   # create the migration file and write the content
   rails_generate_migration_with_content "CreateProduct1s" "class CreateProduct1s < ActiveRecord::Migration[6.1]
-  def change
+    def change
       create_table :product1s do |t|
-          t.string :name
-          t.text :description
+        t.string :name
+        t.text :description
 
-          t.timestamps
+        t.timestamps
       end
-  end
-end"
+    end
+  end"
   rake_migrate
   # insert into the table a row
   mysql_run "insert into product1s(name,description,created_at,updated_at) values ('RGT','Rails Guide Testing Migration Overview',NOW(),NOW())"
@@ -165,9 +165,9 @@ function check_passing_modifiers(){
 function check_create_table(){
   rails_generate_migration_with_content "CreateTable" "class CreateTable < ActiveRecord::Migration[6.1]
     def change
-       create_table :products101 do |t|
-         t.string :name
-       end
+      create_table :products101 do |t|
+        t.string :name
+      end
     end
   end"
   rake_migrate
@@ -179,9 +179,9 @@ function check_create_table(){
 function check_create_table_option_blackhole(){
   rails_generate_migration_with_content "CreateTableBlackhole" "class CreateTableBlackhole < ActiveRecord::Migration[6.1]
     def change
-       create_table :products102, options: 'ENGINE=BLACKHOLE' do |t|
-         t.string :name, null: false
-       end
+      create_table :products102, options: 'ENGINE=BLACKHOLE' do |t|
+        t.string :name, null: false
+      end
     end
   end"
   rake_migrate
@@ -194,7 +194,7 @@ function check_create_table_option_blackhole(){
 function check_create_join_table(){
   rails_generate_migration_with_content "CreateJoinTable" "class CreateJoinTable < ActiveRecord::Migration[6.1]
     def change
-       create_join_table :products103, :categories103
+      create_join_table :products103, :categories103
     end
   end"
   rake_migrate
@@ -206,7 +206,7 @@ function check_create_join_table(){
 function check_create_join_table_null_true(){
   rails_generate_migration_with_content "CreateJoinTable1" "class CreateJoinTable1 < ActiveRecord::Migration[6.1]
     def change
-        create_join_table :products104, :categories104, column_options: { null: true }
+      create_join_table :products104, :categories104, column_options: { null: true }
     end
   end"
   rake_migrate
@@ -230,10 +230,10 @@ function check_create_join_table_and_name_categorization(){
 function check_create_join_table_index(){
   rails_generate_migration_with_content "CreateJoinTable3" "class CreateJoinTable3 < ActiveRecord::Migration[6.1]
     def change
-       create_join_table :products106, :categories106 do |t|
-          t.index :products106_id
-          t.index :categories106_id
-       end
+      create_join_table :products106, :categories106 do |t|
+        t.index :products106_id
+        t.index :categories106_id
+      end
     end
   end"
   rake_migrate
@@ -586,9 +586,9 @@ function check_reverting_previous_migrations(){
   filename=$(rails_generate_migration "CreateProduct118s")
   write_to_file $filename "class CreateProduct118s < ActiveRecord::Migration[6.1]
     def change
-        create_table :product118s do |t|
-            t.string :name
-        end
+      create_table :product118s do |t|
+        t.string :name
+      end
     end
   end"
   rake_migrate
@@ -788,25 +788,25 @@ function check_changing_output_migrations(){
   # Create a migration along with commands to change the output
   rails_generate_migration_with_content "CreateProduct12s" "class CreateProduct12s < ActiveRecord::Migration[6.1]
     def change
-    suppress_messages do
-      create_table :product12s do |t|
-        t.string :name
-        t.text :description
-        t.timestamps
+      suppress_messages do
+        create_table :product12s do |t|
+          t.string :name
+          t.text :description
+          t.timestamps
+        end
+      end
+
+      say \"Created a table\"
+
+      suppress_messages {add_index :product12s, :name}
+      say \"and an index!\", true
+
+      say_with_time 'Waiting for a while' do
+        sleep 10
+        250
       end
     end
-
-    say \"Created a table\"
-
-    suppress_messages {add_index :product12s, :name}
-    say \"and an index!\", true
-
-    say_with_time 'Waiting for a while' do
-      sleep 10
-      250
-    end
-  end
-end"
+  end"
   # run the migration
   rake_migrate
   # Also check that there is no output when we call migration with false VERBOSE
@@ -853,16 +853,16 @@ function check_add_data_via_migration(){
   rails generate model Product14 name:string description:text
   # Create a migration that adds data to the table
   rails_generate_migration_with_content "AddInitialProduct14s" "class AddInitialProduct14s < ActiveRecord::Migration[6.1]
-  def up
-    5.times do |i|
-      Product14.create(name: \"Product ##{i}\", description: \"A product.\")
+    def up
+      5.times do |i|
+        Product14.create(name: \"Product ##{i}\", description: \"A product.\")
+      end
     end
-  end
 
-  def down
-    Product14.delete_all
-  end
-end"
+    def down
+      Product14.delete_all
+    end
+  end"
   # run the migration
   rake_migrate
   # assert that the data is inserted into the table
