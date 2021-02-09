@@ -18,3 +18,4 @@ rake user:create_fail || true
 rake user:list | tail
 
 sh ActiveRecordMigrations.sh
+sh ActiveRecordCallbacks.sh
