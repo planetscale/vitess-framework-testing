@@ -173,6 +173,43 @@ function check_before_save(){
   assert_mysql_output "select id, name from user105s" "1 name2"
 }
 
+# check_around_save checks the callback around_save
+function check_around_save(){
+  # create a user model
+  rails generate model User106s name:string
+  # also create a model for the emails
+  rails generate model Email106s user106:references email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user106.rb" "class User106 < ApplicationRecord
+  around_save :trim_name_and_insert_email
+
+  private
+    def trim_name_and_insert_email
+      self.name = name.strip
+      yield
+      if email_row = Email106.where(:user106_id => id).first
+        email_row.email = (name+'@vitess.in') 
+        email_row.save
+      else
+        Email106.create!(:user106_id => id, :email => (name+'@vitess.in')) 
+      end
+    end
+  end"
+  
+  # check that the before-save function is called on creation
+  rails runner 'User106.create!(:name => " name   ")'
+  # check that the data is inserted into the table and email is also added
+  assert_mysql_output "select id, name from user106s" "1 name"
+  assert_mysql_output "select id, user106_id, email from email106s" "1 1 name@vitess.in"
+  # check that the before-save function is called on updation
+  rails runner 'User106.find(1).update!(:name => " name2 ")'
+  assert_mysql_output "select id, name from user106s" "1 name2"
+  # also check that the email got changed
+  assert_mysql_output "select id, user106_id, email from email106s" "1 1 name2@vitess.in"
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -193,3 +230,4 @@ check_normalize_name_and_set_location
 check_before_validation
 check_after_validation
 check_before_save
+check_around_save
