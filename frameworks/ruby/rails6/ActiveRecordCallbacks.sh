@@ -367,6 +367,62 @@ function check_after_initialize_and_after_find(){
   assert_matches "$first_output" "$expected_output"
 }
 
+# 3.5 after_touch
+# check_after_touch checks the callback after_touch
+function check_after_touch(){
+  # create a user model
+  rails generate model User112s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user112.rb" "class User112 < ApplicationRecord
+    after_touch do |user|
+      puts \"You have touched an object\"
+    end
+  end"
+
+  # insert a new user and touch it
+  touch_output=$(rails runner 'u = User112.create(name: "Kuldeep"); u.touch')
+  expected_output="You have touched an object"
+  # assert that the output matches the expectation
+  assert_matches "$touch_output" "$expected_output"
+}
+
+# check_after_touch_with_belongs_to checks that the callback after_touch works with the association belongs_to
+function check_after_touch_with_belongs_to(){
+  # create an employee and a company migration
+  rails generate model Company1 name:string
+  rails generate model Employee1 company1:references
+  # run the migration
+  rake_migrate
+  # implement the callback methods
+  write_to_file "app/models/employee1.rb" "class Employee1 < ApplicationRecord
+    belongs_to :company1, touch: true
+    after_touch do
+      puts 'An Employee was touched'
+    end
+  end"
+  write_to_file "app/models/company1.rb" "class Company1 < ApplicationRecord
+    has_many :employee1s
+    after_touch :log_when_employees_or_company_touched
+
+    private
+      def log_when_employees_or_company_touched
+        puts 'Employee/Company was touched'
+      end
+  end"
+
+  # insert a new company and a new employee
+  rails runner 'Company1.create(:name => "Vitess")'
+  rails runner 'Employee1.create(:company1_id => 1)'
+
+  # find the output of touch
+  touch_output=$(rails runner '@employee = Employee1.last; @employee.touch')
+  expected_output="An Employee was touched\nEmployee/Company was touched"
+  # assert that the output matches the expectation
+  assert_matches "$touch_output" "$expected_output"
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -395,3 +451,7 @@ check_after_create
 # 3.4 after_initialize and after_find
 # https://guides.rubyonrails.org/active_record_callbacks.html#after-initialize-and-after-find
 check_after_initialize_and_after_find
+# 3.5 after_touch
+# https://guides.rubyonrails.org/active_record_callbacks.html#after-touch
+check_after_touch
+check_after_touch_with_belongs_to
