@@ -332,6 +332,41 @@ function check_after_create(){
   assert_mysql_output "select id, user110_id, email from email110s" "1 1 name@vitess.in"
 }
 
+# 3.4 after_initialize and after_find
+# check_after_initialize_and_after_find checks the callbacks after_initialize and after_find
+function check_after_initialize_and_after_find(){
+  # create a user model
+  rails generate model User111s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback methods
+  write_to_file "app/models/user111.rb" "class User111 < ApplicationRecord
+    after_initialize do |user|
+      puts \"You have initialized an object!\"
+    end
+
+    after_find do |user|
+      puts \"You have found an object!\"
+    end
+  end
+  "
+  new_output=$(rails runner 'User111.new')
+  expected_output="You have initialized an object!"
+  # assert that the output matches the expectation
+  assert_matches "$new_output" "$expected_output"
+  
+  # insert a new user
+  create_output=$(rails runner 'User111.create(:name => "RailsUser")')
+  expected_output="You have initialized an object!"
+  # assert that the output matches the expectation
+  assert_matches "$create_output" "$expected_output"
+
+  first_output=$(rails runner 'User111.first')
+  expected_output="You have found an object!\nYou have initialized an object!"
+  # assert that the output matches the expectation
+  assert_matches "$first_output" "$expected_output"
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -357,3 +392,6 @@ check_after_save
 check_before_create
 check_around_create
 check_after_create
+# 3.4 after_initialize and after_find
+# https://guides.rubyonrails.org/active_record_callbacks.html#after-initialize-and-after-find
+check_after_initialize_and_after_find
