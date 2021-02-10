@@ -126,11 +126,11 @@ function check_after_validation(){
   write_to_file "app/models/user104.rb" "class User104 < ApplicationRecord
   validates :name, length: { maximum: 10 }
 
-  after_validation :trim_name
+  after_validation :delete_spaces
 
   private
-    def trim_name
-      self.name = name.strip
+    def delete_spaces
+      self.name = name.delete(' ')
     end
   end"
   
@@ -140,11 +140,11 @@ function check_after_validation(){
     exit 1
   fi
   # check that the post-validation function is called on creation
-  rails runner 'User104.create!(:name => " name   ")'
+  rails runner 'User104.create!(:name => " name  1")'
   # check that the data is inserted into the table
-  assert_mysql_output "select id, name from user104s" "1 name"
+  assert_mysql_output "select id, name from user104s" "1 name1"
   # check that the post-validation function is called on updation
-  rails runner 'User104.find(1).update!(:name => " name2 ")'
+  rails runner 'User104.find(1).update!(:name => " name 2 ")'
   assert_mysql_output "select id, name from user104s" "1 name2"
 }
 
@@ -156,21 +156,21 @@ function check_before_save(){
   rake_migrate
   # implement the callback method
   write_to_file "app/models/user105.rb" "class User105 < ApplicationRecord
-  before_save :trim_name
+  before_save :replace_spaces
 
   private
-    def trim_name
-      self.name = name.strip
+    def replace_spaces
+      self.name = name.parameterize(separator: '_')
     end
   end"
   
   # check that the before-save function is called on creation
-  rails runner 'User105.create!(:name => " name   ")'
+  rails runner 'User105.create!(:name => "name 1")'
   # check that the data is inserted into the table
-  assert_mysql_output "select id, name from user105s" "1 name"
+  assert_mysql_output "select id, name from user105s" "1 name_1"
   # check that the before-save function is called on updation
-  rails runner 'User105.find(1).update!(:name => " name2 ")'
-  assert_mysql_output "select id, name from user105s" "1 name2"
+  rails runner 'User105.find(1).update!(:name => "name 2")'
+  assert_mysql_output "select id, name from user105s" "1 name_2"
 }
 
 # check_around_save checks the callback around_save
@@ -183,11 +183,11 @@ function check_around_save(){
   rake_migrate
   # implement the callback method
   write_to_file "app/models/user106.rb" "class User106 < ApplicationRecord
-  around_save :trim_name_and_insert_email
+  around_save :parameterize_name_and_insert_email
 
   private
-    def trim_name_and_insert_email
-      self.name = name.strip
+    def parameterize_name_and_insert_email
+      self.name = name.parameterize(separator: '_')
       yield
       if email_row = Email106.where(:user106_id => id).first
         email_row.email = (name+'@vitess.in') 
@@ -198,16 +198,138 @@ function check_around_save(){
     end
   end"
   
-  # check that the before-save function is called on creation
-  rails runner 'User106.create!(:name => " name   ")'
+  # check that the around-save function is called on creation
+  rails runner 'User106.create!(:name => "name 1")'
   # check that the data is inserted into the table and email is also added
-  assert_mysql_output "select id, name from user106s" "1 name"
-  assert_mysql_output "select id, user106_id, email from email106s" "1 1 name@vitess.in"
-  # check that the before-save function is called on updation
-  rails runner 'User106.find(1).update!(:name => " name2 ")'
-  assert_mysql_output "select id, name from user106s" "1 name2"
+  assert_mysql_output "select id, name from user106s" "1 name_1"
+  assert_mysql_output "select id, user106_id, email from email106s" "1 1 name_1@vitess.in"
+  # check that the around-save function is called on updation
+  rails runner 'User106.find(1).update!(:name => "name 2")'
+  assert_mysql_output "select id, name from user106s" "1 name_2"
   # also check that the email got changed
-  assert_mysql_output "select id, user106_id, email from email106s" "1 1 name2@vitess.in"
+  assert_mysql_output "select id, user106_id, email from email106s" "1 1 name_2@vitess.in"
+}
+
+# check_after_save checks the callback after_save
+function check_after_save(){
+  # create a user model
+  rails generate model User107s name:string
+  # also create a model for the emails
+  rails generate model Email107s user107:references email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user107.rb" "class User107 < ApplicationRecord
+  after_save :insert_email
+
+  private
+    def insert_email
+      if email_row = Email107.where(:user107_id => id).first
+        email_row.email = (name+'@vitess.in') 
+        email_row.save
+      else
+        Email107.create!(:user107_id => id, :email => (name+'@vitess.in')) 
+      end
+    end
+  end"
+  
+  # check that the after-save function is called on creation
+  rails runner 'User107.create!(:name => "name")'
+  # check that the data is inserted into the table and email is also added
+  assert_mysql_output "select id, name from user107s" "1 name"
+  assert_mysql_output "select id, user107_id, email from email107s" "1 1 name@vitess.in"
+  # check that the after-save function is called on updation
+  rails runner 'User107.find(1).update!(:name => "name2")'
+  assert_mysql_output "select id, name from user107s" "1 name2"
+  # also check that the email got changed
+  assert_mysql_output "select id, user107_id, email from email107s" "1 1 name2@vitess.in"
+}
+
+# check_before_create checks the callback before_create
+function check_before_create(){
+  # create a user model
+  rails generate model User108s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user108.rb" "class User108 < ApplicationRecord
+  before_create :parameterize_name
+
+  private
+    def parameterize_name
+      self.name = name.parameterize(separator: '_')
+    end
+  end"
+  
+  # check that the before-create function is called on creation
+  rails runner 'User108.create!(:name => "name 1")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user108s" "1 name_1"
+  # check that the before-create function is not called on updation
+  rails runner 'User108.find(1).update!(:name => " name 2")'
+  assert_mysql_output "select id, name from user108s" "1 name 2"
+}
+
+# check_around_create checks the callback around_create
+function check_around_create(){
+  # create a user model
+  rails generate model User109s name:string
+  # also create a model for the emails
+  rails generate model Email109s user109:references email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user109.rb" "class User109 < ApplicationRecord
+  around_create :parameterize_name_and_insert_email
+
+  private
+    def parameterize_name_and_insert_email
+      self.name = name.parameterize(separator: '_')
+      yield
+      Email109.create!(:user109_id => id, :email => (name+'@vitess.in')) 
+      end
+  end"
+  
+  # check that the around-create function is called on creation
+  rails runner 'User109.create!(:name => "name 1")'
+  # check that the data is inserted into the table and email is also added
+  assert_mysql_output "select id, name from user109s" "1 name_1"
+  assert_mysql_output "select id, user109_id, email from email109s" "1 1 name_1@vitess.in"
+  # check that the around-create function is not called on updation
+  rails runner 'User109.find(1).update!(:name => "name 2")'
+  assert_mysql_output "select id, name from user109s" "1 name 2"
+  # also check that the email didn't get changed
+  assert_mysql_output "select id, user109_id, email from email109s" "1 1 name_1@vitess.in"
+}
+
+# check_after_create checks the callback after_create
+function check_after_create(){
+  # create a user model
+  rails generate model User110s name:string
+  # also create a model for the emails
+  rails generate model Email110s user110:references email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user110.rb" "class User110 < ApplicationRecord
+  after_create :insert_email
+
+  private
+    def insert_email
+      Email110.create!(:user110_id => id, :email => (name+'@vitess.in')) 
+    end
+  end"
+  
+  # check that the after_create function is called on creation
+  rails runner 'User110.create!(:name => "name")'
+  # check that the data is inserted into the table and email is also added
+  assert_mysql_output "select id, name from user110s" "1 name"
+  assert_mysql_output "select id, user110_id, email from email110s" "1 1 name@vitess.in"
+  # check that the around-create function is not called on updation
+  rails runner 'User110.find(1).update!(:name => "name2")'
+  assert_mysql_output "select id, name from user110s" "1 name2"
+  # also check that the email didn't get changed
+  assert_mysql_output "select id, user110_id, email from email110s" "1 1 name@vitess.in"
 }
 
 # setup_mysql_attributes will setup the mysql attributes
@@ -231,3 +353,7 @@ check_before_validation
 check_after_validation
 check_before_save
 check_around_save
+check_after_save
+check_before_create
+check_around_create
+check_after_create
