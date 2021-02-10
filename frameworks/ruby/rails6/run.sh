@@ -17,4 +17,6 @@ rake 'user:get[101]'
 rake user:create_fail || true
 rake user:list | tail
 
-sh ActiveRecordMigrations.sh
+./ActiveRecordMigrations.sh
+./ActiveRecordValidations.sh
+
