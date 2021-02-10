@@ -95,7 +95,7 @@ function check_before_validation(){
   rails generate model User103s name:string login:string email:string
   # run the migration
   rake_migrate
-  # implement the callback method ensure_login_has_a_value
+  # implement the callback method
   write_to_file "app/models/user103.rb" "class User103 < ApplicationRecord
   validates :login, :email, presence: true
 
@@ -122,7 +122,7 @@ function check_after_validation(){
   rails generate model User104s name:string
   # run the migration
   rake_migrate
-  # implement the callback method ensure_login_has_a_value
+  # implement the callback method
   write_to_file "app/models/user104.rb" "class User104 < ApplicationRecord
   validates :name, length: { maximum: 10 }
 
@@ -139,13 +139,38 @@ function check_after_validation(){
     echo "Command should have failed!"
     exit 1
   fi
-  # check that an post-validation function is called on creation
+  # check that the post-validation function is called on creation
   rails runner 'User104.create!(:name => " name   ")'
   # check that the data is inserted into the table
   assert_mysql_output "select id, name from user104s" "1 name"
-  # check that an post-validation function is called on updation
+  # check that the post-validation function is called on updation
   rails runner 'User104.find(1).update!(:name => " name2 ")'
   assert_mysql_output "select id, name from user104s" "1 name2"
+}
+
+# check_before_save checks the callback before_save
+function check_before_save(){
+  # create a user model
+  rails generate model User105s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user105.rb" "class User105 < ApplicationRecord
+  before_save :trim_name
+
+  private
+    def trim_name
+      self.name = name.strip
+    end
+  end"
+  
+  # check that the before-save function is called on creation
+  rails runner 'User105.create!(:name => " name   ")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user105s" "1 name"
+  # check that the before-save function is called on updation
+  rails runner 'User105.find(1).update!(:name => " name2 ")'
+  assert_mysql_output "select id, name from user105s" "1 name2"
 }
 
 # setup_mysql_attributes will setup the mysql attributes
@@ -167,3 +192,4 @@ check_normalize_name_and_set_location
 # https://guides.rubyonrails.org/active_record_callbacks.html#available-callbacks
 check_before_validation
 check_after_validation
+check_before_save
