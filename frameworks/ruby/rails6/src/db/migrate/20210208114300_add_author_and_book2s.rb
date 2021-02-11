@@ -6,11 +6,11 @@ class AddAuthorAndBook2s < ActiveRecord::Migration[6.1]
     end
 
     create_table :book2s do |t|
+      t.belongs_to :author, index: true, foreign_key: true
       t.string :title
-      t.belongs_to :author, foreign_key: true
+      t.datetime :published_at
       t.timestamps
     end
   end
 end
-
 
