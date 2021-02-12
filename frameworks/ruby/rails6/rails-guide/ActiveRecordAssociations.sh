@@ -16,3 +16,10 @@ rake guide_association:step_2_8 # Choosing between has_many :through and has_and
 rake guide_association:step_2_9 # Polymorphic Associations
 rake guide_association:step_2_10 # Self Joins
 
+# 3 Tips, Tricks, and Warnings
+rake guide_association:step_3_1 # Controlling Caching
+# 3.2 Avoiding Name Collisions is just advice about naming fields
+rake guide_association:step_3_3 # Updating the schema
+# 3.4 Controlling Association Scope is only examples for more fine-grained Ruby module organization, nothing to do with the database
+rake guide_association:step_3_5 # Bi-directional Associations
+
