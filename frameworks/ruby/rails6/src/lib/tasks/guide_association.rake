@@ -122,5 +122,46 @@ namespace :guide_association do
 		e6 = Employee2.create!(name: "Dev 1", manager: e5)
 		e7 = Employee2.create!(name: "Dev 2", manager: e5)
 	end
+
+	task :step_3_1 do
+		author = Author.create!(name: "Great Writer")
+		book1 = Book2.create!(author: author, title: "Series 1", published_at: Date.today)
+		book2 = Book2.create!(author: author, title: "Series 2", published_at: Date.today)
+		raise "wrong size" if author.book2s.size != 2
+		st = ActiveRecord::Base.connection.raw_connection.prepare("DELETE FROM book2s WHERE author_id = ?")
+		st.execute(author.id)
+		st.close
+		raise "not empty" unless author.book2s.reload.empty?
+	end
+
+	task :step_3_3 do
+		# 3.3.1 is migration only and doesn't highlight any features that we haven't already tested ad infinitum
+		# 3.3.2, however, shows create_join_table, so we want to show that working
+		p1 = Part4.create!(part_number: "1")
+		p2 = Part4.create!(part_number: "2")
+		p3 = Part4.create!(part_number: "3")
+		a1 = Assembly4.create!(name: "a")
+		a2 = Assembly4.create!(name: "b")
+		a1.part4s = [p1, p2, p3]
+		a1.save!
+		p2.assembly4s += [a2]
+		p2.save!
+		a2.part4s += [p3]
+		a2.save!
+		raise "p1 assemblies wrong" unless p1.assembly4s == [a1]
+		raise "p2 assemblies wrong" unless p2.assembly4s == [a1, a2]
+		raise "p3 assemblies wrong" unless p3.assembly4s == [a1, a2]
+		raise "a1 parts wrong" unless a1.part4s == [p1, p2, p3]
+		raise "a2 parts wrong" unless a2.part4s == [p2, p3]
+	end
+
+	task :step_3_5 do
+		a = Author2.create!(first_name: "Great")
+		b = Book3.create!(title: "Mystery", writer: a)
+		b = a.book3s.first
+		raise "name mismatch 1" unless a.first_name == b.writer.first_name
+		a.first_name = "Awesome"
+		raise "name mismatch 2" unless a.first_name == b.writer.first_name
+	end
 end
 
