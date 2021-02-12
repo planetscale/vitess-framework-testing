@@ -32,7 +32,7 @@ function check_ensure_login_has_a_value(){
   # check that an empty login value works because of the pre-validation function
   rails runner 'User100.create!(:name => "RailsUser", :email => "rails@vitess.in")'
   # check that the data is inserted into the table and login is the same as the email
-  assert_mysql_output "select id, name, login, email from user100s" "1 RailsUser rails@vitess.in rails@vitess.in"  
+  assert_mysql_output "select id, name, login, email from user100s" "1 RailsUser rails@vitess.in rails@vitess.in"
 }
 
 # check_name_login_capitalization checks that the callback function for setting name to login.capitalize works
@@ -53,7 +53,7 @@ function check_name_login_capitalization(){
   # check that an empty name value works because of the pre-validation function
   rails runner 'User101.create!(:email => "rails@vitess.in", :login => "railsuser")'
   # check that the data is inserted into the table and name is set to captial of login
-  assert_mysql_output "select id, name, login, email from user101s" "1 Railsuser railsuser rails@vitess.in"  
+  assert_mysql_output "select id, name, login, email from user101s" "1 Railsuser railsuser rails@vitess.in"
 }
 
 # check_normalize_name_and_set_location checks that normalize_name and set_location works
@@ -81,11 +81,11 @@ function check_normalize_name_and_set_location(){
   # create a new user
   rails runner 'User102.create!(:name => "RAILSUSER", :location => "loc")'
   # check that the row is created with location customLoc and name is downcased
-  assert_mysql_output "select id, name, location from user102s" "1 Railsuser customLoc"  
+  assert_mysql_output "select id, name, location from user102s" "1 Railsuser customLoc"
   # update the user record
   rails runner 'User102.find(1).update!(:name => "RAILSUSER", :location => "loc")'
   # check that the row is created with location customLoc but the name is as is
-  assert_mysql_output "select id, name, location from user102s" "1 RAILSUSER customLoc" 
+  assert_mysql_output "select id, name, location from user102s" "1 RAILSUSER customLoc"
 }
 
 # 3. Available Callbacks
@@ -106,7 +106,7 @@ function check_before_validation(){
         self.login = name
       end
   end"
-  
+
   # check that an empty login value works because of the pre-validation function
   rails runner 'User103.create!(:name => "RailsUser", :email => "rails@vitess.in")'
   # check that the data is inserted into the table and login is the same as the email
@@ -133,7 +133,7 @@ function check_after_validation(){
         self.name = name.delete(' ')
       end
   end"
-  
+
   # check that a long name does not work. If the spaces had been removed before, then the validation would have passed
   if rails runner 'User104.create!(:name => "  TooLong       ")'; then
     echo "Command should have failed!"
@@ -163,7 +163,7 @@ function check_before_save(){
         self.name = name.parameterize(separator: '_')
       end
   end"
-  
+
   # check that the before-save function is called on creation
   rails runner 'User105.create!(:name => "name 1")'
   # check that the data is inserted into the table
@@ -190,14 +190,14 @@ function check_around_save(){
         self.name = name.parameterize(separator: '_')
         yield
         if email_row = Email106.where(:user106_id => id).first
-          email_row.email = (name+'@vitess.in') 
+          email_row.email = (name+'@vitess.in')
           email_row.save
         else
-          Email106.create!(:user106_id => id, :email => (name+'@vitess.in')) 
+          Email106.create!(:user106_id => id, :email => (name+'@vitess.in'))
         end
       end
   end"
-  
+
   # check that the around-save function is called on creation
   rails runner 'User106.create!(:name => "name 1")'
   # check that the data is inserted into the table and email is also added
@@ -220,19 +220,18 @@ function check_after_save(){
   rake_migrate
   # implement the callback method
   write_to_file "app/models/user107.rb" "class User107 < ApplicationRecord
-    after_save :insert_email
+  after_save :insert_email
 
-    private
-      def insert_email
-        if email_row = Email107.where(:user107_id => id).first
-          email_row.email = (name+'@vitess.in') 
-          email_row.save
-        else
-          Email107.create!(:user107_id => id, :email => (name+'@vitess.in')) 
-        end
+  private
+    def insert_email
+      if email_row = Email107.where(:user107_id => id).first
+        email_row.email = (name+'@vitess.in')
+        email_row.save
+      else
+        Email107.create!(:user107_id => id, :email => (name+'@vitess.in'))
       end
   end"
-  
+
   # check that the after-save function is called on creation
   rails runner 'User107.create!(:name => "name")'
   # check that the data is inserted into the table and email is also added
@@ -260,7 +259,7 @@ function check_before_create(){
         self.name = name.parameterize(separator: '_')
       end
   end"
-  
+
   # check that the before-create function is called on creation
   rails runner 'User108.create!(:name => "name 1")'
   # check that the data is inserted into the table
@@ -286,10 +285,10 @@ function check_around_create(){
       def parameterize_name_and_insert_email
         self.name = name.parameterize(separator: '_')
         yield
-        Email109.create!(:user109_id => id, :email => (name+'@vitess.in')) 
+        Email109.create!(:user109_id => id, :email => (name+'@vitess.in'))
       end
   end"
-  
+
   # check that the around-create function is called on creation
   rails runner 'User109.create!(:name => "name 1")'
   # check that the data is inserted into the table and email is also added
@@ -316,10 +315,10 @@ function check_after_create(){
 
     private
       def insert_email
-        Email110.create!(:user110_id => id, :email => (name+'@vitess.in')) 
+        Email110.create!(:user110_id => id, :email => (name+'@vitess.in'))
       end
   end"
-  
+
   # check that the after_create function is called on creation
   rails runner 'User110.create!(:name => "name")'
   # check that the data is inserted into the table and email is also added
@@ -354,7 +353,7 @@ function check_after_initialize_and_after_find(){
   expected_output="You have initialized an object!"
   # assert that the output matches the expectation
   assert_matches "$new_output" "$expected_output"
-  
+
   # insert a new user
   create_output=$(rails runner 'User111.create(:name => "RailsUser")')
   expected_output="You have initialized an object!"
@@ -423,6 +422,166 @@ function check_after_touch_with_belongs_to(){
   assert_matches "$touch_output" "$expected_output"
 }
 
+# Registers a callback to be called before a record is updated
+function check_before_update(){
+  # create a user model
+  rails generate model User115s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user115.rb" "class User115 < ApplicationRecord
+    before_update :parameterize_name
+
+    private
+      def parameterize_name
+        self.name = name.parameterize(separator: '_')
+      end
+  end"
+
+  # check that the before update not called on creation
+  rails runner 'User115.create!(:name => "name 1")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user115s" "1 name 1"
+  # check that the before update function is called on updation
+  rails runner 'User115.find(1).update!(:name => " name 2")'
+  assert_mysql_output "select id, name from user115s" "1 name_2"
+}
+
+# Registers a callback to be called around the update of a record.
+function check_around_update(){
+  # create a user model
+  rails generate model User116s name:string
+  # also create a model for the emails
+  rails generate model Email116s user116:references email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user116.rb" "class User116 < ApplicationRecord
+    around_update :parameterize_name_and_insert_email
+
+    private
+      def parameterize_name_and_insert_email
+        self.name = name.parameterize(separator: '_')
+        yield
+        Email116.create!(:user116_id => id, :email => (name+'@vitess.in'))
+      end
+  end"
+
+  # check that the around-update function is not called on creation
+  rails runner 'User116.create!(:name => "name 1")'
+  # check that the data is inserted into the table and email is not added
+  assert_mysql_output "select id, name from user116s" "1 name 1"
+  assert_mysql_output "select id, user116_id, email from email116s" ""
+  # check that the around-update function is called on updation
+  rails runner 'User116.find(1).update!(:name => "name 2")'
+  assert_mysql_output "select id, name from user116s" "1 name_2"
+  # also check that the email is inserted
+  assert_mysql_output "select id, user116_id, email from email116s" "1 1 name_2@vitess.in"
+
+}
+
+# Registers a callback to be called after a record is updated
+function check_after_update(){
+
+  # create a user model
+  rails generate model User117s name:string
+  # also create a model for the emails
+  rails generate model Email117s user115:references email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user117.rb" "class User117 < ApplicationRecord
+  after_update :insert_email
+
+  private
+    def insert_email
+      Email117.create!(:user117_id => id, :email => (name+'@vitess.in'))
+    end
+  end"
+
+  # check that the after_update function is not called on creation
+  rails runner 'User117.create!(:name => "name")'
+  # check that the data is inserted into the table and email is also added
+  assert_mysql_output "select id, name from user117s" "1 name"
+  assert_mysql_output "select id, user117_id, email from email117s" ""
+  # check that the around_update function is called on updation
+  rails runner 'User117.find(1).update!(:name => "name2")'
+  assert_mysql_output "select id, name from user117s" "1 name2"
+  # also check that the email gets inserted
+  assert_mysql_output "select id, user117_id, email from email117s" "1 1 name2@vitess.in"
+
+}
+
+# Registers a callback to be called before a record is destroyed
+function check_before_destroy(){
+
+  # create a user model
+  rails generate model User118s name:string
+  # also create a model for the emails
+  rails generate model Email118s email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user118.rb" "class User118 < ApplicationRecord
+  before_destroy :insert_email
+
+  private
+    def insert_email
+      Email118.create!(:email => (name+'@vitess.in'))
+    end
+  end"
+
+  # add 2 users
+  rails runner 'User118.create!(:name => "name")'
+  rails runner 'User118.create!(:name => "name2")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user118s" "1 name 2 name2"
+
+  # Check that email is added on destroy of ID 1
+  rails runner 'User118.find(1).destroy()'
+  assert_mysql_output "select id, name from user118s" "2 name2"
+  assert_mysql_output "select id, email from email118s" "1 name@vitess.in"
+}
+
+function check_after_commit_rollback(){
+  # create a user model
+  rails generate model User119s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user119.rb" "class User119 < ApplicationRecord
+    after_rollback :printrollbacks
+    after_commit :printcommits
+    before_update  :raise_rollback!
+
+    def printrollbacks
+       puts 'rollback'
+    end
+    def printcommits
+       puts 'commit'
+    end
+    def raise_rollback!
+       raise ActiveRecord::Rollback
+    end
+
+  end"
+
+  # Insert a new user
+  create_output=$(rails runner 'User119.create!(:name => "name 1")')
+  expected_output="commit"
+  # assert that the output matches the expectation
+  assert_matches "$create_output" "$expected_output"
+
+  # update user
+  create_output=$(rails runner 'User119.find(1).update(:name => "name 2")')
+  expected_output="rollback"
+  # assert that the output matches the expectation
+  assert_matches "$create_output" "$expected_output"
+
+  assert_mysql_output "select id, name from user119s" "1 name 1"
+
+}
+
 # 6. Halting Execution
 # check_halting_execution checks that throw :abort works
 function check_halting_execution(){
@@ -433,19 +592,18 @@ function check_halting_execution(){
   # implement the callback method
   write_to_file "app/models/user113.rb" "class User113 < ApplicationRecord
     after_create :throw_abort
-
     private
       def throw_abort
         throw :abort
       end
   end"
-  
+
   # try to create a new user and assert that it fails
   if rails runner 'User113.create!(:name => "name")'; then
     echo "Command should have failed!"
     exit 1
   fi
-  # check that the data is not inserted into the table 
+  # check that the data is not inserted into the table
   assert_mysql_output "select id, name from user113s" ""
 }
 
@@ -454,7 +612,7 @@ function check_halting_execution(){
 function check_relational_callbacks(){
   # create a user model
   rails generate model User114s name:string
-  # create an articles model 
+  # create an articles model
   rails generate model Article114s user114:references
   # run the migration
   rake_migrate
@@ -464,7 +622,6 @@ function check_relational_callbacks(){
   end"
   write_to_file "app/models/article114.rb" "class Article114 < ApplicationRecord
     after_destroy :log_destroy_action
-
     def log_destroy_action
       puts 'Article destroyed'
     end
@@ -498,12 +655,10 @@ function check_if_with_symbol(){
   # add the callback function conditioned using if with a symbol
   write_to_file "app/models/order100.rb" "class Order100 < ApplicationRecord
     before_save :normalize_card_number, if: :paid_with_card?
-
     private
       def paid_with_card?
         return !cardNumber.nil?
       end
-
       def normalize_card_number
         puts \"Normalize Card Number called\"
         self.cardNumber = cardNumber.parameterize(separator: '-')
@@ -537,11 +692,11 @@ function check_if_with_proc_v1(){
   write_to_file "app/models/order101.rb" "class Order101 < ApplicationRecord
     before_save :normalize_card_number,
       if: Proc.new { |order| order.paid_with_card? }
-    
+
     def paid_with_card?
       return !cardNumber.nil?
     end
-    
+
     private
       def normalize_card_number
         puts \"Normalize Card Number called\"
@@ -574,11 +729,11 @@ function check_if_with_proc_v2(){
   # add the callback function conditioned using if with a symbol
   write_to_file "app/models/order102.rb" "class Order102 < ApplicationRecord
     before_save :normalize_card_number, if: Proc.new { paid_with_card? }
-    
+
     def paid_with_card?
       return !cardNumber.nil?
     end
-    
+
     private
       def normalize_card_number
         puts \"Normalize Card Number called\"
@@ -615,7 +770,7 @@ function check_multiple_conditions_callbacks(){
     belongs_to :article115
     after_create :send_email_to_author, if: :author_wants_emails?,
       unless: Proc.new { |comment| comment.article115.ignore_comments? }
-    
+
     def author_wants_emails?
       return wantEmails
     end
@@ -678,6 +833,12 @@ check_after_save
 check_before_create
 check_around_create
 check_after_create
+check_before_update
+check_around_update
+check_after_update
+check_before_destroy
+check_after_commit_rollback
+
 # 3.4 after_initialize and after_find
 # https://guides.rubyonrails.org/active_record_callbacks.html#after-initialize-and-after-find
 check_after_initialize_and_after_find
