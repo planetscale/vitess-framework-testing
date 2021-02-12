@@ -19,4 +19,5 @@ rake user:list | tail
 
 ./ActiveRecordMigrations.sh
 ./ActiveRecordValidations.sh
+./ActiveRecordAssociations.sh
 
