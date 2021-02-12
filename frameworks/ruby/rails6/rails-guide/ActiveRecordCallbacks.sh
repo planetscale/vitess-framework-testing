@@ -810,6 +810,60 @@ function check_multiple_conditions_callbacks(){
   assert_matches "$create_output" ""
 }
 
+# 8.4 Combining Callbacks Conditions
+# check_combining_conditions_callbacks checks that combining conditions in the callbacks works
+function check_combining_conditions_callbacks(){
+  # create a comment article and user models
+  rails generate model Article120s title:string ignoreComments:boolean author:string wantEmails:boolean 
+  rails generate model User120s name:string allowEmail:boolean
+  rails generate model Comment120s value:string article120:references user120:references
+  # run the migration
+  rake_migrate
+  # add the callback function with multiple conditions
+  write_to_file "app/models/comment120.rb" "class Comment120 < ApplicationRecord
+    belongs_to :article120
+    belongs_to :user120
+
+    after_create :send_email_to_author,
+      if: [Proc.new { |c| c.user120.allow_send_email? }, :author_wants_emails?],
+      unless: Proc.new { |c| c.article120.ignore_comments? }
+
+    def author_wants_emails?
+      return article120.wantEmails
+    end
+
+    def send_email_to_author
+      puts (\"Email sent to the author \" + article120.author)
+    end
+  end"
+  write_to_file "app/models/article120.rb" "class Article120 < ApplicationRecord
+    has_many :comment120s
+
+    def ignore_comments?
+      return ignoreComments
+    end
+  end"
+  write_to_file "app/models/user120.rb" "class User120 < ApplicationRecord
+    def allow_send_email?
+      return allowEmail
+    end
+  end"
+
+  # create a new article with ignoreComments false and wantEmails true
+  rails runner 'Article120.create!(:title => "Vitess", :ignoreComments => false, :author => "VitessUser", :wantEmails => true)'
+  # create a user which allows emails and one which doesn't
+  rails runner 'User120.create!(:name => "AllowComments", :allowEmail => true)'
+  rails runner 'User120.create!(:name => "DisallowComments", :allowEmail => false)'
+
+  # create a new comment in the article and assert that the message is received when the user AllowComments is used
+  create_output=$(rails runner 'Comment120.create!(:article120_id => 1, :user120_id => 1, :value => "Vitess is awesome")')
+  assert_matches "$create_output" "Email sent to the author VitessUser"
+
+  # create a new comment in Rails article and assert that no message is received when the user DisallowComments is used
+  create_output=$(rails runner 'Comment120.create!(:article120_id => 1, :user120_id => 2, :value => "Vitess is awesome")')
+  assert_matches "$create_output" ""
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -876,3 +930,4 @@ check_if_with_proc_v2
 # 8.3 Multiple Conditions for Callbacks
 # https://guides.rubyonrails.org/active_record_callbacks.html#multiple-conditions-for-callbacks
 check_multiple_conditions_callbacks
+check_combining_conditions_callbacks
