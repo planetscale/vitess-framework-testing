@@ -925,6 +925,121 @@ function check_callback_class_v2(){
   fi
 }
 
+# 10. Transaction Callbacks
+# check_after_commit_on_destroy checks that callback after_commit on: :destroy works
+function check_after_commit_on_destroy(){
+  # create the models
+  rails generate model PictureFile3 filepath:string
+  # run the migration
+  rake_migrate
+  write_to_file "app/models/picture_file3.rb" "class PictureFile3 < ApplicationRecord
+    after_commit :delete_picture_file_from_disk, on: :destroy
+
+    def delete_picture_file_from_disk
+      if File.exist?(filepath)
+        File.delete(filepath)
+      end
+    end
+  end"
+
+  # create a temporary file
+  touch ./tmpPicture
+  # insert a record for this file in the table
+  rails runner 'PictureFile3.create!(:filepath => "./tmpPicture")'
+  # now we delete the record
+  rails runner 'PictureFile3.find(1).destroy'
+  # check that the temporary file is deleted
+  if [ -f "./tmpPicture" ]; then
+    echo "The temporary file has not been deleted yet"
+    exit 1
+  fi
+}
+
+# check_after_destroy_commit checks that callback after_destroy_commit works
+function check_after_destroy_commit(){
+  # create the models
+  rails generate model PictureFile4 filepath:string
+  # run the migration
+  rake_migrate
+  write_to_file "app/models/picture_file4.rb" "class PictureFile4 < ApplicationRecord
+    after_destroy_commit :delete_picture_file_from_disk
+
+    def delete_picture_file_from_disk
+      if File.exist?(filepath)
+        File.delete(filepath)
+      end
+    end
+  end"
+
+  # create a temporary file
+  touch ./tmpPicture
+  # insert a record for this file in the table
+  rails runner 'PictureFile4.create!(:filepath => "./tmpPicture")'
+  # now we delete the record
+  rails runner 'PictureFile4.find(1).destroy'
+  # check that the temporary file is deleted
+  if [ -f "./tmpPicture" ]; then
+    echo "The temporary file has not been deleted yet"
+    exit 1
+  fi
+}
+
+# check_after_update_commit checks that callback after_update_commit works
+function check_after_update_commit(){
+  # create the models
+  rails generate model User121s
+  # run the migration
+  rake_migrate
+  write_to_file "app/models/user121.rb" "class User121 < ApplicationRecord
+    after_create_commit :log_user_saved_to_db
+    after_update_commit :log_user_saved_to_db
+
+    private
+      def log_user_saved_to_db
+        puts 'User was saved to database'
+      end
+  end"
+
+  # check the output on create
+  create_output=$(rails runner 'User121.create')
+  # assert that the output is empty
+  assert_matches "$create_output" ""
+ 
+  # check the output on save
+  save_output=$(rails runner 'User121.find(1).save')
+  expected_output="User was saved to database"
+  # assert that the output matches the expectation
+  assert_matches "$save_output" "$expected_output"
+}
+
+# check_after_save_commit checks that callback after_save_commit works
+function check_after_save_commit(){
+  # create the models
+  rails generate model User122s
+  # run the migration
+  rake_migrate
+  write_to_file "app/models/user122.rb" "class User122 < ApplicationRecord
+    after_save_commit :log_user_saved_to_db
+
+    private
+      def log_user_saved_to_db
+        puts 'User was saved to database'
+      end
+  end"
+
+  # check the output on create
+  create_output=$(rails runner 'User122.create')
+  expected_output="User was saved to database"
+  # assert that the output matches the expectation
+  assert_matches "$create_output" "$expected_output"
+ 
+  # check the output on save
+  save_output=$(rails runner 'User122.find(1).save')
+  expected_output="User was saved to database"
+  # assert that the output matches the expectation
+  assert_matches "$save_output" "$expected_output"
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -993,7 +1108,14 @@ check_if_with_proc_v2
 check_multiple_conditions_callbacks
 check_combining_conditions_callbacks
 
-# 9 Callback Classes
+# 9. Callback Classes
 # https://guides.rubyonrails.org/active_record_callbacks.html#callback-classes
 check_callback_class_v1
 check_callback_class_v2
+
+# 10. Transaction Callbacks
+# https://guides.rubyonrails.org/active_record_callbacks.html#transaction-callbacks
+check_after_commit_on_destroy
+check_after_destroy_commit
+check_after_update_commit
+check_after_save_commit
