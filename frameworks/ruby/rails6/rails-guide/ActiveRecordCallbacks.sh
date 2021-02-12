@@ -220,15 +220,16 @@ function check_after_save(){
   rake_migrate
   # implement the callback method
   write_to_file "app/models/user107.rb" "class User107 < ApplicationRecord
-  after_save :insert_email
+    after_save :insert_email
 
-  private
-    def insert_email
-      if email_row = Email107.where(:user107_id => id).first
-        email_row.email = (name+'@vitess.in')
-        email_row.save
-      else
-        Email107.create!(:user107_id => id, :email => (name+'@vitess.in'))
+    private
+      def insert_email
+        if email_row = Email107.where(:user107_id => id).first
+          email_row.email = (name+'@vitess.in')
+          email_row.save
+        else
+          Email107.create!(:user107_id => id, :email => (name+'@vitess.in'))
+        end
       end
   end"
 
@@ -486,7 +487,7 @@ function check_after_update(){
   # create a user model
   rails generate model User117s name:string
   # also create a model for the emails
-  rails generate model Email117s user115:references email:string
+  rails generate model Email117s user117:references email:string
   # run the migration
   rake_migrate
   # implement the callback method
@@ -543,27 +544,29 @@ function check_before_destroy(){
   assert_mysql_output "select id, email from email118s" "1 name@vitess.in"
 }
 
+# check_after_commit_rollback checks that after_commit and after_rollback work
 function check_after_commit_rollback(){
   # create a user model
   rails generate model User119s name:string
   # run the migration
   rake_migrate
-  # implement the callback method
+  # implement the callback methods
   write_to_file "app/models/user119.rb" "class User119 < ApplicationRecord
-    after_rollback :printrollbacks
-    after_commit :printcommits
-    before_update  :raise_rollback!
+    after_rollback :print_rollback
+    after_commit :print_commit
+    after_update  :raise_rollback!
 
-    def printrollbacks
-       puts 'rollback'
+    def print_rollback
+      puts 'rollback'
     end
-    def printcommits
-       puts 'commit'
+
+    def print_commit
+      puts 'commit'
     end
+
     def raise_rollback!
-       raise ActiveRecord::Rollback
+      raise ActiveRecord::Rollback
     end
-
   end"
 
   # Insert a new user
@@ -573,13 +576,12 @@ function check_after_commit_rollback(){
   assert_matches "$create_output" "$expected_output"
 
   # update user
-  create_output=$(rails runner 'User119.find(1).update(:name => "name 2")')
+  create_output=$(rails runner 'User119.find(1).update!(:name => "name 2")')
   expected_output="rollback"
   # assert that the output matches the expectation
   assert_matches "$create_output" "$expected_output"
-
+  # assert that the data in the table is also correct
   assert_mysql_output "select id, name from user119s" "1 name 1"
-
 }
 
 # 6. Halting Execution
