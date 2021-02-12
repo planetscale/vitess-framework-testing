@@ -425,62 +425,58 @@ function check_after_touch_with_belongs_to(){
 # Registers a callback to be called before a record is updated
 function check_before_update(){
   # create a user model
-  rails generate model User113s name:string
-  # also create a model for the emails
-  rails generate model Email113s user113:references email:string
+  rails generate model User115s name:string
   # run the migration
   rake_migrate
   # implement the callback method
-  write_to_file "app/models/user113.rb" "class User113 < ApplicationRecord
-  before_update :insert_email
+  write_to_file "app/models/user115.rb" "class User115 < ApplicationRecord
+    before_update :parameterize_name
 
-  private
-    def insert_email
-      Email113.create!(:user113_id => id, :email => (name+'@vitess.in'))
-    end
+    private
+      def parameterize_name
+        self.name = name.parameterize(separator: '_')
+      end
   end"
 
-  # check that the after_create function is called on creation
-  rails runner 'User113.create!(:name => "name")'
-  # check that the data is inserted into the table and email is also added
-  assert_mysql_output "select id, name from user113s" "1 name"
-  assert_mysql_output "select id, user113_id, email from email113s" ""
-  # check that the around-create function is not called on updation
-  rails runner 'User113.find(1).update!(:name => "name2")'
-  assert_mysql_output "select id, name from user113s" "1 name2"
-  # also check that the email didn't get changed
-  assert_mysql_output "select id, user113_id, email from email113s" "1 1 name2@vitess.in"
+  # check that the before update not called on creation
+  rails runner 'User115.create!(:name => "name 1")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user115s" "1 name 1"
+  # check that the before update function is called on updation
+  rails runner 'User115.find(1).update!(:name => " name 2")'
+  assert_mysql_output "select id, name from user115s" "1 name_2"
 }
 
 # Registers a callback to be called around the update of a record.
 function check_around_update(){
-
   # create a user model
-  rails generate model User114s name:string
+  rails generate model User116s name:string
   # also create a model for the emails
-  rails generate model Email114s user114:references email:string
+  rails generate model Email116s user116:references email:string
   # run the migration
   rake_migrate
   # implement the callback method
-  write_to_file "app/models/user114.rb" "class User114 < ApplicationRecord
-  around_update :insert_email
+  write_to_file "app/models/user116.rb" "class User116 < ApplicationRecord
+    around_update :parameterize_name_and_insert_email
 
-  private
-    def insert_email
-      Email114.create!(:user114_id => id, :email => (name+'@vitess.in'))
-    end
+    private
+      def parameterize_name_and_insert_email
+        self.name = name.parameterize(separator: '_')
+        yield
+        Email116.create!(:user116_id => id, :email => (name+'@vitess.in'))
+      end
   end"
 
-  # check that the after_create function is called on creation
-  rails runner 'User114.create!(:name => "name")'
-  # check that the data is inserted into the table and email is also added
-  assert_mysql_output "select id, name from user114s" "1 name"
-  assert_mysql_output "select id, user114_id, email from email114s" ""
-  # check that the around-create function is not called on updation
-  rails runner 'User114.find(1).update!(:name => "name2")'
-  assert_mysql_output "select id, name from user114s" "1 name"
-  # also check that the email didn't get changed
-  assert_mysql_output "select id, user114_id, email from email114s" "1 1 name2@vitess.in"
+  # check that the around-update function is not called on creation
+  rails runner 'User116.create!(:name => "name 1")'
+  # check that the data is inserted into the table and email is not added
+  assert_mysql_output "select id, name from user116s" "1 name 1"
+  assert_mysql_output "select id, user116_id, email from email116s" ""
+  # check that the around-update function is called on updation
+  rails runner 'User116.find(1).update!(:name => "name 2")'
+  assert_mysql_output "select id, name from user116s" "1 name_2"
+  # also check that the email is inserted
+  assert_mysql_output "select id, user116_id, email from email116s" "1 1 name_2@vitess.in"
 
 }
 
@@ -488,31 +484,31 @@ function check_around_update(){
 function check_after_update(){
 
   # create a user model
-  rails generate model User115s name:string
+  rails generate model User117s name:string
   # also create a model for the emails
-  rails generate model Email115s user115:references email:string
+  rails generate model Email117s user115:references email:string
   # run the migration
   rake_migrate
   # implement the callback method
-  write_to_file "app/models/user115.rb" "class User115 < ApplicationRecord
+  write_to_file "app/models/user117.rb" "class User117 < ApplicationRecord
   after_update :insert_email
 
   private
     def insert_email
-      Email115.create!(:user115_id => id, :email => (name+'@vitess.in'))
+      Email117.create!(:user117_id => id, :email => (name+'@vitess.in'))
     end
   end"
 
-  # check that the after_create function is called on creation
-  rails runner 'User115.create!(:name => "name")'
+  # check that the after_update function is not called on creation
+  rails runner 'User117.create!(:name => "name")'
   # check that the data is inserted into the table and email is also added
-  assert_mysql_output "select id, name from user115s" "1 name"
-  assert_mysql_output "select id, user115_id, email from email115s" ""
-  # check that the around-create function is not called on updation
-  rails runner 'User115.find(1).update!(:name => "name2")'
-  assert_mysql_output "select id, name from user115s" "1 name2"
-  # also check that the email didn't get changed
-  assert_mysql_output "select id, user115_id, email from email115s" "1 1 name2@vitess.in"
+  assert_mysql_output "select id, name from user117s" "1 name"
+  assert_mysql_output "select id, user117_id, email from email117s" ""
+  # check that the around_update function is called on updation
+  rails runner 'User117.find(1).update!(:name => "name2")'
+  assert_mysql_output "select id, name from user117s" "1 name2"
+  # also check that the email gets inserted
+  assert_mysql_output "select id, user117_id, email from email117s" "1 1 name2@vitess.in"
 
 }
 
@@ -520,30 +516,70 @@ function check_after_update(){
 function check_before_destroy(){
 
   # create a user model
-  rails generate model User116s name:string
+  rails generate model User118s name:string
   # also create a model for the emails
-  rails generate model Email116s email:string
+  rails generate model Email118s email:string
   # run the migration
   rake_migrate
   # implement the callback method
-  write_to_file "app/models/user116.rb" "class User116 < ApplicationRecord
+  write_to_file "app/models/user118.rb" "class User118 < ApplicationRecord
   before_destroy :insert_email
 
   private
     def insert_email
-      Email116.create!(:email => (name+'@vitess.in'))
+      Email118.create!(:email => (name+'@vitess.in'))
     end
   end"
 
-  # check that the after_create function is called on creation
-  rails runner 'User116.create!(:name => "name")'
-  rails runner 'User116.create!(:name => "name2")'
-  # check that the data is inserted into the table and email is also added
-  assert_mysql_output "select id, name from user116s" "1 name 2 name2"
+  # add 2 users
+  rails runner 'User118.create!(:name => "name")'
+  rails runner 'User118.create!(:name => "name2")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user118s" "1 name 2 name2"
 
-  rails runner 'User116.find(1).destroy()'
-  assert_mysql_output "select id, name from user116s" "2 name2"
-  assert_mysql_output "select id, email from email116s" "1 name@vitess.in"
+  # Check that email is added on destroy of ID 1
+  rails runner 'User118.find(1).destroy()'
+  assert_mysql_output "select id, name from user118s" "2 name2"
+  assert_mysql_output "select id, email from email118s" "1 name@vitess.in"
+}
+
+function check_after_commit_rollback(){
+  # create a user model
+  rails generate model User119s name:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user119.rb" "class User119 < ApplicationRecord
+    after_rollback :printrollbacks
+    after_commit :printcommits
+    before_update  :raise_rollback!
+
+    def printrollbacks
+       puts 'rollback'
+    end
+    def printcommits
+       puts 'commit'
+    end
+    def raise_rollback!
+       raise ActiveRecord::Rollback
+    end
+
+  end"
+
+  # Insert a new user
+  create_output=$(rails runner 'User119.create!(:name => "name 1")')
+  expected_output="commit"
+  # assert that the output matches the expectation
+  assert_matches "$create_output" "$expected_output"
+
+  # update user
+  create_output=$(rails runner 'User119.find(1).update(:name => "name 2")')
+  expected_output="rollback"
+  # assert that the output matches the expectation
+  assert_matches "$create_output" "$expected_output"
+
+  assert_mysql_output "select id, name from user119s" "1 name 1"
+
 }
 
 # 6. Halting Execution
@@ -801,6 +837,8 @@ check_before_update
 check_around_update
 check_after_update
 check_before_destroy
+check_after_commit_rollback
+
 # 3.4 after_initialize and after_find
 # https://guides.rubyonrails.org/active_record_callbacks.html#after-initialize-and-after-find
 check_after_initialize_and_after_find
