@@ -602,6 +602,57 @@ function check_if_with_proc_v2(){
   assert_mysql_output "select id, cardNumber, phoneNumber from order102s" "1 NULL 9999999999 2 9999-9999-9999-9999 NULL"
 }
 
+# 8.3 Multiple Conditions for Callbacks
+# check_multiple_conditions_callbacks checks that multiple conditions in the callbacks works
+function check_multiple_conditions_callbacks(){
+  # create a comment and article models
+  rails generate model Article115s title:string ignoreComments:boolean
+  rails generate model Comment115s author:string value:string wantEmails:boolean article115:references
+  # run the migration
+  rake_migrate
+  # add the callback function with multiple conditions
+  write_to_file "app/models/comment115.rb" "class Comment115 < ApplicationRecord
+    belongs_to :article115
+    after_create :send_email_to_author, if: :author_wants_emails?,
+      unless: Proc.new { |comment| comment.article115.ignore_comments? }
+    
+    def author_wants_emails?
+      return wantEmails
+    end
+
+    def send_email_to_author
+      puts (\"Email sent to the author \" + author)
+    end
+  end"
+  write_to_file "app/models/article115.rb" "class Article115 < ApplicationRecord
+    has_many :comment115s
+
+    def ignore_comments?
+      return ignoreComments
+    end
+  end"
+
+  # insert a new article with ignoreComments true
+  rails runner 'Article115.create!(:title => "Vitess", :ignoreComments => true)'
+  # insert a new article with ignoreComments false
+  rails runner 'Article115.create!(:title => "Rails", :ignoreComments => false)'
+  # create a new comment in Rails article and assert that the message is received when wantEmails is true
+  create_output=$(rails runner 'Comment115.create!(:article115_id => 2, :author => "RailsUser", :value => "Rails is awesome", :wantEmails => true )')
+  assert_matches "$create_output" "Email sent to the author RailsUser"
+
+  # create a new comment in Rails article and assert that no message is received when wantEmails is false
+  create_output=$(rails runner 'Comment115.create!(:article115_id => 2, :author => "RailsUser2", :value => "Rails is awesome", :wantEmails => false )')
+  assert_matches "$create_output" ""
+
+  # create a new comment in Vitess article and assert that no message is received when wantEmails is true
+  create_output=$(rails runner 'Comment115.create!(:article115_id => 1, :author => "VitessUser", :value => "Vitess is awesome", :wantEmails => true )')
+  assert_matches "$create_output" ""
+
+  # create a new comment in Vitess article and assert that no message is received when wantEmails is false
+  create_output=$(rails runner 'Comment115.create!(:article115_id => 1, :author => "VitessUser2", :value => "Vitess is awesome", :wantEmails => false )')
+  assert_matches "$create_output" ""
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -659,3 +710,6 @@ check_if_with_symbol
 # 8.2 Using :if and :unless with a Proc
 check_if_with_proc_v1
 check_if_with_proc_v2
+# 8.3 Multiple Conditions for Callbacks
+# https://guides.rubyonrails.org/active_record_callbacks.html#multiple-conditions-for-callbacks
+check_multiple_conditions_callbacks
