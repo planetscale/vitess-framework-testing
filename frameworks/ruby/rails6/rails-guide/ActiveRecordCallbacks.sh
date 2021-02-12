@@ -524,12 +524,12 @@ function check_before_destroy(){
   rake_migrate
   # implement the callback method
   write_to_file "app/models/user118.rb" "class User118 < ApplicationRecord
-  before_destroy :insert_email
+    before_destroy :insert_email
 
-  private
-    def insert_email
-      Email118.create!(:email => (name+'@vitess.in'))
-    end
+    private
+      def insert_email
+        Email118.create!(:email => (name+'@vitess.in'))
+      end
   end"
 
   # add 2 users
@@ -542,6 +542,85 @@ function check_before_destroy(){
   rails runner 'User118.find(1).destroy()'
   assert_mysql_output "select id, name from user118s" "2 name2"
   assert_mysql_output "select id, email from email118s" "1 name@vitess.in"
+}
+
+# Registers a callback to be called after a record is destroyed
+function check_after_destroy(){
+
+  # create a user model
+  rails generate model User123s name:string
+  # also create a model for the emails
+  rails generate model Email123s email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user123.rb" "class User123 < ApplicationRecord
+    after_destroy :insert_email
+
+    private
+      def insert_email
+        Email123.create!(:email => (name+'@vitess.in'))
+      end
+  end"
+
+  # add 2 users
+  rails runner 'User123.create!(:name => "name")'
+  rails runner 'User123.create!(:name => "name2")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user123s" "1 name 2 name2"
+
+  # Check that email is added on destroy of ID 1
+  rails runner 'User123.find(1).destroy()'
+  assert_mysql_output "select id, name from user123s" "2 name2"
+  assert_mysql_output "select id, email from email123s" "1 name@vitess.in"
+}
+
+# Registers a callback to be called around a record is destroyed
+function check_around_destroy(){
+  # create a user model
+  rails generate model User124s name:string
+  # also create a model for the emails
+  rails generate model Email124s email:string
+  # run the migration
+  rake_migrate
+  # implement the callback method
+  write_to_file "app/models/user124.rb" "class User124 < ApplicationRecord
+    around_destroy :insert_email
+
+    private
+      def insert_email
+        puts \"trying to destroy\"
+        if name.length < 5
+          return false
+        end
+        yield
+        Email124.create!(:email => (name+'@vitess.com'))
+      end
+  end"
+
+  # add 2 users
+  rails runner 'User124.create!(:name => "name")'
+  rails runner 'User124.create!(:name => "name2")'
+  # check that the data is inserted into the table
+  assert_mysql_output "select id, name from user124s" "1 name 2 name2"
+
+  # check that destroying the first id does not succeed
+  destroy_output=$(rails runner 'User124.find(1).destroy')
+  expected_output="trying to destroy"
+  # check that the output matches the expectation
+  assert_matches "$destroy_output" "$expected_output"
+  # check that the data is intact
+  assert_mysql_output "select id, name from user124s" "1 name 2 name2"
+  assert_mysql_output "select id, email from email124s" ""
+
+  # check that destroying the second id succeeds
+  destroy_output=$(rails runner 'User124.find(2).destroy')
+  expected_output="trying to destroy"
+  # check that the output matches the expectation
+  assert_matches "$destroy_output" "$expected_output"
+  # check that the data is deleted and email is added
+  assert_mysql_output "select id, name from user124s" "1 name"
+  assert_mysql_output "select id, email from email124s" "1 name2@vitess.com"
 }
 
 # check_after_commit_rollback checks that after_commit and after_rollback work
@@ -1069,6 +1148,8 @@ check_before_update
 check_around_update
 check_after_update
 check_before_destroy
+check_after_destroy
+check_around_destroy
 check_after_commit_rollback
 
 # 3.4 after_initialize and after_find
