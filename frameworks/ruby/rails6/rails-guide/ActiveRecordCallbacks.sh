@@ -864,6 +864,67 @@ function check_combining_conditions_callbacks(){
   assert_matches "$create_output" ""
 }
 
+# 9 Callback Classes
+# check_callback_class_v1 checks that callbacks classes works - version 1
+function check_callback_class_v1(){
+  # create the models
+  rails generate model PictureFile1 filepath:string
+  # run the migration
+  rake_migrate
+  write_to_file "app/models/picture_file_callback1s.rb" "class PictureFileCallback1s
+    def after_destroy(picture_file)
+      if File.exist?(picture_file.filepath)
+        File.delete(picture_file.filepath)
+      end
+    end
+  end"
+  write_to_file "app/models/picture_file1.rb" "class PictureFile1 < ApplicationRecord
+    after_destroy PictureFileCallback1s.new
+  end"
+
+  # create a temporary file
+  touch ./tmpPicture
+  # insert a record for this file in the table
+  rails runner 'PictureFile1.create!(:filepath => "./tmpPicture")'
+  # now we delete the record
+  rails runner 'PictureFile1.find(1).destroy'
+  # check that the temporary file is deleted
+  if [ -f "./tmpPicture" ]; then
+    echo "The temporary file has not been deleted yet"
+    exit 1
+  fi
+}
+
+# check_callback_class_v2 checks that callbacks classes works - version 2
+function check_callback_class_v2(){
+  # create the models
+  rails generate model PictureFile2 filepath:string
+  # run the migration
+  rake_migrate
+  write_to_file "app/models/picture_file_callback2s.rb" "class PictureFileCallback2s
+    def self.after_destroy(picture_file)
+      if File.exist?(picture_file.filepath)
+        File.delete(picture_file.filepath)
+      end
+    end
+  end"
+  write_to_file "app/models/picture_file2.rb" "class PictureFile2 < ApplicationRecord
+    after_destroy PictureFileCallback2s
+  end"
+
+  # create a temporary file
+  touch ./tmpPicture
+  # insert a record for this file in the table
+  rails runner 'PictureFile2.create!(:filepath => "./tmpPicture")'
+  # now we delete the record
+  rails runner 'PictureFile2.find(1).destroy'
+  # check that the temporary file is deleted
+  if [ -f "./tmpPicture" ]; then
+    echo "The temporary file has not been deleted yet"
+    exit 1
+  fi
+}
+
 # setup_mysql_attributes will setup the mysql attributes
 setup_mysql_attributes
 
@@ -931,3 +992,8 @@ check_if_with_proc_v2
 # https://guides.rubyonrails.org/active_record_callbacks.html#multiple-conditions-for-callbacks
 check_multiple_conditions_callbacks
 check_combining_conditions_callbacks
+
+# 9 Callback Classes
+# https://guides.rubyonrails.org/active_record_callbacks.html#callback-classes
+check_callback_class_v1
+check_callback_class_v2
