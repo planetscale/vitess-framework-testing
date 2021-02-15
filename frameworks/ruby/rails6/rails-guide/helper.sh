@@ -71,6 +71,17 @@ function assert_mysql_output(){
   fi
 }
 
+# assert_matches is used to assert that the two strings match
+function assert_matches(){
+  # $1 is the actual output
+  # $2 is the expected output
+  if [[ "$(echo -e "$1")" != "$(echo -e "$2")" ]]
+  then
+    echo -e "Got wrong output \nExpected: $2 \nGot: $1"
+    exit 1
+  fi
+}
+
 # get_mysql_version gets the mysql version
 function get_mysql_version(){
   version=$(mysql_run "SELECT @@version")
