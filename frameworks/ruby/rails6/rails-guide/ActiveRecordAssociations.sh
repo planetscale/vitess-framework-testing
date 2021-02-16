@@ -23,3 +23,6 @@ rake guide_association:step_3_3 # Updating the schema
 # 3.4 Controlling Association Scope is only examples for more fine-grained Ruby module organization, nothing to do with the database
 rake guide_association:step_3_5 # Bi-directional Associations
 
+# 4 Detailed Association Reference
+# This is only a reference of all the available methods/options/etc added by each reference type
+
