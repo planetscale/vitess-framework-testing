@@ -26,3 +26,11 @@ rake guide_association:step_3_5 # Bi-directional Associations
 # 4 Detailed Association Reference
 # This is only a reference of all the available methods/options/etc added by each reference type
 
+# 5 Single Table Inheritance (STI)
+rails generate model vehicle type:string color:string price:decimal{10.2}
+rails generate model car --parent=vehicle
+rails generate model motorcycle --parent=vehicle
+rails generate model bicycle --parent=vehicle
+rails db:migrate
+rake guide_association:step_5
+
