@@ -163,5 +163,12 @@ namespace :guide_association do
 		a.first_name = "Awesome"
 		raise "name mismatch 2" unless a.first_name == b.writer.first_name
 	end
+
+	task :step_5 do
+		c = Car.create!(color: 'Red', price: 10000)
+		b = Bicycle.create!(color: 'Silver', price: 100)
+		m = Motorcycle.create!(color: 'Black', price: 5000)
+		raise "vehicles wrong" unless Vehicle.all == [c, b, m]
+	end
 end
 
