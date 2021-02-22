@@ -1,4 +1,4 @@
 class Supplier2 < ApplicationRecord
-	has_one :account3
+  has_one :account3
 end
 
