@@ -24,7 +24,30 @@ rake guide_association:step_3_3 # Updating the schema
 rake guide_association:step_3_5 # Bi-directional Associations
 
 # 4 Detailed Association Reference
-# This is only a reference of all the available methods/options/etc added by each reference type
+# 4.1 belongs_to Association Reference
+rake guide_association:step_4_1_1 # Methods Added by belongs_to
+rake guide_association:step_4_1_2 # Options for belongs_to
+rake guide_association:step_4_1_3 # Scopes for belongs_to
+rake guide_association:step_4_1_4 # Do Any Associated Objects Exist?
+# 4.1.5 When are Objects Saved? is just answering a question
+# 4.2 has_one Association Reference
+rake guide_association:step_4_2_1 # Methods Added by has_one
+rake guide_association:step_4_2_2 # Options for has_one
+rake guide_association:step_4_2_3 # Scopes for has_one
+rake guide_association:step_4_2_4 # Do Any Associated Objects Exist?
+# 4.2.5 When are Objects Saved? is just answering a question
+# 4.3 has_many Association Reference
+rake guide_association:step_4_3_1 # Methods Added by has_many
+# 4.3.2 Options for has_many is well-covered in the 4.3.1 test
+rake guide_association:step_4_3_3 # Scopes for has_many
+# 4.3.4 When are Objects Saved? is just answering a question
+# 4.4 has_and_belongs_to_many Association Reference
+rake guide_association:step_4_4_1 # Methods Added by has_and_belongs_to_many
+# 4.4.2 Options for has_and_belongs_to_many is well-covered in the 4.4.1 test
+rake guide_association:step_4_4_3 # Scopes for has_and_belongs_to_many
+# 4.4.4 When are Objects Saved? is just answering a question
+# 4.5 Association Callbacks doesn't explain any database-facing functionality
+# 4.6 Association Extensions doesn't explain any database-facing functionality
 
 # 5 Single Table Inheritance (STI)
 rails generate model vehicle type:string color:string price:decimal{10.2}
