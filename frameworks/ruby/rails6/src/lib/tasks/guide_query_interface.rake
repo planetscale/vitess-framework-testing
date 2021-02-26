@@ -262,5 +262,31 @@ namespace :guide_query_interface do
 		customers = Customer2.where(first_name: 'One').or(Customer2.where(orders_count: [1, 3, 5])).to_a
 		raise 'count wrong 1' unless customers.size == 3
 	end
+
+	task :step_4 do
+		customers = Customer2.order(:created_at).to_a
+		raise 'count wrong 1' unless customers.size == 10
+		(0..9).each do |i|
+			raise "id wrong 1 (#{i})" unless customers[i].id == (i + 1)
+		end
+
+		customers = Customer2.order(created_at: :desc).to_a
+		raise 'count wrong 2' unless customers.size == 10
+		(0..9).each do |i|
+			raise "id wrong 2 (#{i})" unless customers[i].id == (10 - i)
+		end
+
+		customers = Customer2.order(created_at: :desc, orders_count: :asc).to_a
+		raise 'count wrong 3' unless customers.size == 10
+		(0..9).each do |i|
+			raise "id wrong 3 (#{i})" unless customers[i].id == (10 - i)
+		end
+
+		customers = Customer2.order("orders_count ASC", "created_at DESC").to_a
+		raise 'count wrong 4' unless customers.size == 10
+		(0..9).each do |i|
+			raise "id wrong 4 (#{i})" unless customers[i].id == (i + 1)
+		end
+	end
 end
 
