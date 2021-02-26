@@ -16,11 +16,13 @@ class AddQueryInterfaceTables < ActiveRecord::Migration[6.1]
 			t.string :title
 			t.integer :price
 			t.integer :year_published
+			t.boolean :out_of_print
 			t.timestamps
 		end
 
 		create_table :customer2s do |t|
 			t.string :first_name
+			t.integer :orders_count
 			t.timestamps
 		end
 
