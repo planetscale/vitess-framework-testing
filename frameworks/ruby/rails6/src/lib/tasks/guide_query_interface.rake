@@ -1,8 +1,97 @@
 namespace :guide_query_interface do
 	task :seed do
 		for i in 1..10
-			Customer2.create(first_name: i.humanize.humanize)
+			Customer2.create!(first_name: i.humanize.humanize)
 		end
+
+		for i in 1..10
+			Supplier5.create!(state: "ST#{i}")
+		end
+
+		for i in 1..10
+			Author5.create!(name: "Novelist #{i}")
+		end
+
+		for i in 1..10
+			for j in 1..10
+				for k in 1..3
+					Book6.create!(
+						supplier: Supplier5.find(i),
+						author: Author5.find(j),
+						title: "Book #{i}-#{j}-#{k}",
+						price: (i * 100) + (j * 10) + k,
+						year_published: 2000 + i + j + k,
+						out_of_print: (k % 2 == 0)
+					)
+				end
+			end
+		end
+
+		c = Customer2.find(1)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c = Customer2.find(2)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c = Customer2.find(3)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c = Customer2.find(4)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c = Customer2.find(5)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c = Customer2.find(6)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
+		c = Customer2.find(7)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c = Customer2.find(8)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17]), status: :complete)
+		c = Customer2.find(9)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17, 19]), status: :complete)
+		c = Customer2.find(10)
+		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17, 19]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17, 19, 23]), status: :complete)
 	end
 
 	task :step_2_1 do
@@ -97,6 +186,81 @@ namespace :guide_query_interface do
 		end
 		# :error_in_ignore
 		# ???
+	end
+
+	task :step_3_1 do
+		books = Book6.where("title LIKE 'Book 1-1-%'").to_a
+		raise 'count wrong' unless books.size == 3
+		books.each do |b|
+			raise "supplier wrong" unless b.supplier5_id == 1
+			raise "author wrong" unless b.author5_id == 1
+		end
+	end
+
+	task :step_3_2 do
+		books = Book6.where("title = ?", 'Book 1-1-1').to_a
+		raise 'count wrong 1' unless books.size == 1
+		book = books.first
+		raise 'supplier wrong 1' unless book.supplier5_id == 1
+		raise 'author wrong 1' unless book.author5_id == 1
+		raise 'price wrong 1' unless book.price == 111
+		raise 'published date wrong 1' unless book.year_published == 2003
+		raise 'out of print wrong 1' unless book.out_of_print == false
+
+		books = Book6.where("title = ? AND out_of_print = ?", 'Book 4-8-2', false).to_a
+		raise 'count wrong 2' unless books.size == 0
+		books = Book6.where("title = ? AND out_of_print = ?", 'Book 4-8-2', true).to_a
+		raise 'count wrong 2' unless books.size == 1
+		book = books.first
+		raise 'supplier wrong 2' unless book.supplier5_id == 4
+		raise 'author wrong 2' unless book.author5_id == 8
+		raise 'price wrong 2' unless book.price == 482
+		raise 'published date wrong 2' unless book.year_published == 2014
+		raise 'out of print wrong 2' unless book.out_of_print == true
+
+		books = Book6.where("created_at >= :start_date AND created_at <= :end_date", {
+			start_date: '2021-01-01', end_date: '3021-01-01'
+		}).to_a
+		raise 'count wrong 3' unless books.size == (10 * 10 * 3)
+	end
+
+	task :step_3_3 do
+		# 3.3.1 Equality Conditions
+		books = Book6.where(out_of_print: true).to_a
+		raise 'count wrong 1' unless books.size == (10 * 10 * 1)
+
+		books = Book6.where('out_of_print' => true).to_a
+		raise 'count wrong 2' unless books.size == (10 * 10 * 1)
+
+		author = Author5.first
+		books = Book6.where(author5_id: author.id).to_a
+		raise 'count wrong 3' unless books.size == (10 * 3)
+		Author5.joins(:books).where(books: { author: author }) # What does this do?  What do we actually check?
+
+		# 3.3.2 Range Conditions
+		books = Book6.where(created_at: (Time.new(2021, 01, 01)..Time.new(3021, 01, 01))).to_a
+		raise 'count wrong 4' unless books.size == (10 * 10 * 3)
+		books = Book6.where(year_published: 2005..2010).to_a
+		raise 'count wrong 5' unless books.size == 81
+		books.each do |b|
+			raise "published date wrong (#{b.id})" unless b.year_published >= 2005 && b.year_published <= 2010
+		end
+
+		# 3.3.3 Subset Conditions
+		customers = Customer2.where(orders_count: [1, 3, 5]).to_a
+		raise 'count wrong 6' unless customers.size == 3
+	end
+
+	task :step_3_4 do
+		customers = Customer2.where.not(orders_count: [1, 3, 5]).to_a
+		raise 'count wrong' unless customers.size == 7
+	end
+
+	task :step_3_5 do
+		customers = Customer2.where(first_name: 'Two').or(Customer2.where(orders_count: [1, 3, 5])).to_a
+		raise 'count wrong 1' unless customers.size == 4
+		customers = Customer2.where(first_name: 'One').or(Customer2.where(orders_count: [1, 3, 5])).to_a
+		raise 'count wrong 1' unless customers.size == 3
 	end
 end
 
