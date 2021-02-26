@@ -104,8 +104,8 @@ namespace :guide_query_interface do
 
 		# 2.1.2 take
 		# While ActiveRecord explicitly does not make any ordering guarantees
-		#    here, MySQL provides implicit ordering by primary key, so we can
-		#    expect specific results here
+		#    with .take(), MySQL provides implicit ordering by primary key, so
+		#    we can expect specific results here
 		raise "customer wrong 4" unless Customer2.take.first_name == 'One'
 		c = Customer2.take(2)
 		raise "count wrong 2" unless c.size == 2
