@@ -19,3 +19,6 @@ rake guide_query_interface:step_3_5 # OR Conditions
 # 4 Ordering
 rake guide_query_interface:step_4
 
+# 5 Selecting Specific Fields
+rake guide_query_interface:step_5
+
