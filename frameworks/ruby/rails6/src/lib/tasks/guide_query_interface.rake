@@ -35,60 +35,60 @@ namespace :guide_query_interface do
 		c = Customer2.find(3)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c = Customer2.find(4)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
 		c = Customer2.find(5)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :shipped)
 		c = Customer2.find(6)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :shipped)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
 		c = Customer2.find(7)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :shipped)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :cancelled)
 		c = Customer2.find(8)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :shipped)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :cancelled)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17]), status: :complete)
 		c = Customer2.find(9)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :shipped)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :cancelled)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17, 19]), status: :complete)
 		c = Customer2.find(10)
 		c.orders.create!(books: Book6.where(id: [1]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3]), status: :being_packed)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7]), status: :shipped)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11]), status: :complete)
-		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :complete)
+		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13]), status: :cancelled)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17, 19]), status: :complete)
 		c.orders.create!(books: Book6.where(id: [1, 2, 3, 5, 7, 11, 13, 17, 19, 23]), status: :complete)
@@ -311,6 +311,20 @@ namespace :guide_query_interface do
 		(0..4).each do |i|
 			raise "id wrong 2 (#{i})" unless customers[i].id == (i + 1 + 4)
 		end
+	end
+
+	task :step_7 do
+		# 7 Group
+		orders = Order2.select(:created_at).group(:created_at).to_a
+		raise 'count wrong 1' unless orders.size == 55
+
+		# 7.1 Total of grouped items
+		status_counts = Order2.group(:status).count
+		raise 'count wrong 2' unless status_counts.size == 4
+		raise 'count wrong 3' unless status_counts[:being_packed] == 8
+		raise 'count wrong 4' unless status_counts[:shipped] == 6
+		raise 'count wrong 5' unless status_counts[:complete] == 37
+		raise 'count wrong 6' unless status_counts[:cancelled] == 4
 	end
 end
 
