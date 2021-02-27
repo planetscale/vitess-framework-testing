@@ -22,3 +22,6 @@ rake guide_query_interface:step_4
 # 5 Selecting Specific Fields
 rake guide_query_interface:step_5
 
+# 6 Limit and Offset
+rake guide_query_interface:step_6
+
