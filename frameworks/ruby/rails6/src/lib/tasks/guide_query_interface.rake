@@ -298,5 +298,19 @@ namespace :guide_query_interface do
 		books = query.distinct(false).to_a
 		raise 'count wrong 3' unless books.size == (10 * 10 * 3)
 	end
+
+	task :step_6 do
+		customers = Customer2.limit(5).to_a
+		raise 'count wrong 1' unless customers.size == 5
+		(0..4).each do |i|
+			raise "id wrong 1 (#{i})" unless customers[i].id == (i + 1)
+		end
+
+		customers = Customer2.limit(5).offset(4).to_a
+		raise 'count wrong 2' unless customers.size == 5
+		(0..4).each do |i|
+			raise "id wrong 2 (#{i})" unless customers[i].id == (i + 1 + 4)
+		end
+	end
 end
 
