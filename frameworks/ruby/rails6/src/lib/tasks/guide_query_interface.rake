@@ -288,5 +288,15 @@ namespace :guide_query_interface do
 			raise "id wrong 4 (#{i})" unless customers[i].id == (i + 1)
 		end
 	end
+
+	task :step_5 do
+		books = Book6.select(:author5_id, :supplier5_id).to_a
+		raise 'count wrong 1' unless books.size == (10 * 10 * 3)
+		books = Book6.select(:author5_id, :supplier5_id).distinct.to_a
+		raise 'count wrong 2' unless books.size == (10 * 10)
+		query = Book6.select(:author5_id, :supplier5_id).distinct
+		books = query.distinct(false).to_a
+		raise 'count wrong 3' unless books.size == (10 * 10 * 3)
+	end
 end
 
