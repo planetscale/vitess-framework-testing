@@ -326,5 +326,13 @@ namespace :guide_query_interface do
 		raise 'count wrong 5' unless status_counts['complete'] == 37
 		raise 'count wrong 6' unless status_counts['cancelled'] == 4
 	end
+
+	task :step_8 do
+		status_counts = Order2.group(:status).having("COUNT(*) > 4").count
+		raise 'count wrong 1' unless status_counts.size == 3
+		raise 'count wrong 2' unless status_counts['being_packed'] == 8
+		raise 'count wrong 3' unless status_counts['shipped'] == 6
+		raise 'count wrong 4' unless status_counts['complete'] == 37
+	end
 end
 
