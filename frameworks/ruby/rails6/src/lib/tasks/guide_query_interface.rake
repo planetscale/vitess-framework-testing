@@ -321,10 +321,10 @@ namespace :guide_query_interface do
 		# 7.1 Total of grouped items
 		status_counts = Order2.group(:status).count
 		raise 'count wrong 2' unless status_counts.size == 4
-		raise 'count wrong 3' unless status_counts[:being_packed] == 8
-		raise 'count wrong 4' unless status_counts[:shipped] == 6
-		raise 'count wrong 5' unless status_counts[:complete] == 37
-		raise 'count wrong 6' unless status_counts[:cancelled] == 4
+		raise 'count wrong 3' unless status_counts['being_packed'] == 8
+		raise 'count wrong 4' unless status_counts['shipped'] == 6
+		raise 'count wrong 5' unless status_counts['complete'] == 37
+		raise 'count wrong 6' unless status_counts['cancelled'] == 4
 	end
 end
 
