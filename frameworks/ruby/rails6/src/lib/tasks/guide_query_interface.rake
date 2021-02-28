@@ -334,5 +334,83 @@ namespace :guide_query_interface do
 		raise 'count wrong 3' unless status_counts['shipped'] == 6
 		raise 'count wrong 4' unless status_counts['complete'] == 37
 	end
+
+	task :step_9_1 do
+		books = Book6.where('id > 100').limit(20).order('id DESC').to_a
+		raise 'count wrong 1' unless books.size == 20
+		(0..19).each do |i|
+			raise "id wrong 1 (#{i})" unless books[i].id == (300 - i)
+		end
+
+		books = Book6.where('id > 100').limit(20).order('id DESC').unscope(:order).to_a
+		raise 'count wrong 2' unless books.size == 20
+		(0..19).each do |i|
+			raise "id wrong 2 (#{i})" unless books[i].id == (101 + i)
+		end
+	end
+
+	task :step_9_2 do
+		books = Book6.where('id > 10').limit(20).order('id DESC').to_a
+		raise 'count wrong 1' unless books.size == 20
+		(0..19).each do |i|
+			raise "id wrong 1 (#{i})" unless books[i].id == (300 - i)
+		end
+
+		books = Book6.where('id > 10').limit(20).order('id DESC').only(:order, :where).to_a
+		raise 'count wrong 2' unless books.size == 290
+		(0..289).each do |i|
+			raise "id wrong 2 (#{i})" unless books[i].id == (300 - i)
+		end
+	end
+
+	task :step_9_3 do
+		book = Book6.select(:title, :price).reselect(:created_at).first
+		raise 'title shouldn\'t exist' if book.attributes.has_key? 'title'
+		raise 'price shouldn\'t exist' if book.attributes.has_key? 'price'
+		raise 'created_at should exist' unless book.attributes.has_key? 'created_at'
+	end
+
+	task :step_9_4 do
+		books = Author5.find(10).books
+		raise 'count wrong 1' unless books.size == 30
+		wanted_ids = [
+			300, 299, 270, 298, 269, 240,
+			268, 239, 210, 238, 209, 180,
+			208, 150, 179, 178, 149, 120,
+			148, 119, 90, 118, 89, 60,
+			88, 59, 30, 58, 29, 28
+		]
+		(0..29).each do |i|
+			raise "id wrong 1 (#{i})" unless books[i].id == wanted_ids[i]
+		end
+
+		books = Author5.find(10).books.reorder(id: :ASC)
+		raise 'count wrong 2' unless books.size == 30
+		wanted_ids = wanted_ids.sort
+		(0..29).each do |i|
+			raise "id wrong 2 (#{i})" unless books[i].id == wanted_ids[i]
+		end
+	end
+
+	task :step_9_5 do
+		customers = Customer2.where('orders_count > 7')
+		raise 'count wrong 1' unless customers.size == 3
+		raise 'id wrong 1' unless customers[0].id == 8
+		raise 'id wrong 2' unless customers[1].id == 9
+		raise 'id wrong 3' unless customers[2].id == 10
+
+		customers = Customer2.where('orders_count > 7').reverse_order
+		raise 'count wrong 2' unless customers.size == 3
+		raise 'id wrong 4' unless customers[0].id == 10
+		raise 'id wrong 5' unless customers[1].id == 9
+		raise 'id wrong 6' unless customers[2].id == 8
+	end
+
+	task :step_9_6 do
+		books = Book6.out_of_print.to_a
+		raise 'count wrong 1' unless books.size == 100
+		books = Book6.out_of_print.rewhere(out_of_print: false).to_a
+		raise 'count wrong 2' unless books.size == 200
+	end
 end
 
