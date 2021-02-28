@@ -25,3 +25,6 @@ rake guide_query_interface:step_5
 # 6 Limit and Offset
 rake guide_query_interface:step_6
 
+# 7 Group
+rake guide_query_interface:step_7
+
