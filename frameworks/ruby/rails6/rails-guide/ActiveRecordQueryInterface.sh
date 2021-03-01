@@ -49,3 +49,7 @@ rake guide_query_interface:step_11
 rake guide_query_interface:step_12_1 # Optimistic Locking
 rake guide_query_interface:step_12_2 # Pessimistic Locking
 
+# 13 Joining Tables
+rake guide_query_interface:step_13_1 # joins
+rake guide_query_interface:step_13_2 # left_outer_joins
+
