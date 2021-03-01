@@ -537,5 +537,65 @@ namespace :guide_query_interface do
 			raise "book count wrong 2 (#{a.id})" unless a.books.size == 10
 		end
 	end
+
+	task :step_15 do
+		books = Book6.out_of_print
+		raise 'count wrong 1' unless books.size == 100
+		author = Author5.first
+		raise 'count wrong 2' unless author.books.out_of_print.size == 10
+		books = Book6.out_of_print_and_expensive
+		raise 'count wrong 3' unless books.size == 61
+	end
+
+	task :step_15_1 do
+		books = Book6.costs_more_than(365)
+		raise 'count wrong 1' unless books.size == 223
+		books = Author5.first.books.costs_more_than(365)
+		raise 'count wrong 2' unless books.size == 22
+	end
+
+	task :step_15_2 do
+		orders = Order2.created_before(Time.now)
+		raise 'count wrong 1' unless orders.size == 55
+		orders = Order2.created_before(Time.now - 1.day)
+		raise 'count wrong 2' unless orders.size == 0
+		orders = Order2.created_before(nil)
+		raise 'count wrong 3' unless orders.size == 55
+	end
+
+	task :step_15_3 do
+		books = Book7.all
+		raise 'count wrong 1' unless books.size == 199
+		books = Book7.unscoped.all
+		raise 'count wrong 2' unless books.size == 300
+		book = Book7.new
+		raise 'book wrong' unless book.out_of_print == false
+		book = Book7.unscoped.new
+		raise 'book wrong' unless book.out_of_print == nil
+	end
+
+	task :step_15_4 do
+		books = Book6.in_print.out_of_print
+		raise 'count wrong 1' unless books.size == 0
+		books = Book6.in_print.merge(Book6.out_of_print)
+		raise 'count wrong 2' unless books.size == 100
+		books = Book7.out_of_print
+		raise 'count wrong 3' unless books.size == 0
+		books = Book7.out_of_print.merge(Book7.in_print)
+		raise 'count wrong 4' unless books.size == 199
+		books = Book6.in_print.where('price > 250')
+		raise 'count wrong 5' unless books.size == 173
+		books = Book7.where('price > 250')
+		raise 'count wrong 6' unless books.size == 172
+	end
+
+	task :step_15_5 do
+		books = Book7.unscoped.all
+		raise 'count wrong 1' unless books.size == 300
+		books = Book7.where(out_of_print: true).unscoped.all
+		raise 'count wrong 2' unless books.size == 300
+		books = Book7.unscoped { Book7.out_of_print }
+		raise 'count wrong 3' unless books.size == 100
+	end
 end
 
