@@ -495,5 +495,47 @@ namespace :guide_query_interface do
 			raise "count wrong 2 (#{c.id})" unless c.reviews_count == 0
 		end
 	end
+
+	task :step_14 do
+		books = Book6.includes(:author).limit(10).to_a
+		raise 'count wrong 1' unless books.count == 10
+		books = Book6.includes(:author).to_a
+		raise 'count wrong 2' unless books.count == 300
+	end
+
+	task :step_14_1 do
+		customers = Customer2.includes(:orders, :reviews).to_a
+		raise 'count wrong 1' unless customers.size == 10
+		customers.each do |c|
+			raise "count wrong 2 (#{c.id})" unless c.orders.size == c.id
+		end
+
+		customers = Customer2.includes(orders: {books: [:supplier, :author]}).to_a
+		raise 'count wrong 3' unless customers.size == 10
+		customers.each do |c|
+			raise "count wrong 4 (#{c.id})" unless c.orders.size == c.id
+			(0..c.orders.size - 1).each do |i|
+				raise "count wrong 5 (#{c.id}; #{i})" unless c.orders[i].books.size == (i + 1)
+				(0..c.orders[i].books.size - 1).each do |j|
+					raise "supplier missing (#{c.id}; #{i}; #{j})" if c.orders[i].books[j].supplier == nil
+					raise "author missing (#{c.id}; #{i}; #{j})" if c.orders[i].books[j].author == nil
+				end
+			end
+		end
+	end
+
+	task :step_14_2 do
+		authors = Author5.includes(:books).where(books: {out_of_print: true}).to_a
+		raise 'count wrong 1' unless authors.count == 10
+		authors.each do |a|
+			raise "book count wrong 1 (#{a.id})" unless a.books.size == 10
+		end
+
+		authors = Author5.includes(:books).where("book6s.out_of_print = TRUE").references(:books).to_a
+		raise 'count wrong 2' unless authors.count == 10
+		authors.each do |a|
+			raise "book count wrong 2 (#{a.id})" unless a.books.size == 10
+		end
+	end
 end
 
