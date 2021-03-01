@@ -31,3 +31,11 @@ rake guide_query_interface:step_7
 # 8 Having
 rake guide_query_interface:step_8
 
+# 9 Overriding Conditions
+rake guide_query_interface:step_9_1 # unscope
+rake guide_query_interface:step_9_2 # only
+rake guide_query_interface:step_9_3 # reselect
+rake guide_query_interface:step_9_4 # reorder
+rake guide_query_interface:step_9_5 # reverse_order
+rake guide_query_interface:step_9_6 # rewhere
+
