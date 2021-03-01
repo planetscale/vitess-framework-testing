@@ -418,5 +418,11 @@ namespace :guide_query_interface do
 		order = Order2.none.to_a
 		raise 'should be no orders' unless order.size == 0
 	end
+
+	task :step_11 do
+		# TODO:  Assert that trying to write to the read-only model fails with ReadOnlyRecord exception
+		customer = Customer2.readonly.first
+		raise 'id wrong' unless customer.id == 1
+	end
 end
 
