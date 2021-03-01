@@ -42,3 +42,6 @@ rake guide_query_interface:step_9_6 # rewhere
 # 10 Null Relation
 rake guide_query_interface:step_10
 
+# 11 Readonly Objects
+rake guide_query_interface:step_11
+
