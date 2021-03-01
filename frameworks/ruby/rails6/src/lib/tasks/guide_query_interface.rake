@@ -431,5 +431,39 @@ namespace :guide_query_interface do
 		end
 		assert 'writing did not fail' if raised == false
 	end
+
+	task :step_12_1 do
+		c1 = Customer2.find(1)
+		c2 = Customer2.find(1)
+
+		c1.first_name = 'OneOne'
+		c1.save
+
+		c2.first_name = 'OneOneOne'
+		raised = false
+		begin
+			c2.save
+		rescue ActiveRecord::StaleObjectError
+			raised = true
+		end
+		assert 'saving did not fail' if raised == false
+	end
+
+	task :step_12_2 do
+		# TODO:  I don't feel like this really exercises locking; we aren't attempting to access the record concurrently.
+		book = Book6.first
+		book.with_lock do
+			book.price = 2111
+			book.year_published = 1803
+			book.save!
+		end
+
+		book = Book6.first
+		book.with_lock('LOCK IN SHARE MODE')do
+			book.price = 3111
+			book.year_published = 1703
+			book.save!
+		end
+	end
 end
 
