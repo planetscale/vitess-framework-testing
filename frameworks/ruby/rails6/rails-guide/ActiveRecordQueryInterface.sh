@@ -66,3 +66,6 @@ rake guide_query_interface:step_15_3 # Applying a default scope
 rake guide_query_interface:step_15_4 # Merging of scopes
 rake guide_query_interface:step_15_5 # Removing all scoping
 
+# 16 Dynamic Finders
+rake guide_query_interface:step_16
+
