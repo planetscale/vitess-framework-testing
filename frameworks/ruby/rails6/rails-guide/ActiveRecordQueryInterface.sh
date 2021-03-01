@@ -39,3 +39,6 @@ rake guide_query_interface:step_9_4 # reorder
 rake guide_query_interface:step_9_5 # reverse_order
 rake guide_query_interface:step_9_6 # rewhere
 
+# 10 Null Relation
+rake guide_query_interface:step_10
+
