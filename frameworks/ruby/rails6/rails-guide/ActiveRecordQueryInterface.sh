@@ -53,3 +53,8 @@ rake guide_query_interface:step_12_2 # Pessimistic Locking
 rake guide_query_interface:step_13_1 # joins
 rake guide_query_interface:step_13_2 # left_outer_joins
 
+# 14 Eager Loading Associations
+rake guide_query_interface:step_14
+rake guide_query_interface:step_14_1 # Eager Loading Multiple Associations
+rake guide_query_interface:step_14_2 # Specifying Conditions on Eager Loaded Associations
+
