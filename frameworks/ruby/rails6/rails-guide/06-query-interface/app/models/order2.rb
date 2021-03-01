@@ -5,5 +5,6 @@ class Order2 < ApplicationRecord
 	enum status: [:being_packed, :shipped, :complete, :cancelled]
 
 	scope :created_before, ->(time) { where('created_at < ?', time) }
+	scope :created_in_time_range, ->(time_range) { where(created_at: time_range) }
 end
 
