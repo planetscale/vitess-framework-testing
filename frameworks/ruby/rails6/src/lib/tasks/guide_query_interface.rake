@@ -465,5 +465,35 @@ namespace :guide_query_interface do
 			book.save!
 		end
 	end
+
+	task :step_13_1 do
+		authors = Author5.joins('INNER JOIN book6s ON book6s.author5_id = author5s.id AND book6s.out_of_print = FALSE').to_a
+		raise 'count wrong 1' unless authors.count == 200
+
+		books = Book6.joins(:reviews).to_a
+		raise 'count wrong 2' unless books.count == 0
+
+		books = Book6.joins(orders: :customer).to_a
+		raise 'count wrong 3' unless books.count == 220
+
+		authors = Author5.joins(books: [{orders: :customer}, :supplier])
+		raise 'count wrong 4' unless authors.count == 220
+
+		time_range = (Time.now.midnight - 1.day)..(Time.now.midnight + 1.day)
+		customers = Customer2.joins(:orders).where('order2s.created_at' => time_range).distinct.to_a
+		raise 'count wrong 5' unless customers.size == 10
+
+		time_range = (Time.now.midnight - 1.day)..(Time.now.midnight + 1.day)
+		customers = Customer2.joins(:orders).merge(Order2.created_in_time_range(time_range)).distinct.to_a
+		raise 'count wrong 6' unless customers.size == 10
+	end
+
+	task :step_13_2 do
+		customers = Customer2.left_outer_joins(:reviews).distinct.select('customer2s.*, COUNT(reviews.id) AS reviews_count').group('customer2s.id').to_a
+		raise 'count wrong 1' unless customers.count == 10
+		customers.each do |c|
+			raise "count wrong 2 (#{c.id})" unless c.reviews_count == 0
+		end
+	end
 end
 
