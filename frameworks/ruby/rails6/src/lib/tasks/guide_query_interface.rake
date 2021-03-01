@@ -412,5 +412,11 @@ namespace :guide_query_interface do
 		books = Book6.out_of_print.rewhere(out_of_print: false).to_a
 		raise 'count wrong 2' unless books.size == 200
 	end
+
+	task :step_10 do
+		# Tough one
+		order = Order2.none.to_a
+		raise 'should be no orders' unless order.size == 0
+	end
 end
 
