@@ -420,9 +420,16 @@ namespace :guide_query_interface do
 	end
 
 	task :step_11 do
-		# TODO:  Assert that trying to write to the read-only model fails with ReadOnlyRecord exception
 		customer = Customer2.readonly.first
 		raise 'id wrong' unless customer.id == 1
+		raised = false
+		begin
+			customer.first_name = 'OneOne'
+			customer.save
+		rescue ActiveRecord::ReadOnlyRecord
+			raised = true
+		end
+		assert 'writing did not fail' if raised == false
 	end
 end
 
