@@ -23,6 +23,7 @@ class AddQueryInterfaceTables < ActiveRecord::Migration[6.1]
 		create_table :customer2s do |t|
 			t.string :first_name
 			t.integer :orders_count
+			t.integer :lock_version
 			t.timestamps
 		end
 
