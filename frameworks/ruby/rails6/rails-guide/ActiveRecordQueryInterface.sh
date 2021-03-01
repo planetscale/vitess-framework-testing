@@ -58,3 +58,11 @@ rake guide_query_interface:step_14
 rake guide_query_interface:step_14_1 # Eager Loading Multiple Associations
 rake guide_query_interface:step_14_2 # Specifying Conditions on Eager Loaded Associations
 
+# 15 Scopes
+rake guide_query_interface:step_15
+rake guide_query_interface:step_15_1 # Passing in arguments
+rake guide_query_interface:step_15_2 # Using conditionals
+rake guide_query_interface:step_15_3 # Applying a default scope
+rake guide_query_interface:step_15_4 # Merging of scopes
+rake guide_query_interface:step_15_5 # Removing all scoping
+
