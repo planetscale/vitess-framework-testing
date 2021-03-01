@@ -597,5 +597,14 @@ namespace :guide_query_interface do
 		books = Book7.unscoped { Book7.out_of_print }
 		raise 'count wrong 3' unless books.size == 100
 	end
+
+	task :step_16 do
+		customer = Customer2.find_by_first_name!('Four')
+		customer = Customer2.find_by_first_name('Eleven')
+		raise 'found 1' unless customer == nil
+		customer = Customer2.find_by_first_name_and_orders_count!('Seven', 7)
+		customer = Customer2.find_by_first_name_and_orders_count('Five', 2)
+		raise 'found 2' unless customer == nil
+	end
 end
 
