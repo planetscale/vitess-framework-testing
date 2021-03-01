@@ -45,3 +45,7 @@ rake guide_query_interface:step_10
 # 11 Readonly Objects
 rake guide_query_interface:step_11
 
+# 12 Locking Records for Update
+rake guide_query_interface:step_12_1 # Optimistic Locking
+rake guide_query_interface:step_12_2 # Pessimistic Locking
+
