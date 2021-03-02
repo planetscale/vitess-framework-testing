@@ -782,5 +782,11 @@ namespace :guide_query_interface do
 		raise 'sum wrong 1' unless Customer2.sum(:orders_count) == 55
 		raise 'sum wrong 2' unless Customer2.where(first_name: 'OneOne').sum(:orders_count) == 1
 	end
+
+	task :step_23 do
+		Customer2.where(id: 1).joins(:orders).explain
+		Customer2.where(id: 3).includes(:orders).explain
+		Customer2.includes(orders: {books: [:supplier, :author]}).explain
+	end
 end
 
