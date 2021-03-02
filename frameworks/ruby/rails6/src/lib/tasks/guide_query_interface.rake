@@ -654,5 +654,20 @@ namespace :guide_query_interface do
 		Order2.find(id).cancelled!
 		raise 'status wrong 4' unless Order2.find(id).cancelled?
 	end
+
+	task :step_18 do
+		customers = Customer2
+			.select('customer2s.id, customer2s.first_name, order2s.status')
+			.joins(:orders)
+			.where('order2s.created_at > ? AND order2s.status = ?', 1.week.ago, 3)
+			.to_a
+		raise 'count wrong' unless customers.size == 5
+
+		book = Book6
+			.select('book6s.id, book6s.title, author5s.name')
+			.joins(:author)
+			.find_by!(title: 'Book 10-3-2')
+		raise 'author wrong' unless book.name == 'Novelist 3'
+	end
 end
 
