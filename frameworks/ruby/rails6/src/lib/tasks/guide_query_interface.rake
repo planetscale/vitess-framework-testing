@@ -606,5 +606,53 @@ namespace :guide_query_interface do
 		customer = Customer2.find_by_first_name_and_orders_count('Five', 2)
 		raise 'found 2' unless customer == nil
 	end
+
+	task :step_17 do
+		orders = Order2.being_packed
+		raise 'count wrong 1' unless orders.size == 8
+		orders.each do |o|
+			raise "being_packed wrong 1 (#{o.id})" unless o.being_packed?
+			raise "shipped wrong 1 (#{o.id})" if o.shipped?
+			raise "complete wrong 1 (#{o.id})" if o.complete?
+			raise "cancelled wrong 1 (#{o.id})" if o.cancelled?
+		end
+
+		orders = Order2.shipped
+		raise 'count wrong 2' unless orders.size == 6
+		orders.each do |o|
+			raise "being_packed wrong 2 (#{o.id})" if o.being_packed?
+			raise "shipped wrong 2 (#{o.id})" unless o.shipped?
+			raise "complete wrong 2 (#{o.id})" if o.complete?
+			raise "cancelled wrong 2 (#{o.id})" if o.cancelled?
+		end
+
+		orders = Order2.complete
+		raise 'count wrong 3' unless orders.size == 37
+		orders.each do |o|
+			raise "being_packed wrong 3 (#{o.id})" if o.being_packed?
+			raise "shipped wrong 3 (#{o.id})" if o.shipped?
+			raise "complete wrong 3 (#{o.id})" unless o.complete?
+			raise "cancelled wrong 3 (#{o.id})" if o.cancelled?
+		end
+
+		orders = Order2.cancelled
+		raise 'count wrong 4' unless orders.size == 4
+		orders.each do |o|
+			raise "being_packed wrong 4 (#{o.id})" if o.being_packed?
+			raise "shipped wrong 4 (#{o.id})" if o.shipped?
+			raise "complete wrong 4 (#{o.id})" if o.complete?
+			raise "cancelled wrong 4 (#{o.id})" unless o.cancelled?
+		end
+
+		id = Order2.first.id
+		Order2.find(id).being_packed!
+		raise 'status wrong 1' unless Order2.find(id).being_packed?
+		Order2.find(id).shipped!
+		raise 'status wrong 2' unless Order2.find(id).shipped?
+		Order2.find(id).complete!
+		raise 'status wrong 3' unless Order2.find(id).complete?
+		Order2.find(id).cancelled!
+		raise 'status wrong 4' unless Order2.find(id).cancelled?
+	end
 end
 
