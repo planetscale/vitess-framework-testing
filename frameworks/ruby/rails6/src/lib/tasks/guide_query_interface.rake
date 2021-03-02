@@ -724,5 +724,39 @@ namespace :guide_query_interface do
 		ids = Customer2.ids
 		raise 'ids wrong' unless ids == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 	end
+
+	task :step_21 do
+		e = Customer2.exists?(1)
+		raise 'exists wrong 1' unless e
+		e = Customer2.exists?(20)
+		raise 'exists wrong 2' if e
+
+		e = Customer2.exists?(id: [1, 2, 3])
+		raise 'exists wrong 3' unless e
+		e = Customer2.exists?(id: [1, 30, 40])
+		raise 'exists wrong 4' unless e
+		e = Customer2.exists?(id: [20, 30, 40])
+		raise 'exists wrong 5' if e
+
+		e = Customer2.exists?(first_name: ['Two', 'Three', 'Four'])
+		raise 'exists wrong 6' unless e
+		e = Customer2.exists?(first_name: ['Two', 'Thirty', 'Fourty'])
+		raise 'exists wrong 7' unless e
+		e = Customer2.exists?(first_name: ['Twenty', 'Thirty', 'Fourty'])
+		raise 'exists wrong 8' if e
+
+		raise 'any wrong 1' unless Order2.any?
+		raise 'many wrong 1' unless Order2.many?
+		raise 'any wrong 2' unless Order2.shipped.any?
+		raise 'many wrong 2' unless Order2.shipped.many?
+		raise 'any wrong 3' unless Book6.where(out_of_print: true).any?
+		raise 'many wrong 3' unless Book6.where(out_of_print: true).many?
+		raise 'any wrong 4' unless Customer2.first.orders.any?
+		raise 'many wrong 4' if Customer2.first.orders.many?
+		raise 'any wrong 5' if Review.any?
+		raise 'many wrong 5' if Review.many?
+		raise 'any wrong 6' if Customer2.first.reviews.any?
+		raise 'many wrong 6' if Customer2.first.reviews.many?
+	end
 end
 
