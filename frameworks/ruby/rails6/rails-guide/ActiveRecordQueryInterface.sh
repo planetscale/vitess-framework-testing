@@ -78,3 +78,6 @@ rake guide_query_interface:step_18
 # 19 Find or Build a New Object
 rake guide_query_interface:step_19
 
+# 20 Finding by SQL
+rake guide_query_interface:step_20
+
