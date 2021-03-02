@@ -81,3 +81,6 @@ rake guide_query_interface:step_19
 # 20 Finding by SQL
 rake guide_query_interface:step_20
 
+# 21 Existence of Objects
+rake guide_query_interface:step_21
+
