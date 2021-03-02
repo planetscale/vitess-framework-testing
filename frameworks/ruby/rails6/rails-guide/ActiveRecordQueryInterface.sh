@@ -84,3 +84,6 @@ rake guide_query_interface:step_20
 # 21 Existence of Objects
 rake guide_query_interface:step_21
 
+# 22 Calculations
+rake guide_query_interface:step_22
+
