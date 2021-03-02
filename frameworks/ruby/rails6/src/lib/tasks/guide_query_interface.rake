@@ -697,5 +697,32 @@ namespace :guide_query_interface do
 		raise 'id wrong 3' unless customer.id == 12
 		Customer2.find(12)
 	end
+
+	task :step_20 do
+		# select_all
+		result = Customer2.connection.select_all('SELECT first_name, created_at FROM customer2s WHERE id = 1').to_a
+		raise 'count wrong 1' unless result.size == 1
+		raise 'name wrong 1' unless result[0]['first_name'] == 'OneOne'
+
+		# pluck
+		ids = Book6.out_of_print.pluck(:id)
+		raise 'count wrong 2' unless ids.size == 100
+		raise 'missing id' unless ids.include? 2
+		statuses = Order2.distinct.pluck(:status).sort
+		raise 'count wrong 3' unless statuses.size == 4
+		raise 'statuses wrong' unless statuses == ['being_packed', 'cancelled', 'complete', 'shipped']
+		customers = Customer2.pluck(:id, :first_name)
+		raise 'count wrong 4' unless customers.size == 12
+		orders = Order2.joins(:customer, :books).pluck('order2s.created_at, customer2s.first_name, book6s.title')
+		raise 'count wrong 5' unless orders.size == 220
+		ids = Customer2.includes(:reviews).pluck(:id)
+		raise 'count wrong 6' unless ids.size == 12
+		ids = Customer2.includes(:reviews).unscope(:includes).pluck(:id)
+		raise 'count wrong 7' unless ids.size == 12
+
+		# ids
+		ids = Customer2.ids
+		raise 'ids wrong' unless ids == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+	end
 end
 
