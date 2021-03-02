@@ -75,3 +75,6 @@ rake guide_query_interface:step_17
 # 18 Understanding Method Chaining
 rake guide_query_interface:step_18
 
+# 19 Find or Build a New Object
+rake guide_query_interface:step_19
+
