@@ -758,5 +758,29 @@ namespace :guide_query_interface do
 		raise 'any wrong 6' if Customer2.first.reviews.any?
 		raise 'many wrong 6' if Customer2.first.reviews.many?
 	end
+
+	task :step_22 do
+		# count
+		raise 'count wrong 1' unless Customer2.count == 12
+		raise 'count wrong 2' unless Customer2.where(first_name: 'Three').count == 1
+		raise 'count wrong 3' unless Customer2.includes(:orders).where(first_name: 'Three', orders: { status: :being_packed }).count == 1
+		raise 'count wrong 4' unless Customer2.includes(:orders).where(first_name: 'Three', orders: { status: :cancelled }).count == 0
+
+		# average
+		raise 'average wrong 1' unless Book6.average(:price) == 617
+		raise 'average wrong 2' unless Book6.where(author: Author5.find(10)).average(:price) == 652
+
+		# minimum
+		raise 'minimum wrong 1' unless Book6.minimum(:year_published) == 1703
+		raise 'minimum wrong 2' unless Book6.where(supplier: Supplier5.find(3)).minimum(:year_published) == 2005
+
+		# maximum
+		raise 'maximum wrong 1' unless Customer2.maximum(:orders_count) == 10
+		raise 'maximum wrong 2' unless Book6.where(year_published: 2010).maximum(:price) == 811
+
+		# sum
+		raise 'sum wrong 1' unless Customer2.sum(:orders_count) == 55
+		raise 'sum wrong 2' unless Customer2.where(first_name: 'OneOne').sum(:orders_count) == 1
+	end
 end
 
