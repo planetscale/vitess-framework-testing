@@ -87,3 +87,6 @@ rake guide_query_interface:step_21
 # 22 Calculations
 rake guide_query_interface:step_22
 
+# 23 Running EXPLAIN
+rake guide_query_interface:step_23
+
