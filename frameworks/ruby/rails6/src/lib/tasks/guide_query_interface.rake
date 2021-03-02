@@ -669,5 +669,33 @@ namespace :guide_query_interface do
 			.find_by!(title: 'Book 10-3-2')
 		raise 'author wrong' unless book.name == 'Novelist 3'
 	end
+
+	task :step_19 do
+		# find_or_create_by
+		customer = Customer2.find_or_create_by(first_name: 'Andy')
+		raise 'id wrong 1' unless customer.id == 11
+		customer = Customer2.find_or_create_by(first_name: 'Four')
+		raise 'id wrong 2' unless customer.id == 4
+
+		# find_or_create_by!
+		raised = false
+		begin
+			Customer3.find_or_create_by!(first_name: 'Andy2')
+			customer.first_name = 'OneOne'
+		rescue ActiveRecord::RecordInvalid
+			raised = true
+		end
+		raise 'failed to throw validation error' unless raised
+
+		# find_or_initialize_by
+		customer = Customer2.find_or_initialize_by(first_name: 'Nina')
+		raise 'persisted' if customer.persisted?
+		raise 'not new' unless customer.new_record?
+		customer.save!
+		raise 'not persisted' unless customer.persisted?
+		raise 'new' if customer.new_record?
+		raise 'id wrong 3' unless customer.id == 12
+		Customer2.find(12)
+	end
 end
 
