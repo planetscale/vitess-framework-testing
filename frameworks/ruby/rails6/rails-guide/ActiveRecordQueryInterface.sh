@@ -69,3 +69,6 @@ rake guide_query_interface:step_15_5 # Removing all scoping
 # 16 Dynamic Finders
 rake guide_query_interface:step_16
 
+# 17 Enums
+rake guide_query_interface:step_17
+
