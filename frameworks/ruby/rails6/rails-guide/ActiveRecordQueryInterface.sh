@@ -72,3 +72,6 @@ rake guide_query_interface:step_16
 # 17 Enums
 rake guide_query_interface:step_17
 
+# 18 Understanding Method Chaining
+rake guide_query_interface:step_18
+
