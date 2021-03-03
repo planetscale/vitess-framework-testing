@@ -50,9 +50,9 @@ function run_test() {
 
   tag="$(generate_image_name "${language}/${framework}")"
   if ! [ -z "${QUIET}" ]; then
-    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE -e VT_NUM_SHARDS "${tag}" &>/dev/null
   else
-    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE -e VT_NUM_SHARDS "${tag}"
   fi;
 
   result="$?"
@@ -64,7 +64,7 @@ function run_test() {
 }
 
 function validate_environment() {
-  if [[ -z "$VT_HOST" || -z "$VT_PORT" || -z "$VT_USERNAME" || -z "$VT_PASSWORD" || -z "$VT_DATABASE" ]]; then
+  if [[ -z "$VT_HOST" || -z "$VT_PORT" || -z "$VT_USERNAME" || -z "$VT_PASSWORD" || -z "$VT_DATABASE" || -z "$VT_NUM_SHARDS" ]]; then
     echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE} are set"
     exit 1
   fi
