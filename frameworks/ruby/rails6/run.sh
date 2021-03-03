@@ -21,4 +21,5 @@ rake user:list | tail
 ./ActiveRecordValidations.sh
 ./ActiveRecordCallbacks.sh
 ./ActiveRecordAssociations.sh
+./ActiveRecordQueryInterface.sh
 
