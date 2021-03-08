@@ -4,7 +4,7 @@ set -o pipefail
 # TODO:  Validate that each step produces data that we expect, instead of just
 #    displaying it to the user and failing if the server rejects a query
 
-if [[ "$VT_NUM_SHARDS" -gt "1" ]]; then
+if [ "$VT_NUM_SHARDS" -gt "1" ]; then
   ./initialVschemaSetup.sh
 fi
 
