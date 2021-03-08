@@ -23,12 +23,13 @@ index f143c928..44160832 100644
    },
    close: (db) => db.end(),
  } as Input<mariadb.Connection>['database']
-@@ -31,7 +35,7 @@ export const database = {
+@@ -31,7 +35,8 @@ export const database = {
  function getConnectionInfo(ctx: Context) {
    const serviceConnectionString =
      process.env.TEST_MARIADB_BASE_URI || 'mysql://root:root@localhost:4306'
 -  const connectionString = `${serviceConnectionString}/${ctx.id}`
 +  const connectionString = process.env.TEST_MARIADB_URI || `${serviceConnectionString}/${ctx.id}`
++  console.log("connectionString = ", connectionString);
    const credentials = uriToCredentials(connectionString)
  
    return {
@@ -57,12 +58,13 @@ index 2a1d7a85..ce580fc6 100644
    },
    close: (db) => db.end(),
  } as Input<mariadb.Connection>['database']
-@@ -30,7 +34,7 @@ export const database = {
+@@ -30,7 +34,8 @@ export const database = {
  function getConnectionInfo(ctx: Context) {
    const serviceConnectionString =
      process.env.TEST_MYSQL_BASE_URI || 'mysql://root:root@localhost:3306'
 -  const connectionString = `${serviceConnectionString}/${ctx.id}`
 +  const connectionString = process.env.TEST_MYSQL_URI || `${serviceConnectionString}/${ctx.id}`
++  console.log("connectionString = ", connectionString);
    const credentials = uriToCredentials(connectionString)
  
    return {
