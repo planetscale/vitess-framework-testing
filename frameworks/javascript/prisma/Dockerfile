@@ -12,7 +12,7 @@ RUN \
 	cd upstream && \
 	sh .github/workflows/setup.sh && \
 	npm cache clean --force && \
-	rm -Rvf ~/.pnpm-store
+	rm -Rf ~/.pnpm-store
 
 RUN apk add --no-cache patch
 
