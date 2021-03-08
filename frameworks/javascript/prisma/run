@@ -6,12 +6,11 @@ cd src/packages/tests;
 
 export TEST_MYSQL_BASE_URI="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}";
 export TEST_MYSQL_URI="${TEST_MYSQL_BASE_URI}/${VT_DATABASE}";
+export TEST_MARIADB_BASE_URL="${TEST_MYSQL_BASE_URI}";
+export TEST_MARIADB_URI="${TEST_MYSQL_URI}";
 
 env | grep 'VT_\|TEST_'
 
 pnpm run jest integration/mysql -- --detectOpenHandles --maxConcurrency=1;
-
-export TEST_MARIADB_BASE_URL="${TEST_MYSQL_BASE_URI}";
-export TEST_MARIADB_URI="${TEST_MYSQL_URI}";
 pnpm run jest integration/mariadb -- --detectOpenHandles --maxConcurrency=1;
 
