@@ -20,6 +20,12 @@ function cleanup_tables() {
   if [[ "${tables}" != '' ]]; then
     mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne "DROP TABLE ${tables}" 2>/dev/null;
   fi
+
+  mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" -Ne 'SHOW VSCHEMA TABLES' 2>/dev/null | while read -r table; do
+    if [[ "$table" != "dual" ]]; then
+      echo "ALTER VSCHEMA DROP TABLE \`${table}\`;"
+    fi
+  done | mysql --host "${VT_HOST}" --port "${VT_PORT}" --user "${VT_USERNAME}" "-p${VT_PASSWORD}" "${VT_DATABASE}" 2>/dev/null;
 }
 
 # usage: generate_image_name "$language/$framework"
