@@ -65,7 +65,7 @@ function run_test() {
 
 function validate_environment() {
   if [[ -z "$VT_HOST" || -z "$VT_PORT" || -z "$VT_USERNAME" || -z "$VT_PASSWORD" || -z "$VT_DATABASE" || -z "$VT_NUM_SHARDS" ]]; then
-    echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE} are set"
+    echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE,NUM_SHARDS} are set"
     exit 1
   fi
 }
