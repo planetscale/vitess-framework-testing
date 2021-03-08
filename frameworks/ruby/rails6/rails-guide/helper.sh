@@ -112,5 +112,9 @@ function setup_mysql_attributes(){
 
 # Running for basic vindex
 function alter_vschema(){
-   mysql_run "alter vschema on test.'${1}' add vindex \`binary_md5\`(id) using \`binary_md5\`;"
+  if [ -n "$VT_NUM_SHARD" ]; then
+    mysql_run "alter vschema on test.'${1}' add vindex \`binary_md5\`(id) using \`binary_md5\`;"
+  else
+    echo "Running unsharded mode"
+  fi
 }
