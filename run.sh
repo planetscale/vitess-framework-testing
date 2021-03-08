@@ -49,7 +49,7 @@ function run_test() {
   pushd "frameworks/${language}/${framework}" >/dev/null || return
 
   tag="$(generate_image_name "${language}/${framework}")"
-  if ! [ -z "${QUIET}" ]; then
+  if [ -n "${QUIET}" ]; then
     docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}" &>/dev/null
   else
     docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE "${tag}"
