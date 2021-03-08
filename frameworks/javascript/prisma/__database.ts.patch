@@ -2,7 +2,7 @@ diff --git a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts 
 index f143c928..44160832 100644
 --- a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
 +++ b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
-@@ -19,11 +19,15 @@ export const database = {
+@@ -19,11 +19,16 @@ export const database = {
      })
    },
    beforeEach: async (db, sqlScenario, ctx) => {
@@ -11,6 +11,7 @@ index f143c928..44160832 100644
 -    CREATE DATABASE ${ctx.id};
 -    USE ${ctx.id};`
 -    await db.query(sqlUp + sqlScenario)
++    await db.query("USE " + process.env.VT_DATABASE);
 +    const foreign_keys = await db.query({rowsAsArray: true, sql: "SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL"});
 +    for(let row of foreign_keys) {
 +      await db.query("ALTER TABLE `" + row[0] + "` DROP FOREIGN KEY `" + row[1] + "`");
@@ -23,7 +24,7 @@ index f143c928..44160832 100644
    },
    close: (db) => db.end(),
  } as Input<mariadb.Connection>['database']
-@@ -31,7 +35,8 @@ export const database = {
+@@ -31,7 +36,8 @@ export const database = {
  function getConnectionInfo(ctx: Context) {
    const serviceConnectionString =
      process.env.TEST_MARIADB_BASE_URI || 'mysql://root:root@localhost:4306'
@@ -37,7 +38,7 @@ diff --git a/src/packages/tests/src/__tests__/integration/mysql/__database.ts b/
 index 2a1d7a85..ce580fc6 100644
 --- a/src/packages/tests/src/__tests__/integration/mysql/__database.ts
 +++ b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
-@@ -18,11 +18,15 @@ export const database = {
+@@ -18,11 +18,16 @@ export const database = {
      })
    },
    beforeEach: async (db, sqlScenario, ctx) => {
@@ -46,6 +47,7 @@ index 2a1d7a85..ce580fc6 100644
 -    CREATE DATABASE ${ctx.id};
 -    USE ${ctx.id};`
 -    await db.query(sqlUp + sqlScenario)
++    await db.query("USE " + process.env.VT_DATABASE);
 +    const foreign_keys = await db.query({rowsAsArray: true, sql: "SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL"});
 +    for(let row of foreign_keys) {
 +      await db.query("ALTER TABLE `" + row[0] + "` DROP FOREIGN KEY `" + row[1] + "`");
@@ -58,7 +60,7 @@ index 2a1d7a85..ce580fc6 100644
    },
    close: (db) => db.end(),
  } as Input<mariadb.Connection>['database']
-@@ -30,7 +34,8 @@ export const database = {
+@@ -30,7 +35,8 @@ export const database = {
  function getConnectionInfo(ctx: Context) {
    const serviceConnectionString =
      process.env.TEST_MYSQL_BASE_URI || 'mysql://root:root@localhost:3306'
