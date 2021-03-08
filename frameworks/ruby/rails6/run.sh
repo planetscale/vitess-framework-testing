@@ -26,4 +26,3 @@ rake user:list | tail
 ./ActiveRecordCallbacks.sh
 ./ActiveRecordAssociations.sh
 ./ActiveRecordQueryInterface.sh
-

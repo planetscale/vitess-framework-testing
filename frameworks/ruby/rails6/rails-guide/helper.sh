@@ -96,7 +96,7 @@ function setup_mysql_attributes(){
   # get the mysql version
   mysql_version=$(get_mysql_version)
   # Set the BIGINT variable so that while asserting the outputs of `DESCRIBE <table>` and `SHOW CREATE TABLE <table>` it can be used since mysql 5.7 and mysql 8.0 differ in this respect
-  if echo "$mysql_version" | grep -o "8.0" 
+  if echo "$mysql_version" | grep -o "8.0"
   then
     BIGINT="bigint"
     INT="int"
@@ -108,4 +108,9 @@ function setup_mysql_attributes(){
     TINYINT="tinyint(1)"
     SMALLINT="smallint(6)"
   fi
+}
+
+# Running for basic vindex
+function alter_vschema(){
+   mysql_run "alter vschema on test.'${1}' add vindex \`binary_md5\`(id) using \`binary_md5\`;"
 }
