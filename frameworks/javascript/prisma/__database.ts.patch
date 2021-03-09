@@ -12,14 +12,14 @@ index 3bcc844f..45a0b11b 100644
      extraFields,
    }
 diff --git a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
-index f143c928..ebe0b9ae 100644
+index f143c928..3edcbac1 100644
 --- a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
 +++ b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
 @@ -15,15 +15,22 @@ export const database = {
        port: credentials.port,
        user: credentials.user,
        password: credentials.password,
-+      ssl: false,
++      ssl: credentials.ssl,
 +      allowPublicKeyRetrieval: true,
        multipleStatements: true,
      })
