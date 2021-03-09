@@ -1,5 +1,7 @@
 FROM node:alpine3.13
 
+RUN apk add --no-cache patch
+
 RUN mkdir /src
 WORKDIR /src
 
@@ -8,14 +10,19 @@ RUN \
 	git clone https://github.com/prisma/prisma.git /src/upstream && \
 	rm -Rvf /src/upstream/.git && \
 	apk del --no-cache git
+
+ADD __database.ts.patch /src/
 RUN \
+	cd /src/upstream && \
+	patch -p1 < ../__database.ts.patch
+
+RUN \
+	set -ex && \
 	cd upstream && \
 	sh .github/workflows/setup.sh && \
 	npm cache clean --force && \
 	rm -Rf ~/.pnpm-store
 
-RUN apk add --no-cache patch
-
-ADD run __database.ts.patch /src/
+ADD run /src/
 ENTRYPOINT ["./run"]
 
