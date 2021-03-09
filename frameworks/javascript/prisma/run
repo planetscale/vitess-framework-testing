@@ -1,8 +1,6 @@
 #!/bin/sh -ex
 
-cd upstream;
-patch -p1 < ../__database.ts.patch;
-cd src/packages/tests;
+cd upstream/src/packages/tests;
 
 export TEST_MYSQL_BASE_URI="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}";
 export TEST_MYSQL_URI="${TEST_MYSQL_BASE_URI}/${VT_DATABASE}?sslmode=false";
