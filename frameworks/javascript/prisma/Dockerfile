@@ -1,6 +1,6 @@
 FROM node:alpine3.13
 
-RUN apk add --no-cache patch
+RUN apk add --no-cache patch coreutils
 
 RUN mkdir /src
 WORKDIR /src
