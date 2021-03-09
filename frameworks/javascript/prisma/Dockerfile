@@ -11,10 +11,10 @@ RUN \
 	rm -Rvf /src/upstream/.git && \
 	apk del --no-cache git
 
-ADD __database.ts.patch /src/
+ADD hacks.patch /src/
 RUN \
 	cd /src/upstream && \
-	patch -p1 < ../__database.ts.patch
+	patch -p1 < ../hacks.patch
 
 RUN \
 	set -ex && \
