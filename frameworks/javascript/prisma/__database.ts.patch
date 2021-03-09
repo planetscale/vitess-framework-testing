@@ -77,7 +77,7 @@ index 3bcc844f..45a0b11b 100644
      schema: schema || defaultSchema,
      uri: connectionString,
 -    ssl: Boolean(uri.query.sslmode),
-+    ssl: (uri.query.sslmode == 'true'),
++    ssl: {allowPublicKeyRetrieval: true},
      socket: socket || host,
      extraFields,
    }
