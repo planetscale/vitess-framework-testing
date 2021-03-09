@@ -12,14 +12,15 @@ index 3bcc844f..45a0b11b 100644
      extraFields,
    }
 diff --git a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
-index f143c928..db0e1217 100644
+index f143c928..ebe0b9ae 100644
 --- a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
 +++ b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
-@@ -15,15 +15,21 @@ export const database = {
+@@ -15,15 +15,22 @@ export const database = {
        port: credentials.port,
        user: credentials.user,
        password: credentials.password,
-+      ssl: {allowPublicKeyRetrieval: true},
++      ssl: false,
++      allowPublicKeyRetrieval: true,
        multipleStatements: true,
      })
    },
@@ -42,7 +43,7 @@ index f143c928..db0e1217 100644
    },
    close: (db) => db.end(),
  } as Input<mariadb.Connection>['database']
-@@ -31,7 +37,7 @@ export const database = {
+@@ -31,7 +38,7 @@ export const database = {
  function getConnectionInfo(ctx: Context) {
    const serviceConnectionString =
      process.env.TEST_MARIADB_BASE_URI || 'mysql://root:root@localhost:4306'
@@ -52,14 +53,15 @@ index f143c928..db0e1217 100644
  
    return {
 diff --git a/src/packages/tests/src/__tests__/integration/mysql/__database.ts b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
-index 2a1d7a85..403531a6 100644
+index 2a1d7a85..a21f66fe 100644
 --- a/src/packages/tests/src/__tests__/integration/mysql/__database.ts
 +++ b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
-@@ -14,15 +14,21 @@ export const database = {
+@@ -14,15 +14,22 @@ export const database = {
        port: credentials.port,
        user: credentials.user,
        password: credentials.password,
-+      ssl: {allowPublicKeyRetrieval: true},
++      ssl: credentials.ssl,
++      allowPublicKeyRetrieval: true,
        multipleStatements: true,
      })
    },
@@ -82,7 +84,7 @@ index 2a1d7a85..403531a6 100644
    },
    close: (db) => db.end(),
  } as Input<mariadb.Connection>['database']
-@@ -30,7 +36,7 @@ export const database = {
+@@ -30,7 +37,7 @@ export const database = {
  function getConnectionInfo(ctx: Context) {
    const serviceConnectionString =
      process.env.TEST_MYSQL_BASE_URI || 'mysql://root:root@localhost:3306'
