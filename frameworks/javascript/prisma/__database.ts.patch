@@ -68,3 +68,19 @@ index 2a1d7a85..ce580fc6 100644
    const credentials = uriToCredentials(connectionString)
  
    return {
+diff --git a/src/packages/sdk/src/convertCredentials.ts b/src/packages/sdk/src/convertCredentials.ts
+index 3bcc844f..a25fab88 100644
+--- a/src/packages/sdk/src/convertCredentials.ts
++++ b/src/packages/sdk/src/convertCredentials.ts
+@@ -119,6 +119,10 @@ export function uriToCredentials(
+     defaultSchema = 'public'
+   }
+ 
++  console.log(uri.query);
++  console.log(uri.query.sslmode);
++  console.log(Boolean(uri.query.sslmode));
++
+   return {
+     type,
+     host: exists(uri.hostname) ? uri.hostname : undefined,
+
