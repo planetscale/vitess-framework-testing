@@ -5,6 +5,7 @@ frameworks:
   - 'haskell/persistent-mysql'
   - 'java/jdbc'
   - 'java/spring'
+  - 'javascript/prisma'
   - 'javascript/sequelize'
   - 'javascript/typeorm'
   - 'mysqldump/export'
