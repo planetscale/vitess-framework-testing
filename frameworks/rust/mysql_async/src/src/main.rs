@@ -252,7 +252,7 @@ async fn main() {
 	//, vec![std::env::var("VT_DATABASE").unwrap()]).await
 	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).await.expect("SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
-	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int", None, 10, 0, None, None, "NO", "", "a"));
-	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int", None, 10, 0, None, None, "NO", "", "a"));
+	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, 10, 0, None, None, "NO", "", "a"));
+	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, 10, 0, None, None, "NO", "", "a"));
 }
 
