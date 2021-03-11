@@ -244,13 +244,36 @@ async fn main() {
 		extra extra,
 		table_name table_name
 	FROM information_schema.columns
+	WHERE table_schema = '".to_owned() + &std::env::var("VT_DATABASE").unwrap() + r"'
+	ORDER BY ordinal_position
+	";
+	println!("--- query:{}", query);
+	let rows: Vec<ColumnInfo> = conn.query(query).await.expect("SELECT from information_schema.columns failed");
+	assert_eq!(rows.len(), 2);
+	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
+	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
+
+	let query = r"
+	SELECT
+		column_name column_name,
+		data_type data_type,
+		column_type full_data_type,
+		character_maximum_length character_maximum_length,
+		numeric_precision numeric_precision,
+		numeric_scale numeric_scale,
+		datetime_precision datetime_precision,
+		column_default column_default,
+		is_nullable is_nullable,
+		extra extra,
+		table_name table_name
+	FROM information_schema.columns
 	WHERE table_schema = ?
 	ORDER BY ordinal_position
 	";
 	println!("--- query:{}", query);
 	let stmt = conn.prep(query).await.expect("prepare SELECT from information_schema.columns failed");
 	//, vec![std::env::var("VT_DATABASE").unwrap()]).await
-	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).await.expect("SELECT from information_schema.columns failed");
+	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).await.expect("exec prepared SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
 	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
 	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
