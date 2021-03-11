@@ -250,8 +250,14 @@ async fn main() {
 	println!("--- query:{}", query);
 	let rows: Vec<ColumnInfo> = conn.query(query).await.expect("SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
-	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
-	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
 
 	let query = r"
 	SELECT
@@ -274,7 +280,13 @@ async fn main() {
 	let stmt = conn.prep(query).await.expect("prepare SELECT from information_schema.columns failed");
 	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).await.expect("exec prepared SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
-	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
-	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
 }
 
