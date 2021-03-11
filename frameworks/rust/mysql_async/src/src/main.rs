@@ -23,8 +23,8 @@ struct ColumnInfo {
 	data_type: String,
 	full_data_type: String,
 	character_maximum_length: Option<u16>,
-	numeric_precision: u8,
-	numeric_scale: u8,
+	numeric_precision: Option<u8>,
+	numeric_scale: Option<u8>,
 	datetime_precision: Option<u8>,
 	column_default: Option<String>,
 	is_nullable: String,
@@ -51,7 +51,7 @@ impl FromRow for ColumnInfo {
 }
 
 impl ColumnInfo {
-	fn new(column_name: String, data_type: String, full_data_type: String, character_maximum_length: Option<u16>, numeric_precision: u8, numeric_scale: u8, datetime_precision: Option<u8>, column_default: Option<String>, is_nullable: String, extra: String, table_name: String) -> Self {
+	fn new(column_name: String, data_type: String, full_data_type: String, character_maximum_length: Option<u16>, numeric_precision: Option<u8>, numeric_scale: Option<u8>, datetime_precision: Option<u8>, column_default: Option<String>, is_nullable: String, extra: String, table_name: String) -> Self {
 		Self{
 			column_name,
 			data_type,
@@ -67,7 +67,7 @@ impl ColumnInfo {
 		}
 	}
 
-	fn new2(column_name: &str, data_type: &str, full_data_type: &str, character_maximum_length: Option<u16>, numeric_precision: u8, numeric_scale: u8, datetime_precision: Option<u8>, column_default: Option<&str>, is_nullable: &str, extra: &str, table_name: &str) -> Self {
+	fn new2(column_name: &str, data_type: &str, full_data_type: &str, character_maximum_length: Option<u16>, numeric_precision: Option<u8>, numeric_scale: Option<u8>, datetime_precision: Option<u8>, column_default: Option<&str>, is_nullable: &str, extra: &str, table_name: &str) -> Self {
 		Self::new(
 			column_name.to_string(),
 			data_type.to_string(),
@@ -252,7 +252,7 @@ async fn main() {
 	//, vec![std::env::var("VT_DATABASE").unwrap()]).await
 	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).await.expect("SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
-	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, 10, 0, None, None, "NO", "", "a"));
-	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, 10, 0, None, None, "NO", "", "a"));
+	assert_eq!(rows[0], ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
+	assert_eq!(rows[1], ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a"));
 }
 
