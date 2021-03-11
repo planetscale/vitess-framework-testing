@@ -250,6 +250,7 @@ async fn main() {
 	println!("--- query:{}", query);
 	let rows: Vec<ColumnInfo> = conn.query(query).await.expect("SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
+	// MySQL 5.7 returns "int(11)" for column_type; 8.0 only returns "int"
 	assert!(
 		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
 		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
