@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-cat test.sql | mysql -h"$VT_HOST" -P"$VT_PORT" -u"$VT_USERNAME" -p"$VT_PASSWORD" "$VT_DATABASE";
+cat test.sql | mysql --default-auth=mysql_native_password -h"$VT_HOST" -P"$VT_PORT" -u"$VT_USERNAME" -p"$VT_PASSWORD" "$VT_DATABASE";
 skeema init -d test -h "${VT_HOST}" -P "${VT_PORT}" -u "${VT_USERNAME}" -p"${VT_PASSWORD}" --schema "$VT_DATABASE";
 
 cp -vf test.step1/* test/;
