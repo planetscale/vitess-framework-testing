@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --no-cache mysql-client
+RUN apk add --no-cache mysql-client mariadb-connector-c
 
 RUN mkdir /src
 WORKDIR /src
