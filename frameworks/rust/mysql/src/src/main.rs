@@ -150,5 +150,65 @@ fn main() {
 		Ok(_) => panic!("SELECT after DROP succeeded when it should have failed"),
 		Err(e) => println!("Error (as expected):\n\t{}\n\n", e)
 	};
+
+	let query = r"
+	SELECT
+		column_name column_name,
+		data_type data_type,
+		column_type full_data_type,
+		character_maximum_length character_maximum_length,
+		numeric_precision numeric_precision,
+		numeric_scale numeric_scale,
+		datetime_precision datetime_precision,
+		column_default column_default,
+		is_nullable is_nullable,
+		extra extra,
+		table_name table_name
+	FROM information_schema.columns
+	WHERE table_schema = '".to_owned() + &std::env::var("VT_DATABASE").unwrap() + r"'
+	ORDER BY ordinal_position
+	";
+	println!("--- query:{}", query);
+	let rows: Vec<ColumnInfo> = conn.query(query).expect("SELECT from information_schema.columns failed");
+	assert_eq!(rows.len(), 2);
+	// MySQL 5.7 returns "int(11)" for column_type; 8.0 only returns "int"
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+
+	let query = r"
+	SELECT
+		column_name column_name,
+		data_type data_type,
+		column_type full_data_type,
+		character_maximum_length character_maximum_length,
+		numeric_precision numeric_precision,
+		numeric_scale numeric_scale,
+		datetime_precision datetime_precision,
+		column_default column_default,
+		is_nullable is_nullable,
+		extra extra,
+		table_name table_name
+	FROM information_schema.columns
+	WHERE table_schema = ?
+	ORDER BY ordinal_position
+	";
+	println!("--- query:{}", query);
+	let stmt = conn.prep(query).expect("prepare SELECT from information_schema.columns failed");
+	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).expect("exec prepared SELECT from information_schema.columns failed");
+	assert_eq!(rows.len(), 2);
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
 }
 
