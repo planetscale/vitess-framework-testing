@@ -17,4 +17,9 @@ rake 'user:get[101]'
 rake user:create_fail || true
 rake user:list | tail
 
-python testingGuides.py
+./ActiveRecordMigrations.sh
+./ActiveRecordValidations.sh
+./ActiveRecordCallbacks.sh
+./ActiveRecordAssociations.sh
+./ActiveRecordQueryInterface.sh
+

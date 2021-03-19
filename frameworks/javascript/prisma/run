@@ -1,0 +1,12 @@
+#!/bin/sh -ex
+
+cd upstream/src/packages/tests;
+
+export TEST_MYSQL_BASE_URI="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}";
+export TEST_MYSQL_URI="${TEST_MYSQL_BASE_URI}/${VT_DATABASE}?sslmode=false";
+export TEST_MARIADB_BASE_URL="${TEST_MYSQL_BASE_URI}";
+export TEST_MARIADB_URI="${TEST_MYSQL_URI}";
+
+timeout 3m pnpm run jest integration/mysql -- --detectOpenHandles --maxConcurrency=1;
+timeout 3m pnpm run jest integration/mariadb -- --detectOpenHandles --maxConcurrency=1;
+

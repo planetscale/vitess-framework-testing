@@ -39,3 +39,5 @@ production:
   username: <%= ENV.fetch("VT_USERNAME") %>
   password: <%= ENV.fetch("VT_PASSWORD") %>
   port: <%= ENV.fetch("VT_PORT") %>
+  init_command: "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))"
+

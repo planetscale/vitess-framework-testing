@@ -1,0 +1,95 @@
+diff --git a/src/packages/sdk/src/convertCredentials.ts b/src/packages/sdk/src/convertCredentials.ts
+index 3bcc844f..45a0b11b 100644
+--- a/src/packages/sdk/src/convertCredentials.ts
++++ b/src/packages/sdk/src/convertCredentials.ts
+@@ -128,7 +128,7 @@ export function uriToCredentials(
+     database,
+     schema: schema || defaultSchema,
+     uri: connectionString,
+-    ssl: Boolean(uri.query.sslmode),
++    ssl: (uri.query.sslmode == 'true'),
+     socket: socket || host,
+     extraFields,
+   }
+diff --git a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
+index f143c928..3edcbac1 100644
+--- a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
++++ b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
+@@ -15,15 +15,22 @@ export const database = {
+       port: credentials.port,
+       user: credentials.user,
+       password: credentials.password,
++      ssl: credentials.ssl,
++      allowPublicKeyRetrieval: true,
+       multipleStatements: true,
+     })
+   },
+   beforeEach: async (db, sqlScenario, ctx) => {
+-    const sqlUp = `
+-    DROP DATABASE IF EXISTS ${ctx.id};
+-    CREATE DATABASE ${ctx.id};
+-    USE ${ctx.id};`
+-    await db.query(sqlUp + sqlScenario)
++    await db.query("USE " + process.env.VT_DATABASE);
++    const foreign_keys = await db.query({rowsAsArray: true, sql: "SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL"});
++    for(let row of foreign_keys) {
++      await db.query("ALTER TABLE `" + row[0] + "` DROP FOREIGN KEY `" + row[1] + "`");
++    }
++    const tables = await db.query({rowsAsArray: true, sql: "SHOW TABLES"});
++    for(let row of tables) {
++      await db.query("DROP TABLE `" + row[0] + "`");
++    }
++    await db.query(sqlScenario)
+   },
+   close: (db) => db.end(),
+ } as Input<mariadb.Connection>['database']
+@@ -31,7 +38,7 @@ export const database = {
+ function getConnectionInfo(ctx: Context) {
+   const serviceConnectionString =
+     process.env.TEST_MARIADB_BASE_URI || 'mysql://root:root@localhost:4306'
+-  const connectionString = `${serviceConnectionString}/${ctx.id}`
++  const connectionString = process.env.TEST_MARIADB_URI || `${serviceConnectionString}/${ctx.id}`
+   const credentials = uriToCredentials(connectionString)
+ 
+   return {
+diff --git a/src/packages/tests/src/__tests__/integration/mysql/__database.ts b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
+index 2a1d7a85..a21f66fe 100644
+--- a/src/packages/tests/src/__tests__/integration/mysql/__database.ts
++++ b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
+@@ -14,15 +14,22 @@ export const database = {
+       port: credentials.port,
+       user: credentials.user,
+       password: credentials.password,
++      ssl: credentials.ssl,
++      allowPublicKeyRetrieval: true,
+       multipleStatements: true,
+     })
+   },
+   beforeEach: async (db, sqlScenario, ctx) => {
+-    const sqlUp = `
+-    DROP DATABASE IF EXISTS ${ctx.id};
+-    CREATE DATABASE ${ctx.id};
+-    USE ${ctx.id};`
+-    await db.query(sqlUp + sqlScenario)
++    await db.query("USE " + process.env.VT_DATABASE);
++    const foreign_keys = await db.query({rowsAsArray: true, sql: "SELECT DISTINCT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL"});
++    for(let row of foreign_keys) {
++      await db.query("ALTER TABLE `" + row[0] + "` DROP FOREIGN KEY `" + row[1] + "`");
++    }
++    const tables = await db.query({rowsAsArray: true, sql: "SHOW TABLES"});
++    for(let row of tables) {
++      await db.query("DROP TABLE `" + row[0] + "`");
++    }
++    await db.query(sqlScenario)
+   },
+   close: (db) => db.end(),
+ } as Input<mariadb.Connection>['database']
+@@ -30,7 +37,7 @@ export const database = {
+ function getConnectionInfo(ctx: Context) {
+   const serviceConnectionString =
+     process.env.TEST_MYSQL_BASE_URI || 'mysql://root:root@localhost:3306'
+-  const connectionString = `${serviceConnectionString}/${ctx.id}`
++  const connectionString = process.env.TEST_MYSQL_URI || `${serviceConnectionString}/${ctx.id}`
+   const credentials = uriToCredentials(connectionString)
+ 
+   return {
