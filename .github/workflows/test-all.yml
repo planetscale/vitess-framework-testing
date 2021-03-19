@@ -2,10 +2,12 @@ name: Full suite of integration tests
 on:
   workflow_dispatch:
     inputs:
-      vttestserver_tag:
-        description: Container image tag for vttestserver
-        required: true
-        default: "mysql57"
+      vttestserver57imagetag:
+        description: Container image tag to use for vttestserver:mysql57
+        default: mysql57
+      vttestserver80imagetag:
+        description: Container image tag to use for vttestserver:mysql80
+        default: mysql80
 
 jobs:
   determine_frameworks:
@@ -25,8 +27,8 @@ jobs:
     needs: determine_frameworks
 
     services:
-      vttestserver:
-        image: "vitess/vttestserver:${{ github.event.inputs.vttestserver_tag }}"
+      vttestserver57:
+        image: "vitess/vttestserver:${{ github.event.inputs.vttestserver57imagetag }}"
         ports:
           - 33577:33577
         env:
@@ -35,6 +37,17 @@ jobs:
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
+      vttestserver80:
+        image: "vitess/vttestserver:${{ github.event.inputs.vttestserver80imagetag }}"
+        ports:
+          - 33807:33807
+        env:
+          PORT: 33804
+          KEYSPACES: test
+          NUM_SHARDS: "1"
+          MYSQL_BIND_HOST: "0.0.0.0"
+        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33807" --health-interval=5s --health-timeout=2s --health-retries=5
+
     strategy:
       fail-fast: false
       matrix:
@@ -49,8 +62,8 @@ jobs:
         name: Pull tests
         run: ./run.sh pull_image "${{ matrix.framework }}"
 
-      - id: run
-        name: Run tests against vttestserver
+      - id: run-vttestserver57
+        name: Run changed tests against vttestserver:mysql57
         run: ./run.sh run_test "${{ matrix.framework }}"
         env:
           VT_USERNAME: test
@@ -59,10 +72,20 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
 
+      - id: run-vttestserver80
+        name: Run changed tests against vttestserver:mysql80
+        run: ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33807
+
       - id: logs
-        name: Dump vttestserver logs on failure
+        name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:
-          images: 'vitess/vttestserver:mysql57'
+          images: 'vitess/vttestserver:${{ github.event.inputs.vttestserver57imagetag }},vitess/vttestserver:${{ github.event.inputs.vttestserver80imagetag }}'
 
