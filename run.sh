@@ -68,6 +68,10 @@ function validate_environment() {
     echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE,DIALECT} are set"
     exit 1
   fi
+  if [[ "$VT_DIALECT" != 'mysql57' ]] && [[ "$VT_DIALECT" != 'mysql80' ]]; then
+    echo "Unknown VT_DIALECT '$VT_DIALECT'; must be either 'mysql57' or 'mysql80'"
+    exit 1
+  fi
 }
 
 function get_frameworks() {
