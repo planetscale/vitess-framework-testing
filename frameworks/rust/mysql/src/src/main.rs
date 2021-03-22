@@ -16,6 +16,73 @@ struct Payment {
 	account_name: Option<String>
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Tablefy)]
+struct ColumnInfo {
+	column_name: String,
+	data_type: String,
+	full_data_type: String,
+	character_maximum_length: Option<u16>,
+	numeric_precision: Option<u8>,
+	numeric_scale: Option<u8>,
+	datetime_precision: Option<u8>,
+	column_default: Option<String>,
+	is_nullable: String,
+	extra: String,
+	table_name: String
+}
+
+impl FromRow for ColumnInfo {
+	fn from_row_opt(row: Row) -> core::result::Result<Self, mysql::FromRowError> {
+		Ok(Self::new(
+			row.get(0).unwrap(),
+			row.get(1).unwrap(),
+			row.get(2).unwrap(),
+			row.get(3).unwrap(),
+			row.get(4).unwrap(),
+			row.get(5).unwrap(),
+			row.get(6).unwrap(),
+			row.get(7).unwrap(),
+			row.get(8).unwrap(),
+			row.get(9).unwrap(),
+			row.get(10).unwrap()
+		))
+	}
+}
+
+impl ColumnInfo {
+	fn new(column_name: String, data_type: String, full_data_type: String, character_maximum_length: Option<u16>, numeric_precision: Option<u8>, numeric_scale: Option<u8>, datetime_precision: Option<u8>, column_default: Option<String>, is_nullable: String, extra: String, table_name: String) -> Self {
+		Self{
+			column_name,
+			data_type,
+			full_data_type,
+			character_maximum_length,
+			numeric_precision,
+			numeric_scale,
+			datetime_precision,
+			column_default,
+			is_nullable,
+			extra,
+			table_name
+		}
+	}
+
+	fn new2(column_name: &str, data_type: &str, full_data_type: &str, character_maximum_length: Option<u16>, numeric_precision: Option<u8>, numeric_scale: Option<u8>, datetime_precision: Option<u8>, column_default: Option<&str>, is_nullable: &str, extra: &str, table_name: &str) -> Self {
+		Self::new(
+			column_name.to_string(),
+			data_type.to_string(),
+			full_data_type.to_string(),
+			character_maximum_length,
+			numeric_precision,
+			numeric_scale,
+			datetime_precision,
+			column_default.map(|s| s.to_string()),
+			is_nullable.to_string(),
+			extra.to_string(),
+			table_name.to_string()
+		)
+	}
+}
+
 fn main() {
 	let host = std::env::var("VT_HOST").unwrap();
 	let port = match std::env::var("VT_PORT") {
