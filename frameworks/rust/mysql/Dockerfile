@@ -5,7 +5,7 @@ WORKDIR /src
 # Cache a layer with all the dependencies built
 RUN mkdir src && echo 'fn main() {}' > src/main.rs && cargo build && rm -Rvf src
 ADD src/src /src/src
-RUN cargo build
+RUN touch src/main.rs && cargo build
 ENTRYPOINT ["/src/target/debug/mysql-test"]
 
 FROM fedora:32
