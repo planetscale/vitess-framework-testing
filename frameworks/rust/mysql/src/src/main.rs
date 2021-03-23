@@ -219,6 +219,16 @@ fn main() {
 	};
 
 	let query = r"
+	CREATE TABLE `a` (
+		`one` int NOT NULL,
+		`two` int NOT NULL,
+		PRIMARY KEY(`one`, `two`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+	";
+	println!("--- query:{}", query);
+	conn.query_drop(query).expect("CREATE TABLE `a` failed");
+
+	let query = r"
 	SELECT
 		column_name column_name,
 		data_type data_type,
