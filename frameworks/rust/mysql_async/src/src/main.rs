@@ -294,5 +294,48 @@ async fn main() {
 		assert_eq!(row.extra, "");
 		assert_eq!(row.table_name, "a");
 	}
+
+	let query = r"
+	CREATE TABLE `ScalarModel` (
+		`id` VARCHAR(191) NOT NULL,
+		`optString` VARCHAR(191),
+		`optInt` INTEGER,
+		`optFloat` DOUBLE,
+		`optBoolean` BOOLEAN,
+		`optEnum` ENUM('A', 'B'),
+		`optDateTime` DATETIME(3),
+		`optUnique` VARCHAR(191),
+		`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+		`relId` VARCHAR(191),
+		UNIQUE INDEX `ScalarModel.optUnique_unique`(`optUnique`),
+		PRIMARY KEY (`id`)
+	) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+	println!("--- query:\n\t{}\n\n", query);
+	conn.query_drop(query).await.unwrap();
+
+	let query = r"
+	CREATE TABLE `RelatedModel` (
+		`id` VARCHAR(191) NOT NULL,
+		PRIMARY KEY (`id`)
+	) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+	println!("--- query:\n\t{}\n\n", query);
+	conn.query_drop(query).await.unwrap();
+
+	let query = "ALTER TABLE `ScalarModel` ADD FOREIGN KEY (`relId`) REFERENCES `RelatedModel`(`id`) ON DELETE SET NULL ON UPDATE CASCADE";
+	println!("--- query:\n\t{}\n\n", query);
+	conn.query_drop(query).await.unwrap();
+
+	let query = "INSERT INTO ScalarModel (id, optString, optInt, optFloat, optBoolean, optEnum, optDateTime) VALUES (?, ?, ?, ?, ?, ?, ?)";
+	println!("--- query:\n\t{}", query);
+	let stmt = conn.prep(query).await.unwrap();
+	conn.exec_drop(&stmt, (
+		"ckmayvmxx0000roj6dynmo5uj",
+		"lala¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀",
+		1337,
+		1.234,
+		true,
+		"A",
+		"2016-07-31 23:59:01"
+	)).await.unwrap();
 }
 
