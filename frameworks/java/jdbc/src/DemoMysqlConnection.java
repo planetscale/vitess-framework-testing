@@ -16,7 +16,7 @@ class DemoMysqlConnection {
             Connection con = DriverManager.getConnection(connectionUri, vtUsername, vtPassword);
 
             simpleExample(con);
-            sysSchemaExample(con);
+            sysSchemaExample(con, vtDatabase);
             con.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +63,7 @@ class DemoMysqlConnection {
         st.close();
     }
 
-    private static void sysSchemaExample(Connection con) throws SQLException {
+    private static void sysSchemaExample(Connection con, String vtDatabase) throws SQLException {
         String createTableSql = "CREATE TABLE `a` (`one` int NOT NULL,`two` int NOT NULL,PRIMARY KEY(`one`, `two`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
         String selectSql = "SELECT column_name column_name, " +
                 "data_type data_type, " +
@@ -79,13 +79,14 @@ class DemoMysqlConnection {
                 " FROM information_schema.columns WHERE table_schema = ? ORDER BY ordinal_position";
         String dropTableSql = "DROP TABLE `a`";
 
-        Statement st = con.createStatement();
+		PreparedStatement st = con.prepareStatement(selectSql);
 
-        // Create table
-        st.executeUpdate(createTableSql);
+		// Create table
+		st.executeUpdate(createTableSql);
 
 		System.out.println("select query: " + selectSql);
-        ResultSet rs = st.executeQuery(selectSql);
+		st.setString(1, vtDatabase);
+		ResultSet rs = st.executeQuery();
 
         while(rs.next()) {
             assert (rs.getString(1).equals("one")
