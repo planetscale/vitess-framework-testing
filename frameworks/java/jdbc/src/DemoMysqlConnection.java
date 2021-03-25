@@ -76,7 +76,7 @@ class DemoMysqlConnection {
                 "is_nullable is_nullable," +
                 "extra extra," +
                 "table_name table_name" +
-                "FROM information_schema.columns WHERE table_schema = ? ORDER BY ordinal_position";
+                " FROM information_schema.columns WHERE table_schema = ? ORDER BY ordinal_position";
         String dropTableSql = "DROP TABLE `a`";
 
         Statement st = con.createStatement();
@@ -84,6 +84,7 @@ class DemoMysqlConnection {
         // Create table
         st.executeUpdate(createTableSql);
 
+		System.out.println("select query: " + selectSql);
         ResultSet rs = st.executeQuery(selectSql);
 
         while(rs.next()) {
