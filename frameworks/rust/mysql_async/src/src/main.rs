@@ -281,19 +281,14 @@ async fn main() {
 	let stmt = conn.prep(query).await.expect("prepare SELECT from information_schema.columns failed");
 	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).await.expect("exec prepared SELECT from information_schema.columns failed");
 	assert_eq!(rows.len(), 2);
-	for row in rows {
-		assert!(row.column_name.eq("one") || row.column_name.eq("two"));
-		assert_eq!(row.data_type, "one");
-		assert_eq!(row.full_data_type, "one");
-		assert_eq!(row.character_maximum_length, None);
-		assert_eq!(row.numeric_precision, Some(10));
-		assert_eq!(row.numeric_scale, Some(0));
-		assert_eq!(row.datetime_precision, None);
-		assert_eq!(row.column_default, None);
-		assert_eq!(row.is_nullable, "NO");
-		assert_eq!(row.extra, "");
-		assert_eq!(row.table_name, "a");
-	}
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
 
 	let query = r"
 	CREATE TABLE `ScalarModel` (
