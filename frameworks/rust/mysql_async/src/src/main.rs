@@ -283,8 +283,8 @@ async fn main() {
 	assert_eq!(rows.len(), 2);
 	for row in rows {
 		assert!(row.column_name.eq("one") || row.column_name.eq("two"));
-		assert_eq!(row.data_type, "int");
-		assert!(row.full_data_type.eq("int") || row.full_data_type.eq("int(11)"));
+		assert_eq!(row.data_type, "one");
+		assert_eq!(row.full_data_type, "one");
 		assert_eq!(row.character_maximum_length, None);
 		assert_eq!(row.numeric_precision, Some(10));
 		assert_eq!(row.numeric_scale, Some(0));
