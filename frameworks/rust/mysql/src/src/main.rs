@@ -16,6 +16,73 @@ struct Payment {
 	account_name: Option<String>
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Tablefy)]
+struct ColumnInfo {
+	column_name: String,
+	data_type: String,
+	full_data_type: String,
+	character_maximum_length: Option<u16>,
+	numeric_precision: Option<u8>,
+	numeric_scale: Option<u8>,
+	datetime_precision: Option<u8>,
+	column_default: Option<String>,
+	is_nullable: String,
+	extra: String,
+	table_name: String
+}
+
+impl FromRow for ColumnInfo {
+	fn from_row_opt(row: Row) -> core::result::Result<Self, mysql::FromRowError> {
+		Ok(Self::new(
+			row.get(0).unwrap(),
+			row.get(1).unwrap(),
+			row.get(2).unwrap(),
+			row.get(3).unwrap(),
+			row.get(4).unwrap(),
+			row.get(5).unwrap(),
+			row.get(6).unwrap(),
+			row.get(7).unwrap(),
+			row.get(8).unwrap(),
+			row.get(9).unwrap(),
+			row.get(10).unwrap()
+		))
+	}
+}
+
+impl ColumnInfo {
+	fn new(column_name: String, data_type: String, full_data_type: String, character_maximum_length: Option<u16>, numeric_precision: Option<u8>, numeric_scale: Option<u8>, datetime_precision: Option<u8>, column_default: Option<String>, is_nullable: String, extra: String, table_name: String) -> Self {
+		Self{
+			column_name,
+			data_type,
+			full_data_type,
+			character_maximum_length,
+			numeric_precision,
+			numeric_scale,
+			datetime_precision,
+			column_default,
+			is_nullable,
+			extra,
+			table_name
+		}
+	}
+
+	fn new2(column_name: &str, data_type: &str, full_data_type: &str, character_maximum_length: Option<u16>, numeric_precision: Option<u8>, numeric_scale: Option<u8>, datetime_precision: Option<u8>, column_default: Option<&str>, is_nullable: &str, extra: &str, table_name: &str) -> Self {
+		Self::new(
+			column_name.to_string(),
+			data_type.to_string(),
+			full_data_type.to_string(),
+			character_maximum_length,
+			numeric_precision,
+			numeric_scale,
+			datetime_precision,
+			column_default.map(|s| s.to_string()),
+			is_nullable.to_string(),
+			extra.to_string(),
+			table_name.to_string()
+		)
+	}
+}
+
 fn main() {
 	let host = std::env::var("VT_HOST").unwrap();
 	let port = match std::env::var("VT_PORT") {
@@ -150,6 +217,76 @@ fn main() {
 		Ok(_) => panic!("SELECT after DROP succeeded when it should have failed"),
 		Err(e) => println!("Error (as expected):\n\t{}\n\n", e)
 	};
+
+	let query = r"
+	CREATE TABLE `a` (
+		`one` int NOT NULL,
+		`two` int NOT NULL,
+		PRIMARY KEY(`one`, `two`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+	";
+	println!("--- query:{}", query);
+	conn.query_drop(query).expect("CREATE TABLE `a` failed");
+
+	let query = r"
+	SELECT
+		column_name column_name,
+		data_type data_type,
+		column_type full_data_type,
+		character_maximum_length character_maximum_length,
+		numeric_precision numeric_precision,
+		numeric_scale numeric_scale,
+		datetime_precision datetime_precision,
+		column_default column_default,
+		is_nullable is_nullable,
+		extra extra,
+		table_name table_name
+	FROM information_schema.columns
+	WHERE table_schema = '".to_owned() + &std::env::var("VT_DATABASE").unwrap() + r"'
+	ORDER BY ordinal_position
+	";
+	println!("--- query:{}", query);
+	let rows: Vec<ColumnInfo> = conn.query(query).expect("SELECT from information_schema.columns failed");
+	assert_eq!(rows.len(), 2);
+	// MySQL 5.7 returns "int(11)" for column_type; 8.0 only returns "int"
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+
+	let query = r"
+	SELECT
+		column_name column_name,
+		data_type data_type,
+		column_type full_data_type,
+		character_maximum_length character_maximum_length,
+		numeric_precision numeric_precision,
+		numeric_scale numeric_scale,
+		datetime_precision datetime_precision,
+		column_default column_default,
+		is_nullable is_nullable,
+		extra extra,
+		table_name table_name
+	FROM information_schema.columns
+	WHERE table_schema = ?
+	ORDER BY ordinal_position
+	";
+	println!("--- query:{}", query);
+	let stmt = conn.prep(query).expect("prepare SELECT from information_schema.columns failed");
+	let rows: Vec<ColumnInfo> = conn.exec(stmt, (std::env::var("VT_DATABASE").unwrap(),)).expect("exec prepared SELECT from information_schema.columns failed");
+	assert_eq!(rows.len(), 2);
+	assert!(
+		rows[0] == ColumnInfo::new2("one", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[0] == ColumnInfo::new2("one", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
+	assert!(
+		rows[1] == ColumnInfo::new2("two", "int", "int(11)", None, Some(10), Some(0), None, None, "NO", "", "a") ||
+		rows[1] == ColumnInfo::new2("two", "int", "int", None, Some(10), Some(0), None, None, "NO", "", "a")
+	);
 
 	let query = r"
 	CREATE TABLE `ScalarModel` (

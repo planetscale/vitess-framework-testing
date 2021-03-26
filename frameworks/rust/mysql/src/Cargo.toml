@@ -5,7 +5,7 @@ authors = ["Mike Cronce <mc@planetscale.com>"]
 edition = "2018"
 
 [dependencies]
-mysql = "19"
+mysql = "20"
 tablefy = "0.1"
 tablefy_derive = "0.2"
 prettytable-rs = "0.8"
