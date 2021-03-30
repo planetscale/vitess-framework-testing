@@ -2,13 +2,14 @@
 
 #### Running the tests
 
-To run the tests, there are six environment variables you need to set:  `VT_HOST`, `VT_PORT`, `VT_USERNAME`, `VT_PASSWORD`, `VT_DATABASE` and `VT_NUM_SHARDS`.
+To run the tests, there are seven environment variables you need to set:  `VT_HOST`, `VT_PORT`, `VT_USERNAME`, `VT_PASSWORD`, `VT_DATABASE`, `VT_NUM_SHARDS`, and `VT_DIALECT`.
 * `VT_HOST` is an IP address or port to access the Vitess/MySQL database you want to run the tests against
 * `VT_PORT` is the port number on which the database server is listening; `3306` is probably what you'll want to set this to
 * `VT_USERNAME` is any username with access to the database you want to run tests against
 * `VT_PASSWORD` is the password for that user
 * `VT_DATABASE` is the name of the database/keyspace you want to access
 * `VT_NUM_SHARDS` is the number of shards that are being used for the test.
+* `VT_DIALECT` is the MySQL version we're targeting - currently supported options are `mysql57` and `mysql80`
 
 ##### Example
 
@@ -26,6 +27,7 @@ export VT_USERNAME=root
 export VT_PASSWORD=testpassword
 export VT_DATABASE=test
 export VT_NUM_SHARDS=1
+export VT_DIALECT=mysql57
 ./run.sh run_test rust/mysql_async # Runs a single test, the Rust mysql_async client
 ./alltests.sh # Runs the entire test suite
 ```
@@ -47,6 +49,7 @@ export VT_USERNAME=root
 export VT_PASSWORD=testpassword
 export VT_DATABASE=test
 export VT_NUM_SHARDS=1
+export VT_DIALECT=mysql57
 ./run.sh run_test ruby/rails6
 ./alltests.sh
 ```

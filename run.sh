@@ -56,9 +56,9 @@ function run_test() {
 
   tag="$(generate_image_name "${language}/${framework}")"
   if [ -n "${QUIET}" ]; then
-    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE -e VT_NUM_SHARDS "${tag}" &>/dev/null
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE -e VT_NUM_SHARDS -e VT_DIALECT "${tag}" &>/dev/null
   else
-    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE -e VT_NUM_SHARDS "${tag}"
+    docker run --rm -i --network host -e VT_HOST -e VT_USERNAME -e VT_PASSWORD -e VT_PORT -e VT_DATABASE -e VT_NUM_SHARDS -e VT_DIALECT "${tag}"
   fi;
 
   result="$?"
@@ -70,8 +70,12 @@ function run_test() {
 }
 
 function validate_environment() {
-  if [[ -z "$VT_HOST" || -z "$VT_PORT" || -z "$VT_USERNAME" || -z "$VT_PASSWORD" || -z "$VT_DATABASE" || -z "$VT_NUM_SHARDS" ]]; then
-    echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE,NUM_SHARDS} are set"
+  if [[ -z "$VT_HOST" || -z "$VT_PORT" || -z "$VT_USERNAME" || -z "$VT_PASSWORD" || -z "$VT_DATABASE" || -z "$VT_NUM_SHARDS" || -z "$VT_DIALECT" ]]; then
+    echo "Ensure VT_{HOST,PORT,USERNAME,PASSWORD,DATABASE,NUM_SHARDS,DIALECT} are set"
+    exit 1
+  fi
+  if [[ "$VT_DIALECT" != 'mysql57' ]] && [[ "$VT_DIALECT" != 'mysql80' ]]; then
+    echo "Unknown VT_DIALECT '$VT_DIALECT'; must be either 'mysql57' or 'mysql80'"
     exit 1
   fi
 }
@@ -84,3 +88,4 @@ cmd="${1}"
 shift
 
 "${cmd}" "$@"
+

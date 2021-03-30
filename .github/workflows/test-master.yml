@@ -119,6 +119,7 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
           VT_NUM_SHARDS: 1
+          VT_DIALECT: mysql57
 
       - id: run-mysql80
         name: Run changed tests against upstream MySQL 8.0
@@ -130,6 +131,7 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33578
           VT_NUM_SHARDS: 1
+          VT_DIALECT: mysql80
 
       - id: run-vttestserver57
         name: Run tests against vttestserver:mysql57
@@ -141,6 +143,7 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
           VT_NUM_SHARDS: 1
+          VT_DIALECT: mysql57
 
       - id: run-vttestserver80
         name: Run tests against vttestserver:mysql80
@@ -152,6 +155,7 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33807
           VT_NUM_SHARDS: 1
+          VT_DIALECT: mysql80
 
       - id: run-vttestserver57-sharded
         name: Run changed tests against vttestserver:mysql57 with 2 shards
@@ -163,6 +167,7 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33677
           VT_NUM_SHARDS: 2
+          VT_DIALECT: mysql57
 
       - id: run-vttestserver80-sharded
         name: Run changed tests against vttestserver:mysql80 with 2 shards
@@ -174,6 +179,7 @@ jobs:
           VT_HOST: 127.0.0.1
           VT_PORT: 33607
           VT_NUM_SHARDS: 2
+          VT_DIALECT: mysql80
 
       - id: logs
         name: Dump docker logs on failure

@@ -1,5 +1,6 @@
 frameworks:
   - 'go/gorm'
+  - 'go/skeema'
   - 'haskell/mysql-haskell'
   - 'haskell/mysql-simple'
   - 'haskell/persistent-mysql'
