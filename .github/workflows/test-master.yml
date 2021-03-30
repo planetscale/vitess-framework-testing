@@ -74,8 +74,8 @@ jobs:
           - 33677:33677
         env:
           PORT: 33674
-          KEYSPACES: test
-          NUM_SHARDS: "2"
+          KEYSPACES: test,unsharded
+          NUM_SHARDS: "2,1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33677" --health-interval=5s --health-timeout=2s --health-retries=5
       vttestserver80sharded:
@@ -84,8 +84,8 @@ jobs:
           - 33607:33607
         env:
           PORT: 33604
-          KEYSPACES: test
-          NUM_SHARDS: "2"
+          KEYSPACES: test,unsharded
+          NUM_SHARDS: "2,1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33607" --health-interval=5s --health-timeout=2s --health-retries=5
 
