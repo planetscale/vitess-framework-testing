@@ -11,6 +11,7 @@ frameworks:
   - 'javascript/typeorm'
   - 'mysqldump/export'
   - 'mysqldump/import'
+  - 'php/drupal'
   - 'php/laravel'
   - 'python/django'
   - 'python/PyMySQL'
