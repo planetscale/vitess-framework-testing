@@ -76,7 +76,6 @@ jobs:
           submodules: true
 
       - id: fix-mysql80-auth-plugin
-        uses: mysql:8.0
         run: mysql -h127.0.0.1 -P33806 -uroot -proot -Ne "ALTER USER root IDENTIFIED WITH mysql_native_password BY 'root'"
 
       - id: build
