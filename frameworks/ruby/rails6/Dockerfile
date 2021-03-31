@@ -8,7 +8,7 @@ WORKDIR /src
 ENV PATH /src/bin:$PATH
 
 RUN \
-	apk add --no-cache --virtual .build-deps build-base sqlite-dev mariadb-connector-c-dev && \
+	apk add --no-cache --virtual .build-deps build-base sqlite-dev shared-mime-info mariadb-connector-c-dev && \
 	bundle install -j"$(cat /proc/cpuinfo | grep 'cpu cores' | head -n1 | cut -d: -f2 | awk '{print $1}')" --path=vendor/bundle && \
 	apk del .build-deps && \
 	rm -Rvf vendor/bundle/ruby/*/cache/*.gem && \
