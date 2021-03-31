@@ -25,3 +25,5 @@ cargo run --bin show_posts
 cargo run --bin delete_post -- test
 cargo run --bin show_posts
 
+exit 0
+
