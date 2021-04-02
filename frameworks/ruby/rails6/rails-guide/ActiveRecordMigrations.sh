@@ -20,6 +20,8 @@ function check_create_products_migration(){
     end
   end"
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product1s"
   # insert into the table a row
   mysql_run "insert into product1s(name,description,created_at,updated_at) values ('RGT','Rails Guide Testing Migration Overview',NOW(),NOW())"
   # read from the table and assert that the output matches the expected output
@@ -66,6 +68,8 @@ function create_new_product_table() {
 function check_add_and_remove_partnumber_to_products(){
   # create a table first
   create_new_product_table "2"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product2s"
   # add a new column part_number
   rails generate migration AddPartNumberToProduct2s part_number:string
   rake_migrate
@@ -86,6 +90,8 @@ function check_add_and_remove_partnumber_to_products(){
 function check_add_partnumber_and_index_to_products(){
   # create a table first
   create_new_product_table "3"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product3s"
   # add a new column part_number
   rails generate migration AddPartNumberToProduct3s part_number:string:index
   rake_migrate
@@ -97,6 +103,8 @@ function check_add_partnumber_and_index_to_products(){
 function check_add_multiple_columns_to_products(){
   # create a table first
   create_new_product_table "4"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product4s"
   # add two new columns part_number and price
   rails generate migration AddDetailsToProduct4s part_number:string price:decimal
   rake_migrate
@@ -111,6 +119,8 @@ function check_add_products_table(){
   # Add the product table as a single migration
   rails generate migration CreateProduct5s name:string part_number:string
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product5s"
   # insert into the table a row
   mysql_run "insert into product5s(name,part_number,created_at,updated_at) values ('Single Migration for adding table','2.1',NOW(),NOW())"
   # read from the table and assert that the output matches the expected output
@@ -124,6 +134,10 @@ function check_add_reference_column(){
   # add a new column with reference to user table which we already have because of the base app.
   rails generate migration AddUserRefToProduct6s user:references
   rake_migrate
+  # add vindex for product6s to be based on user_id column.
+  mysql_run "alter vschema on test.\`product6s\` add vindex \`binary_md5\`(user_id) using \`binary_md5\`;"
+  # now add the sequence table
+  add_sequence_table "product6s"
   # assert the creation of the foreign key
   assert_mysql_output "SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product6s';" "product6s user_id users id"
 }
@@ -133,6 +147,8 @@ function check_join_table(){
   # create a join table.
   rails generate migration CreateJoinTableCustomerProduct customer product
   rake_migrate
+  # add vindex for join table to be based on customer_id column.
+  mysql_run "alter vschema on test.\`customers_products\` add vindex \`binary_md5\`(customer_id) using \`binary_md5\`;"
   # assert the creation of the join table
   assert_mysql_output "describe customers_products" "customer_id $BIGINT NO NULL product_id $BIGINT NO NULL"
 }

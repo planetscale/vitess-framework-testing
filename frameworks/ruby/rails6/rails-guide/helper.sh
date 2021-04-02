@@ -110,10 +110,21 @@ function setup_mysql_attributes(){
   fi
 }
 
-# Running for basic vindex
-function alter_vschema(){
-  if [ -n "$VT_NUM_SHARD" ]; then
-    mysql_run "alter vschema on test.'${1}' add vindex \`binary_md5\`(id) using \`binary_md5\`;"
+# Add sequence table
+function add_sequence_table(){
+  # $1 is the name of the table
+  mysql_run "create table unsharded.\`${1}_seq\`(id bigint, next_id bigint, cache bigint, primary key(id)) comment 'vitess_sequence'"
+  mysql_run "insert into unsharded.\`${1}_seq\`(id, next_id, cache) values(0, 1, 3)"
+  mysql_run "alter vschema add sequence unsharded.\`${1}_seq\`"
+  mysql_run "alter vschema on test.\`${1}\` add auto_increment id using unsharded.\`${1}_seq\`"
+}
+
+# Running for basic vindex and sequence addition
+function add_sequence_and_vindex(){
+  # $1 is the name of the table
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    mysql_run "alter vschema on test.\`${1}\` add vindex \`binary_md5\`(id) using \`binary_md5\`;"
+    add_sequence_table "$1"
   else
     echo "Running unsharded mode"
   fi
