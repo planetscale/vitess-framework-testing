@@ -159,6 +159,8 @@ function check_migration_from_model(){
   # create the model
   rails generate model Product7 name:string description:text
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product7s"
   # insert into the table a row
   mysql_run "insert into product7s(name,description,created_at,updated_at) values ('RGT','Rails Guide Testing Model Generators',NOW(),NOW())"
   # read from the table and assert that the output matches the expected output
@@ -170,6 +172,8 @@ function check_migration_from_model(){
 function check_passing_modifiers(){
   # create a table first
   create_new_product_table "8"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product8s"
   # create a migration while passing modifiers
   rails generate migration AddDetailsToProduct8s 'price:decimal{5,2}' supplier:references{polymorphic}
   rake_migrate
@@ -189,6 +193,8 @@ function check_create_table(){
     end
   end"
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "products101"
 
   assert_mysql_output "describe products101" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL"
 }
@@ -202,6 +208,8 @@ function check_create_table_option_blackhole(){
       end
     end
   end"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "products102"
   rake_migrate
 
   assert_mysql_output "describe products102" "id $BIGINT NO PRI NULL auto_increment name varchar(255) NO NULL"
@@ -216,7 +224,8 @@ function check_create_join_table(){
     end
   end"
   rake_migrate
-
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "categories103_products103"
   assert_mysql_output "describe categories103_products103" "products103_id $BIGINT NO NULL categories103_id $BIGINT NO NULL"
 }
 
@@ -228,6 +237,8 @@ function check_create_join_table_null_true(){
     end
   end"
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "categories104_products104"
 
   assert_mysql_output "describe categories104_products104" "products104_id $BIGINT YES NULL categories104_id $BIGINT YES NULL"
 }
@@ -240,6 +251,8 @@ function check_create_join_table_and_name_categorization(){
     end
   end"
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "categorization"
 
   assert_mysql_output "describe categorization" "products105_id $BIGINT NO NULL categories105_id $BIGINT NO NULL"
 }
@@ -255,6 +268,8 @@ function check_create_join_table_index(){
     end
   end"
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "categories106_products106"
 
   assert_mysql_output "describe categories106_products106" "products106_id $BIGINT NO MUL NULL categories106_id $BIGINT NO MUL NULL"
 }
@@ -274,6 +289,8 @@ function check_change_table_products(){
   end"
 
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "products_change"
 
   # Edit table products_change
   rails_generate_migration_with_content "CreateJoinTable5" "class CreateJoinTable5 < ActiveRecord::Migration[6.1]
@@ -299,6 +316,8 @@ function check_change_column(){
   rails generate migration CreateProduct107s name:string part_number:integer
   # run the migration
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product107s"
   # assert that the table is created
   assert_mysql_output "describe product107s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number $INT YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # generate a migration for changing the part_number to text
@@ -319,6 +338,8 @@ function check_change_column_null_default(){
   rails generate migration CreateProduct108s name:string approved:boolean
   # run the migration
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product108s"
   # assert that the table is created
   assert_mysql_output "describe product108s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL approved $TINYINT YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # generate a migration for changing the columns
@@ -341,6 +362,8 @@ function check_column_modifiers() {
   rails generate migration CreateProduct109s string_with_limit:string{100} text_with_limit:text{100} binary_with_limit:binary{100} integer_with_limit:integer{2}
   # run the migration
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product109s"
   # assert the table structure
   assert_mysql_output "describe product109s" "id $BIGINT NO PRI NULL auto_increment string_with_limit varchar(100) YES NULL text_with_limit tinytext YES NULL binary_with_limit varbinary(100) YES NULL integer_with_limit $SMALLINT YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
 
@@ -348,6 +371,8 @@ function check_column_modifiers() {
   rails generate migration CreateProduct110s decimal_with_modifiers:decimal{9,4} ref_with_polymorphic:references{polymorphic}
   # run the migration
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product110s"
   # assert the table structure
   assert_mysql_output "describe product110s" "id $BIGINT NO PRI NULL auto_increment decimal_with_modifiers decimal(9,4) YES NULL ref_with_polymorphic_type varchar(255) NO MUL NULL ref_with_polymorphic_id $BIGINT NO NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
 
@@ -361,6 +386,8 @@ function check_column_modifiers() {
   end"
   # run the migration
   rake_migrate
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product111s"
   # assert the table structure
   assert_mysql_output "select column_name, is_nullable, column_default, column_comment from information_schema.COLUMNS where table_name = 'product111s' and table_schema='$VT_DATABASE'" "id NO NULL name_with_modifiers NO rails testing Explanatory comment"
 }
@@ -371,6 +398,9 @@ function check_foreign_keys(){
   # create 2 product tables
   create_new_product_table "112"
   create_new_product_table "113"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product112s"
+  add_sequence_and_vindex "product113s"
   # add foreign keys
   rails_generate_migration_with_content "AddForeignKeysToProduct112s" "class AddForeignKeysToProduct112s < ActiveRecord::Migration[6.1]
     def change
@@ -385,7 +415,7 @@ function check_foreign_keys(){
   # run the migration
   rake_migrate
   # assert that the foreign key exists
-  assert_mysql_output "SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product112s' ORDER BY CONSTRAINT_NAME;" "fk_rails_597a50398e product112s product113_id3 product113s id fk_rails_ca97e6b679 product112s product113_id product113s id fk_rails_cc95aff6e8 product112s product113_id2 product113s id"
+  assert_mysql_output "SELECT DISTINCT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product112s' ORDER BY CONSTRAINT_NAME;" "fk_rails_597a50398e product112s product113_id3 product113s id fk_rails_ca97e6b679 product112s product113_id product113s id fk_rails_cc95aff6e8 product112s product113_id2 product113s id"
 
   # remove the foreign keys
   rails_generate_migration_with_content "RemoveForeignKeysToProduct112s" "class RemoveForeignKeysToProduct112s < ActiveRecord::Migration[6.1]
