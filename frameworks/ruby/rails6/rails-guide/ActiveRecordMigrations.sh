@@ -924,6 +924,8 @@ function check_changing_output_migrations(){
 # check_schema_dump checks the mysql and rails schema dumps
 function check_schema_dump(){
   create_new_product_table "13"
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product13s"
   # check if schema dump works. We do not need to check its output since it is not dependent on the database
   rake db:schema:dump
   # sqldump is a new task defined in the file /lib/tasks/my_task.rake.
@@ -951,6 +953,8 @@ function check_schema_dump(){
 function check_add_data_via_migration(){
   # create the model
   rails generate model Product14 name:string description:text
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product14s"
   # Create a migration that adds data to the table
   rails_generate_migration_with_content "AddInitialProduct14s" "class AddInitialProduct14s < ActiveRecord::Migration[6.1]
     def up
