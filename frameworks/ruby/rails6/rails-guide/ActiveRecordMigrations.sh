@@ -134,12 +134,12 @@ function check_add_reference_column(){
   # add a new column with reference to user table which we already have because of the base app.
   rails generate migration AddUserRefToProduct6s user:references
   rake_migrate
-  # add vindex for product6s to be based on user_id column.
-  mysql_run "alter vschema on test.\`product6s\` add vindex \`binary_md5\`(user_id) using \`binary_md5\`;"
+  # add vindex for product6s to be based on user_id column for sharded keyspace.
+  add_binary_md5_vindex "product6s" "user_id"
   # now add the sequence table
   add_sequence_table "product6s"
   # assert the creation of the foreign key
-  assert_mysql_output "SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product6s';" "product6s user_id users id"
+  assert_mysql_output "SELECT DISTINCT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM  information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND TABLE_NAME='product6s';" "product6s user_id users id"
 }
 
 # check_join_table checks that a join table can be created
@@ -147,8 +147,8 @@ function check_join_table(){
   # create a join table.
   rails generate migration CreateJoinTableCustomerProduct customer product
   rake_migrate
-  # add vindex for join table to be based on customer_id column.
-  mysql_run "alter vschema on test.\`customers_products\` add vindex \`binary_md5\`(customer_id) using \`binary_md5\`;"
+  # add vindex for join table to be based on customer_id column for sharded keyspace.
+  add_binary_md5_vindex "customers_products" "customer_id"
   # assert the creation of the join table
   assert_mysql_output "describe customers_products" "customer_id $BIGINT NO NULL product_id $BIGINT NO NULL"
 }
@@ -224,8 +224,8 @@ function check_create_join_table(){
     end
   end"
   rake_migrate
-  # add sequence and vindex for sharded keyspace
-  add_sequence_and_vindex "categories103_products103"
+  # add vindex for join table to be based on products103_id column for sharded keyspace.
+  add_binary_md5_vindex "categories103_products103" "products103_id"
   assert_mysql_output "describe categories103_products103" "products103_id $BIGINT NO NULL categories103_id $BIGINT NO NULL"
 }
 
@@ -237,8 +237,8 @@ function check_create_join_table_null_true(){
     end
   end"
   rake_migrate
-  # add sequence and vindex for sharded keyspace
-  add_sequence_and_vindex "categories104_products104"
+  # add vindex for join table to be based on products104_id column for sharded keyspace.
+  add_binary_md5_vindex "categories104_products104" "products104_id"
 
   assert_mysql_output "describe categories104_products104" "products104_id $BIGINT YES NULL categories104_id $BIGINT YES NULL"
 }
@@ -251,8 +251,8 @@ function check_create_join_table_and_name_categorization(){
     end
   end"
   rake_migrate
-  # add sequence and vindex for sharded keyspace
-  add_sequence_and_vindex "categorization"
+  # add vindex for join table to be based on products105_id column for sharded keyspace.
+  add_binary_md5_vindex "categorization" "products105_id"
 
   assert_mysql_output "describe categorization" "products105_id $BIGINT NO NULL categories105_id $BIGINT NO NULL"
 }
@@ -268,8 +268,8 @@ function check_create_join_table_index(){
     end
   end"
   rake_migrate
-  # add sequence and vindex for sharded keyspace
-  add_sequence_and_vindex "categories106_products106"
+  # add vindex for join table to be based on products106_id column for sharded keyspace.
+  add_binary_md5_vindex "categories106_products106" "products106_id"
 
   assert_mysql_output "describe categories106_products106" "products106_id $BIGINT NO MUL NULL categories106_id $BIGINT NO MUL NULL"
 }
