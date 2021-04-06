@@ -791,6 +791,8 @@ function check_revert_block(){
 # check_migrate_to_version checks that rake db:migrate command works with VARIABLE as a given argument
 function check_migrate_to_version(){
   rails generate migration CreateProduct9s name:string
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product9s"
   timestamp2=$(rails_command_with_timestamp "rails generate migration AddPartNumberToProduct9s part_number:int")
   rails generate migration AddDescriptionToProduct9s description:string
   rails generate migration RemovePartNumberFromProduct9s part_number:int
@@ -807,6 +809,8 @@ function check_migrate_to_version(){
 # check_rollback_and_redo checks that the rollback and redo commands work
 function check_rollback_and_redo(){
   rails generate migration CreateProduct10s name:string
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product10s"
   rails generate migration AddPartNumberToProduct10s part_number:int
   rails generate migration AddDescriptionToProduct10s description:string
   rails generate migration RemovePartNumberFromProduct10s part_number:int
@@ -853,6 +857,8 @@ function check_reset_database(){
 # check_run_specific_migrations checks the running of a specific migration given its timestamp
 function check_run_specific_migrations(){
   rails generate migration CreateProduct11s name:string
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product11s"
   timestamp=$(rails_command_with_timestamp "rails generate migration AddPartNumberToProduct11s part_number:int")
   rails generate migration AddDescriptionToProduct11s description:string
   rails generate migration RemovePartNumberFromProduct11s part_number:int
@@ -899,6 +905,8 @@ function check_changing_output_migrations(){
       end
     end
   end"
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product12s"
   # run the migration
   rake_migrate
   # Also check that there is no output when we call migration with false VERBOSE
