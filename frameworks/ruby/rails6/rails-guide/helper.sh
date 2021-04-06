@@ -144,3 +144,13 @@ function add_binary_md5_vindex(){
     echo "Running unsharded mode"
   fi
 }
+
+# Drops the given table from the vschema
+function drop_table_vschema(){
+  # $1 is the name of the table to drop
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    mysql_run "alter vschema drop table test.\`${1}\`;"
+  else
+    echo "Running unsharded mode"
+  fi
+}

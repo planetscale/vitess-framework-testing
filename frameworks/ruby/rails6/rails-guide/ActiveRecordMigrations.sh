@@ -436,6 +436,8 @@ function check_foreign_keys(){
 function check_runner_execute(){
   # create a product model
   rails generate model Product114 name:string price:string
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product114s"
   # run the migration
   rake_migrate
   # insert data into the table
@@ -469,6 +471,14 @@ function check_change_method(){
       create_join_table :product115s, :product117s, table_name: :join_table_115_117
     end
   end"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product115s"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product116s"
+  # add sequence and vindex for sharded keyspace
+  add_sequence_and_vindex "product117s"
+  # add vindex for join table to be based on products117_id column for sharded keyspace.
+  add_binary_md5_vindex "join_table_115_117" "products117_id"
   # run the migration
   rake_migrate
   # check the structure of product115s table
@@ -476,7 +486,7 @@ function check_change_method(){
   # check that the tables product117s and join_table_115_117 are created
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
   # check the names of the indices created
-  assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
+  assert_mysql_output "select distinct non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
 
   # use constructs of the change method - add_timestamps, drop_table, drop_join_table, remove_index, remove_foreign_key, remove_column, rename_column, rename_index, rename_table
   rails_generate_migration_with_content "ChangeStructureOfProduct115sAgain" "class ChangeStructureOfProduct115sAgain < ActiveRecord::Migration[6.1]
@@ -497,22 +507,37 @@ function check_change_method(){
   end"
   # run the migration
   rake_migrate
+  # drop the tables from vschema as well for sharded keyspace
+  drop_table_vschema "join_table_115_117"
+  drop_table_vschema "product117s"
+  # renamed tables must be removed and added again in vschema for sharded keyspace
+  drop_table_vschema "product116s"
+  add_sequence_and_vindex "new_product116s"
   # check the structure of product115s table
   assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL version_number varchar(255) NO 0 created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # check that the tables product117s and join_table_115_117 are deleted and new_product116s is created
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117' or TABLE_NAME='new_product116s');" "new_product116s"
   # check the names of the indices created
-  assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s'" "0 PRIMARY id BTREE"
+  assert_mysql_output "select distinct non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s'" "0 PRIMARY id BTREE"
 
   # check that the changes are reversible by doing a rollback
   rails db:rollback
+  # add the tables back into vschema as well for sharded keyspace
+  add_sequence_and_vindex "product117s"
+  add_binary_md5_vindex "join_table_115_117" "products117_id"
+  # renamed tables must be removed and added again in vschema for sharded keyspace
+  drop_table_vschema "new_product116s"
+  add_sequence_and_vindex "product116s"
   # run the same checks as before
   assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) NO MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
-  assert_mysql_output "select non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
+  assert_mysql_output "select distinct non_unique, index_name, column_name, index_type from  information_schema.statistics where table_name = 'product115s' order by index_name" "1 custom_index_name part_number BTREE 1 fk_rails_5d6c271b44 product115_id2 BTREE 0 PRIMARY id BTREE"
 
   # rollback once again
   rails db:rollback
+  # drop the tables from vschema as well for sharded keyspace
+  drop_table_vschema "join_table_115_117"
+  drop_table_vschema "product117s"
   # check the structure of the table product115s
   assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # check that the created tables are also removed
@@ -553,6 +578,9 @@ function check_reversible(){
     end
   end
   "
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "user1s"
+  add_sequence_and_vindex "distributor1s"
   # run the migration
   rake_migrate
   # check the structure of the two tables
@@ -562,9 +590,11 @@ function check_reversible(){
   # so the next check is only done for mysql 8.0
   if echo "$mysql_version" | grep -o "8.0"
   then
-    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor1s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk1 CHECK"
+    assert_mysql_output "select distinct constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor1s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk1 CHECK"
     # rollback to check that the migration is indeed reversible
     rails db:rollback
+    # drop the table from vschema as well for sharded keyspace
+    drop_table_vschema "distributor1s"
     # assert the structure of the user1s table
     assert_mysql_output "describe user1s" "id $BIGINT NO PRI NULL auto_increment email varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
     # check that distributor1s is also removed
@@ -608,6 +638,9 @@ function check_up_down_methods(){
     end
   end
   "
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "user2s"
+  add_sequence_and_vindex "distributor2s"
   # run the migration
   rake_migrate
   # check the structure of the two tables
@@ -617,9 +650,11 @@ function check_up_down_methods(){
   # so the next check is only done for mysql 8.0
   if echo "$mysql_version" | grep -o "8.0"
   then
-    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor2s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk2 CHECK"
+    assert_mysql_output "select distinct constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor2s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk2 CHECK"
     # rollback to check that the migration is indeed reversible
     rails db:rollback
+    # drop the table from vschema as well for sharded keyspace
+    drop_table_vschema "distributor2s"
     # assert the structure of the user2s table
     assert_mysql_output "describe user2s" "id $BIGINT NO PRI NULL auto_increment email varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
     # check that distributor2s is also removed
@@ -639,6 +674,8 @@ function check_reverting_previous_migrations(){
       end
     end
   end"
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "product118s"
   rake_migrate
   # get the relative filename from filename
   relative_filename=$(echo $filename | sed -E "s/db\/migrate\///")
@@ -656,6 +693,10 @@ function check_reverting_previous_migrations(){
     end
   end
   "
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "apple1s"
+  # drop the table from vschema for sharded keyspace
+  drop_table_vschema "product118s"
   # run the migration
   rake_migrate
   # check that product118s table is removed and apple1s added
@@ -697,6 +738,9 @@ function check_revert_block(){
     end
   end
   "
+  # add vindex and sequence for sharded keyspace
+  add_sequence_and_vindex "user3s"
+  add_sequence_and_vindex "distributor3s"
   # run the migration
   rake_migrate
   # check the structure of the two tables
@@ -706,7 +750,7 @@ function check_revert_block(){
   # so the next check is only done for mysql 8.0
   if echo "$mysql_version" | grep -o "8.0"
   then
-    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk3 CHECK"
+    assert_mysql_output "select distinct constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY zipchk3 CHECK"
     # generate a migration for reverting some of these changes
     rails_generate_migration_with_content "DontUseConstraintForZipcodeValidationMigration" "class DontUseConstraintForZipcodeValidationMigration < ActiveRecord::Migration[6.1]
       def change
@@ -739,7 +783,7 @@ function check_revert_block(){
     # check the structure of the two tables
     assert_mysql_output "describe distributor3s" "id $BIGINT NO PRI NULL auto_increment zipcode varchar(255) YES NULL"
     assert_mysql_output "describe user3s" "id $BIGINT NO PRI NULL auto_increment email_address varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL home_page_url varchar(255) YES NULL"
-    assert_mysql_output "select constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY"
+    assert_mysql_output "select distinct constraint_name, constraint_type from information_schema.table_constraints where table_name = 'distributor3s' order by constraint_name;" "PRIMARY PRIMARY KEY"
   fi
 }
 
