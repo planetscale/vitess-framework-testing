@@ -96,7 +96,7 @@ function setup_mysql_attributes(){
   # get the mysql version
   mysql_version=$(get_mysql_version)
   # Set the BIGINT variable so that while asserting the outputs of `DESCRIBE <table>` and `SHOW CREATE TABLE <table>` it can be used since mysql 5.7 and mysql 8.0 differ in this respect
-  if echo "$mysql_version" | grep -o "8.0" 
+  if echo "$mysql_version" | grep -o "8.0"
   then
     BIGINT="bigint"
     INT="int"
@@ -107,5 +107,50 @@ function setup_mysql_attributes(){
     INT="int(11)"
     TINYINT="tinyint(1)"
     SMALLINT="smallint(6)"
+  fi
+}
+
+# Add sequence table
+function add_sequence_table(){
+  # $1 is the name of the table
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    mysql_run "create table unsharded.\`${1}_seq\`(id bigint, next_id bigint, cache bigint, primary key(id)) comment 'vitess_sequence'"
+    mysql_run "insert into unsharded.\`${1}_seq\`(id, next_id, cache) values(0, 1, 3)"
+    mysql_run "alter vschema add sequence unsharded.\`${1}_seq\`"
+    mysql_run "alter vschema on test.\`${1}\` add auto_increment id using unsharded.\`${1}_seq\`"
+  else
+    echo "Running unsharded mode"
+  fi
+}
+
+# Running for basic vindex and sequence addition
+function add_sequence_and_vindex(){
+  # $1 is the name of the table
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    add_binary_md5_vindex "$1" "id"
+    add_sequence_table "$1"
+  else
+    echo "Running unsharded mode"
+  fi
+}
+
+# Adds a binary_md5 vindex for a given table
+function add_binary_md5_vindex(){
+  # $1 is the name of the table
+  # $2 is the name of the column to use
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    mysql_run "alter vschema on test.\`${1}\` add vindex \`binary_md5\`(${2}) using \`binary_md5\`;"
+  else
+    echo "Running unsharded mode"
+  fi
+}
+
+# Drops the given table from the vschema
+function drop_table_vschema(){
+  # $1 is the name of the table to drop
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    mysql_run "alter vschema drop table test.\`${1}\`;"
+  else
+    echo "Running unsharded mode"
   fi
 }
