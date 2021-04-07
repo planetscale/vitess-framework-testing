@@ -68,6 +68,26 @@ jobs:
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33807" --health-interval=5s --health-timeout=2s --health-retries=5
+      vttestserver57sharded:
+        image: vitess/vttestserver:mysql57
+        ports:
+          - 33677:33677
+        env:
+          PORT: 33674
+          KEYSPACES: test,unsharded
+          NUM_SHARDS: "2,1"
+          MYSQL_BIND_HOST: "0.0.0.0"
+        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33677" --health-interval=5s --health-timeout=2s --health-retries=5
+      vttestserver80sharded:
+        image: vitess/vttestserver:mysql80
+        ports:
+          - 33607:33607
+        env:
+          PORT: 33604
+          KEYSPACES: test,unsharded
+          NUM_SHARDS: "2,1"
+          MYSQL_BIND_HOST: "0.0.0.0"
+        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33607" --health-interval=5s --health-timeout=2s --health-retries=5
 
     strategy:
       fail-fast: false
@@ -98,6 +118,7 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33576
+          VT_NUM_SHARDS: 1
           VT_DIALECT: mysql57
 
       - id: run-mysql80
@@ -109,6 +130,7 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33578
+          VT_NUM_SHARDS: 1
           VT_DIALECT: mysql80
 
       - id: run-vttestserver57
@@ -120,6 +142,7 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
+          VT_NUM_SHARDS: 1
           VT_DIALECT: mysql57
 
       - id: run-vttestserver80
@@ -131,6 +154,31 @@ jobs:
           VT_DATABASE: test
           VT_HOST: 127.0.0.1
           VT_PORT: 33807
+          VT_NUM_SHARDS: 1
+          VT_DIALECT: mysql80
+
+      - id: run-vttestserver57-sharded
+        name: Run changed tests against vttestserver:mysql57 with 2 shards
+        run: ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33677
+          VT_NUM_SHARDS: 2
+          VT_DIALECT: mysql57
+
+      - id: run-vttestserver80-sharded
+        name: Run changed tests against vttestserver:mysql80 with 2 shards
+        run: ./run.sh run_test "${{ matrix.framework }}"
+        env:
+          VT_USERNAME: test
+          VT_PASSWORD: test
+          VT_DATABASE: test
+          VT_HOST: 127.0.0.1
+          VT_PORT: 33607
+          VT_NUM_SHARDS: 2
           VT_DIALECT: mysql80
 
       - id: logs
