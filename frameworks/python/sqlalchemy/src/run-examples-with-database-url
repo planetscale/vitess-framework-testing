@@ -70,6 +70,11 @@ exclude_files = [
 	'./vertical/dictlike.py'
 ]
 
+if(os.environ.get('VT_DIALECT') == 'mysql80'):
+	exclude_files.append('./association/proxied_association.py')
+	exclude_files.append('./inheritance/joined.py')
+	exclude_files.append('./inheritance/single.py')
+
 args = {}
 
 args['host'] = os.environ.get('VT_HOST')
