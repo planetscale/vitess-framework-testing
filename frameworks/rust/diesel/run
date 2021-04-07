@@ -5,7 +5,7 @@ export DATABASE_URL="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}
 pushd all_about_inserts
 diesel database reset
 diesel database setup
-cargo test
+cargo test -- --test-threads 1
 diesel database reset
 popd
 
