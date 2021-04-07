@@ -9,6 +9,10 @@ source helper.sh
 function check_ensure_login_has_a_value(){
   # create a user model
   rails generate model User100s name:string login:string email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User100s"
+
   # run the migration
   rake_migrate
   # implement the callback method ensure_login_has_a_value
@@ -39,6 +43,10 @@ function check_ensure_login_has_a_value(){
 function check_name_login_capitalization(){
   # create a user model
   rails generate model User101s name:string login:string email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User101s"
+
   # run the migration
   rake_migrate
   # implement the callback method ensure_login_has_a_value
@@ -60,6 +68,10 @@ function check_name_login_capitalization(){
 function check_normalize_name_and_set_location(){
   # create a user model
   rails generate model User102s name:string location:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User102s"
+
   # run the migration
   rake_migrate
   # implement the callback methods
@@ -93,6 +105,10 @@ function check_normalize_name_and_set_location(){
 function check_before_validation(){
   # create a user model
   rails generate model User103s name:string login:string email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User103s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -120,6 +136,10 @@ function check_before_validation(){
 function check_after_validation(){
   # create a user model
   rails generate model User104s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User104s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -152,6 +172,10 @@ function check_after_validation(){
 function check_before_save(){
   # create a user model
   rails generate model User105s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User105s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -177,6 +201,10 @@ function check_before_save(){
 function check_around_save(){
   # create a user model
   rails generate model User106s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User106s"
+
   # also create a model for the emails
   rails generate model Email106s user106:references email:string
   # run the migration
@@ -214,6 +242,10 @@ function check_around_save(){
 function check_after_save(){
   # create a user model
   rails generate model User107s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User107s"
+
   # also create a model for the emails
   rails generate model Email107s user107:references email:string
   # run the migration
@@ -249,6 +281,10 @@ function check_after_save(){
 function check_before_create(){
   # create a user model
   rails generate model User108s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User108s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -274,6 +310,10 @@ function check_before_create(){
 function check_around_create(){
   # create a user model
   rails generate model User109s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User109s"
+
   # also create a model for the emails
   rails generate model Email109s user109:references email:string
   # run the migration
@@ -306,6 +346,10 @@ function check_around_create(){
 function check_after_create(){
   # create a user model
   rails generate model User110s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User110s"
+
   # also create a model for the emails
   rails generate model Email110s user110:references email:string
   # run the migration
@@ -337,6 +381,10 @@ function check_after_create(){
 function check_after_initialize_and_after_find(){
   # create a user model
   rails generate model User111s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User111s"
+
   # run the migration
   rake_migrate
   # implement the callback methods
@@ -372,6 +420,10 @@ function check_after_initialize_and_after_find(){
 function check_after_touch(){
   # create a user model
   rails generate model User112s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User112s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -392,7 +444,13 @@ function check_after_touch(){
 function check_after_touch_with_belongs_to(){
   # create an employee and a company migration
   rails generate model Company1 name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Company1"
+
   rails generate model Employee1 company1:references
+
+  add_sequence_and_vindex "Employee1"
   # run the migration
   rake_migrate
   # implement the callback methods
@@ -427,6 +485,10 @@ function check_after_touch_with_belongs_to(){
 function check_before_update(){
   # create a user model
   rails generate model User115s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User115s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -452,8 +514,15 @@ function check_before_update(){
 function check_around_update(){
   # create a user model
   rails generate model User116s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User116s"
+
   # also create a model for the emails
   rails generate model Email116s user116:references email:string
+
+  add_sequence_and_vindex "Email116s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -486,8 +555,16 @@ function check_after_update(){
 
   # create a user model
   rails generate model User117s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User117s"
+
   # also create a model for the emails
   rails generate model Email117s user117:references email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Email117s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -518,8 +595,16 @@ function check_before_destroy(){
 
   # create a user model
   rails generate model User118s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User118s"
+
   # also create a model for the emails
   rails generate model Email118s email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Email118s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -549,8 +634,16 @@ function check_after_destroy(){
 
   # create a user model
   rails generate model User123s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User123s"
+
   # also create a model for the emails
   rails generate model Email123s email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Email123s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -579,8 +672,16 @@ function check_after_destroy(){
 function check_around_destroy(){
   # create a user model
   rails generate model User124s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User124s"
+
   # also create a model for the emails
   rails generate model Email124s email:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Email124s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -627,6 +728,10 @@ function check_around_destroy(){
 function check_after_commit_rollback(){
   # create a user model
   rails generate model User119s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User119s"
+
   # run the migration
   rake_migrate
   # implement the callback methods
@@ -668,6 +773,10 @@ function check_after_commit_rollback(){
 function check_halting_execution(){
   # create a user model
   rails generate model User113s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User113s"
+
   # run the migration
   rake_migrate
   # implement the callback method
@@ -693,8 +802,16 @@ function check_halting_execution(){
 function check_relational_callbacks(){
   # create a user model
   rails generate model User114s name:string
+
+  # Add according vindex
+  add_sequence_and_vindex "User114s"
+
   # create an articles model
   rails generate model Article114s user114:references
+
+  # Add according vindex
+  add_sequence_and_vindex "Article114s"
+
   # run the migration
   rake_migrate
   # add the callbacks and the association
@@ -731,6 +848,10 @@ function check_relational_callbacks(){
 function check_if_with_symbol(){
   # create an order model
   rails generate model Order100s phoneNumber:string cardNumber:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Order100s"
+
   # run the migration
   rake_migrate
   # add the callback function conditioned using if with a symbol
@@ -767,6 +888,10 @@ function check_if_with_symbol(){
 function check_if_with_proc_v1(){
   # create an order model
   rails generate model Order101s phoneNumber:string cardNumber:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Order101s"
+
   # run the migration
   rake_migrate
   # add the callback function conditioned using if with a symbol
@@ -805,6 +930,10 @@ function check_if_with_proc_v1(){
 function check_if_with_proc_v2(){
   # create an order model
   rails generate model Order102s phoneNumber:string cardNumber:string
+
+  # Add according vindex
+  add_sequence_and_vindex "Order102s"
+
   # run the migration
   rake_migrate
   # add the callback function conditioned using if with a symbol
@@ -843,7 +972,15 @@ function check_if_with_proc_v2(){
 function check_multiple_conditions_callbacks(){
   # create a comment and article models
   rails generate model Article115s title:string ignoreComments:boolean
+
+  # Add according vindex
+  add_sequence_and_vindex "Article115s"
+
   rails generate model Comment115s author:string value:string wantEmails:boolean article115:references
+
+  # Add according vindex
+  add_sequence_and_vindex "Comment115s"
+
   # run the migration
   rake_migrate
   # add the callback function with multiple conditions
@@ -893,9 +1030,21 @@ function check_multiple_conditions_callbacks(){
 # check_combining_conditions_callbacks checks that combining conditions in the callbacks works
 function check_combining_conditions_callbacks(){
   # create a comment article and user models
-  rails generate model Article120s title:string ignoreComments:boolean author:string wantEmails:boolean 
+  rails generate model Article120s title:string ignoreComments:boolean author:string wantEmails:boolean
+
+  # Add according vindex
+  add_sequence_and_vindex "Article120s"
+
   rails generate model User120s name:string allowEmail:boolean
+
+  # Add according vindex
+  add_sequence_and_vindex "User120s"
+
   rails generate model Comment120s value:string article120:references user120:references
+
+  # Add according vindex
+  add_sequence_and_vindex "Comment120s"
+
   # run the migration
   rake_migrate
   # add the callback function with multiple conditions
@@ -948,6 +1097,10 @@ function check_combining_conditions_callbacks(){
 function check_callback_class_v1(){
   # create the models
   rails generate model PictureFile1 filepath:string
+
+  # Add according vindex
+  add_sequence_and_vindex "PictureFile1"
+
   # run the migration
   rake_migrate
   write_to_file "app/models/picture_file_callback1s.rb" "class PictureFileCallback1s
@@ -978,6 +1131,10 @@ function check_callback_class_v1(){
 function check_callback_class_v2(){
   # create the models
   rails generate model PictureFile2 filepath:string
+
+  # Add according vindex
+  add_sequence_and_vindex "PictureFile2"
+
   # run the migration
   rake_migrate
   write_to_file "app/models/picture_file_callback2s.rb" "class PictureFileCallback2s
@@ -1009,6 +1166,10 @@ function check_callback_class_v2(){
 function check_after_commit_on_destroy(){
   # create the models
   rails generate model PictureFile3 filepath:string
+
+  # Add according vindex
+  add_sequence_and_vindex "PictureFile3"
+
   # run the migration
   rake_migrate
   write_to_file "app/models/picture_file3.rb" "class PictureFile3 < ApplicationRecord
@@ -1038,6 +1199,10 @@ function check_after_commit_on_destroy(){
 function check_after_destroy_commit(){
   # create the models
   rails generate model PictureFile4 filepath:string
+
+  # Add according vindex
+  add_sequence_and_vindex "PictureFile4"
+
   # run the migration
   rake_migrate
   write_to_file "app/models/picture_file4.rb" "class PictureFile4 < ApplicationRecord
@@ -1067,6 +1232,10 @@ function check_after_destroy_commit(){
 function check_after_update_commit(){
   # create the models
   rails generate model User121s
+
+  # Add according vindex
+  add_sequence_and_vindex "User121s"
+
   # run the migration
   rake_migrate
   write_to_file "app/models/user121.rb" "class User121 < ApplicationRecord
@@ -1083,7 +1252,7 @@ function check_after_update_commit(){
   create_output=$(rails runner 'User121.create')
   # assert that the output is empty
   assert_matches "$create_output" ""
- 
+
   # check the output on save
   save_output=$(rails runner 'User121.find(1).save')
   expected_output="User was saved to database"
@@ -1095,6 +1264,10 @@ function check_after_update_commit(){
 function check_after_save_commit(){
   # create the models
   rails generate model User122s
+
+  # Add according vindex
+  add_sequence_and_vindex "User122s"
+
   # run the migration
   rake_migrate
   write_to_file "app/models/user122.rb" "class User122 < ApplicationRecord
@@ -1111,7 +1284,7 @@ function check_after_save_commit(){
   expected_output="User was saved to database"
   # assert that the output matches the expectation
   assert_matches "$create_output" "$expected_output"
- 
+
   # check the output on save
   save_output=$(rails runner 'User122.find(1).save')
   expected_output="User was saved to database"
