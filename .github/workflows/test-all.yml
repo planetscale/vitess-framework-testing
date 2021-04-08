@@ -5,6 +5,9 @@ on:
       vttestserver_tag:
         description: Container image tag for vttestserver
         required: true
+      vt_dialect:
+        description: mysql57 or mysql80
+        required: true
 
 jobs:
   determine_frameworks:
@@ -57,6 +60,8 @@ jobs:
           VT_DATABASE: testing
           VT_HOST: 127.0.0.1
           VT_PORT: 33577
+          VT_NUM_SHARDS: 1
+          VT_DIALECT: ${{ github.event.inputs.vt_dialect }}
 
       - id: logs
         name: Dump vttestserver logs on failure
