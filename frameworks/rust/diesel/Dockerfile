@@ -1,6 +1,11 @@
 FROM rust
 
-RUN apt-get update && apt-get install -y mariadb-client-10.3
+RUN \
+	sed -i 's/buster/bullseye/' /etc/apt/sources.list && \
+	sed -i '/updates/d' /etc/apt/sources.list && \
+	apt-get update && \
+	apt-get install -y mariadb-client-10.5 libmariadb3 && \
+	rm -Rvf /var/lib/apt
 RUN cargo install diesel_cli --no-default-features --features mysql
 RUN git clone https://github.com/mcronce/diesel.git /src/upstream
 
