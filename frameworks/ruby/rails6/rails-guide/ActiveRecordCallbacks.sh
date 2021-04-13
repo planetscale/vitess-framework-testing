@@ -11,7 +11,7 @@ function check_ensure_login_has_a_value(){
   rails generate model User100s name:string login:string email:string
 
   # Add according vindex
-  add_sequence_and_vindex "User100s"
+  add_sequence_and_vindex "user100s"
 
   # run the migration
   rake_migrate
@@ -45,7 +45,7 @@ function check_name_login_capitalization(){
   rails generate model User101s name:string login:string email:string
 
   # Add according vindex
-  add_sequence_and_vindex "User101s"
+  add_sequence_and_vindex "user101s"
 
   # run the migration
   rake_migrate
@@ -70,7 +70,7 @@ function check_normalize_name_and_set_location(){
   rails generate model User102s name:string location:string
 
   # Add according vindex
-  add_sequence_and_vindex "User102s"
+  add_sequence_and_vindex "user102s"
 
   # run the migration
   rake_migrate
@@ -107,7 +107,7 @@ function check_before_validation(){
   rails generate model User103s name:string login:string email:string
 
   # Add according vindex
-  add_sequence_and_vindex "User103s"
+  add_sequence_and_vindex "user103s"
 
   # run the migration
   rake_migrate
@@ -138,7 +138,7 @@ function check_after_validation(){
   rails generate model User104s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User104s"
+  add_sequence_and_vindex "user104s"
 
   # run the migration
   rake_migrate
@@ -174,7 +174,7 @@ function check_before_save(){
   rails generate model User105s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User105s"
+  add_sequence_and_vindex "user105s"
 
   # run the migration
   rake_migrate
@@ -203,10 +203,13 @@ function check_around_save(){
   rails generate model User106s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User106s"
+  add_sequence_and_vindex "user106s"
 
   # also create a model for the emails
   rails generate model Email106s user106:references email:string
+  # add vindex and sequence table
+  add_binary_md5_vindex "email106s" "user106_id"
+  add_sequence_table "email106s"
   # run the migration
   rake_migrate
   # implement the callback method
@@ -244,10 +247,13 @@ function check_after_save(){
   rails generate model User107s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User107s"
+  add_sequence_and_vindex "user107s"
 
   # also create a model for the emails
   rails generate model Email107s user107:references email:string
+  # add vindex and sequence table
+  add_binary_md5_vindex "email107s" "user107_id"
+  add_sequence_table "email107s"
   # run the migration
   rake_migrate
   # implement the callback method
@@ -283,7 +289,7 @@ function check_before_create(){
   rails generate model User108s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User108s"
+  add_sequence_and_vindex "user108s"
 
   # run the migration
   rake_migrate
@@ -312,10 +318,13 @@ function check_around_create(){
   rails generate model User109s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User109s"
+  add_sequence_and_vindex "user109s"
 
   # also create a model for the emails
   rails generate model Email109s user109:references email:string
+  # add vindex and sequence table
+  add_binary_md5_vindex "email109s" "user109_id"
+  add_sequence_table "email109s"
   # run the migration
   rake_migrate
   # implement the callback method
@@ -348,10 +357,13 @@ function check_after_create(){
   rails generate model User110s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User110s"
+  add_sequence_and_vindex "user110s"
 
   # also create a model for the emails
   rails generate model Email110s user110:references email:string
+  # add vindex and sequence table
+  add_binary_md5_vindex "email110s" "user110_id"
+  add_sequence_table "email110s"
   # run the migration
   rake_migrate
   # implement the callback method
@@ -382,8 +394,8 @@ function check_after_initialize_and_after_find(){
   # create a user model
   rails generate model User111s name:string
 
-  # Add according vindex
-  add_sequence_and_vindex "User111s"
+  # TODO: Add user111s table authoritative columns, as User111.first will need it.
+  add_sequence_table "user111s"
 
   # run the migration
   rake_migrate
@@ -422,7 +434,7 @@ function check_after_touch(){
   rails generate model User112s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User112s"
+  add_sequence_and_vindex "user112s"
 
   # run the migration
   rake_migrate
@@ -446,11 +458,11 @@ function check_after_touch_with_belongs_to(){
   rails generate model Company1 name:string
 
   # Add according vindex
-  add_sequence_and_vindex "Company1"
+  add_sequence_and_vindex "company1s"
 
   rails generate model Employee1 company1:references
-
-  add_sequence_and_vindex "Employee1"
+  # TODO: Add employee1s table authoritative columns, as Employee1.last will need it.
+  add_sequence_table "employee1s"
   # run the migration
   rake_migrate
   # implement the callback methods
@@ -487,7 +499,7 @@ function check_before_update(){
   rails generate model User115s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User115s"
+  add_sequence_and_vindex "user115s"
 
   # run the migration
   rake_migrate
@@ -516,12 +528,13 @@ function check_around_update(){
   rails generate model User116s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User116s"
+  add_sequence_and_vindex "user116s"
 
   # also create a model for the emails
   rails generate model Email116s user116:references email:string
-
-  add_sequence_and_vindex "Email116s"
+  # add vindex and sequence table
+  add_binary_md5_vindex "email116s" "user116_id"
+  add_sequence_table "email116s"
 
   # run the migration
   rake_migrate
@@ -557,13 +570,13 @@ function check_after_update(){
   rails generate model User117s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User117s"
+  add_sequence_and_vindex "user117s"
 
   # also create a model for the emails
   rails generate model Email117s user117:references email:string
-
-  # Add according vindex
-  add_sequence_and_vindex "Email117s"
+  # add vindex and sequence table
+  add_binary_md5_vindex "email117s" "user117_id"
+  add_sequence_table "email117s"
 
   # run the migration
   rake_migrate
@@ -597,13 +610,13 @@ function check_before_destroy(){
   rails generate model User118s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User118s"
+  add_sequence_and_vindex "user118s"
 
   # also create a model for the emails
   rails generate model Email118s email:string
 
   # Add according vindex
-  add_sequence_and_vindex "Email118s"
+  add_sequence_and_vindex "email118s"
 
   # run the migration
   rake_migrate
@@ -636,13 +649,13 @@ function check_after_destroy(){
   rails generate model User123s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User123s"
+  add_sequence_and_vindex "user123s"
 
   # also create a model for the emails
   rails generate model Email123s email:string
 
   # Add according vindex
-  add_sequence_and_vindex "Email123s"
+  add_sequence_and_vindex "email123s"
 
   # run the migration
   rake_migrate
@@ -674,13 +687,13 @@ function check_around_destroy(){
   rails generate model User124s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User124s"
+  add_sequence_and_vindex "user124s"
 
   # also create a model for the emails
   rails generate model Email124s email:string
 
   # Add according vindex
-  add_sequence_and_vindex "Email124s"
+  add_sequence_and_vindex "email124s"
 
   # run the migration
   rake_migrate
@@ -730,7 +743,7 @@ function check_after_commit_rollback(){
   rails generate model User119s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User119s"
+  add_sequence_and_vindex "user119s"
 
   # run the migration
   rake_migrate
@@ -775,7 +788,7 @@ function check_halting_execution(){
   rails generate model User113s name:string
 
   # Add according vindex
-  add_sequence_and_vindex "User113s"
+  add_sequence_and_vindex "user113s"
 
   # run the migration
   rake_migrate
@@ -803,14 +816,15 @@ function check_relational_callbacks(){
   # create a user model
   rails generate model User114s name:string
 
-  # Add according vindex
-  add_sequence_and_vindex "User114s"
+  # TODO: Add user114s table authoritative columns, as User114.first will need it.
+  add_sequence_table "user114s"
 
   # create an articles model
   rails generate model Article114s user114:references
 
-  # Add according vindex
-  add_sequence_and_vindex "Article114s"
+  # add vindex and sequence table
+  add_binary_md5_vindex "article114s" "user114_id"
+  add_sequence_table "article114s"
 
   # run the migration
   rake_migrate
@@ -850,7 +864,7 @@ function check_if_with_symbol(){
   rails generate model Order100s phoneNumber:string cardNumber:string
 
   # Add according vindex
-  add_sequence_and_vindex "Order100s"
+  add_sequence_and_vindex "order100s"
 
   # run the migration
   rake_migrate
@@ -890,7 +904,7 @@ function check_if_with_proc_v1(){
   rails generate model Order101s phoneNumber:string cardNumber:string
 
   # Add according vindex
-  add_sequence_and_vindex "Order101s"
+  add_sequence_and_vindex "order101s"
 
   # run the migration
   rake_migrate
@@ -932,7 +946,7 @@ function check_if_with_proc_v2(){
   rails generate model Order102s phoneNumber:string cardNumber:string
 
   # Add according vindex
-  add_sequence_and_vindex "Order102s"
+  add_sequence_and_vindex "order102s"
 
   # run the migration
   rake_migrate
@@ -974,12 +988,13 @@ function check_multiple_conditions_callbacks(){
   rails generate model Article115s title:string ignoreComments:boolean
 
   # Add according vindex
-  add_sequence_and_vindex "Article115s"
+  add_sequence_and_vindex "article115s"
 
   rails generate model Comment115s author:string value:string wantEmails:boolean article115:references
 
-  # Add according vindex
-  add_sequence_and_vindex "Comment115s"
+  # add vindex and sequence table
+  add_binary_md5_vindex "comment115s" "article115_id"
+  add_sequence_table "comment115s"
 
   # run the migration
   rake_migrate
@@ -1029,21 +1044,17 @@ function check_multiple_conditions_callbacks(){
 # 8.4 Combining Callbacks Conditions
 # check_combining_conditions_callbacks checks that combining conditions in the callbacks works
 function check_combining_conditions_callbacks(){
+  # test will not work in sharded vitess because of 2 foreign keys on the same table
+  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+    return 0
+  fi
+
   # create a comment article and user models
   rails generate model Article120s title:string ignoreComments:boolean author:string wantEmails:boolean
 
-  # Add according vindex
-  add_sequence_and_vindex "Article120s"
-
   rails generate model User120s name:string allowEmail:boolean
 
-  # Add according vindex
-  add_sequence_and_vindex "User120s"
-
   rails generate model Comment120s value:string article120:references user120:references
-
-  # Add according vindex
-  add_sequence_and_vindex "Comment120s"
 
   # run the migration
   rake_migrate
@@ -1099,7 +1110,7 @@ function check_callback_class_v1(){
   rails generate model PictureFile1 filepath:string
 
   # Add according vindex
-  add_sequence_and_vindex "PictureFile1"
+  add_sequence_and_vindex "picture_file1s"
 
   # run the migration
   rake_migrate
@@ -1133,7 +1144,7 @@ function check_callback_class_v2(){
   rails generate model PictureFile2 filepath:string
 
   # Add according vindex
-  add_sequence_and_vindex "PictureFile2"
+  add_sequence_and_vindex "picture_file2s"
 
   # run the migration
   rake_migrate
@@ -1168,7 +1179,7 @@ function check_after_commit_on_destroy(){
   rails generate model PictureFile3 filepath:string
 
   # Add according vindex
-  add_sequence_and_vindex "PictureFile3"
+  add_sequence_and_vindex "picture_file3s"
 
   # run the migration
   rake_migrate
@@ -1201,7 +1212,7 @@ function check_after_destroy_commit(){
   rails generate model PictureFile4 filepath:string
 
   # Add according vindex
-  add_sequence_and_vindex "PictureFile4"
+  add_sequence_and_vindex "picture_file4s"
 
   # run the migration
   rake_migrate
@@ -1234,7 +1245,7 @@ function check_after_update_commit(){
   rails generate model User121s
 
   # Add according vindex
-  add_sequence_and_vindex "User121s"
+  add_sequence_and_vindex "user121s"
 
   # run the migration
   rake_migrate
@@ -1266,7 +1277,7 @@ function check_after_save_commit(){
   rails generate model User122s
 
   # Add according vindex
-  add_sequence_and_vindex "User122s"
+  add_sequence_and_vindex "user122s"
 
   # run the migration
   rake_migrate
