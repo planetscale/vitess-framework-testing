@@ -1,7 +1,9 @@
 #!/bin/sh -ex
+source helper.sh
 
 # 1 Validations Overview
 rails generate migration CreatePerson name:string
+add_sequence_and_vindex "people"
 rails db:migrate
 rake guide_validation:step_1
 rake guide_validation:step_1_1 # Why Use Validations?
@@ -12,9 +14,13 @@ rake guide_validation:step_1_5 # errors[]
 
 # 2 Validation Helpers
 rails generate migration CreatePerson2 terms_of_service:string eula:string
+add_sequence_and_vindex "person2s"
 rails generate migration CreatePerson3 email:string
+add_sequence_and_vindex "person3s"
 rails generate migration CreatePerson4 opt_in:string
+add_sequence_and_vindex "person4s"
 rails generate migration CreateNumbers integer:integer float:float string:string
+add_sequence_and_vindex "numbers"
 rails db:migrate
 rake guide_validation:step_2_1 # acceptance
 rake guide_validation:step_2_2 # validates_associated
@@ -32,9 +38,13 @@ rake guide_validation:step_2_13 # validates_each
 
 # 3 Common Validation Options
 rails generate migration CreateCoffee size:string
+add_sequence_and_vindex "coffees"
 rails generate migration CreateTopic title:string
+add_sequence_and_vindex "topics"
 rails generate migration CreatePerson5 name:string age:integer username:string
+add_sequence_and_vindex "person5s"
 rails generate migration CreatePerson6 email:string age:integer name:string
+add_sequence_and_vindex "person6s"
 rails db:migrate
 rake guide_validation:step_3_1 # :allow_nil
 rake guide_validation:step_3_2 # :allow_blank
@@ -48,8 +58,11 @@ rake guide_validation:step_3_4 # :on
 
 # 5 Conditional Validation
 rails generate migration CreateOrder card_number:integer payment_type:string
+add_sequence_and_vindex "orders"
 rails generate migration CreateAccount password:string
+add_sequence_and_vindex "accounts"
 rails generate migration CreateUser4 email:string password:string is_admin:boolean
+add_sequence_and_vindex "user4s"
 rails db:migrate
 rake guide_validation:step_5_1 # Using a Symbol with :if and :unless
 rake guide_validation:step_5_2 # Using a Proc with :if and :unless
@@ -58,14 +71,18 @@ rake guide_validation:step_5_4 # Combining Validation Conditions
 
 # 6 Performing Custom Validations
 rails generate migration CreatePerson7 email:string
+add_sequence_and_vindex "person7s"
 rails db:migrate
 rake guide_validation:step_6_1 # Custom Validators
 rake guide_validation:step_6_2 # Custom Methods
 
 # 7 Working with Validation Errors
 rails generate migration CreatePerson8 name:string email:string
+add_sequence_and_vindex "person8s"
 rails generate migration CreatePerson9 name:string
+add_sequence_and_vindex "person9s"
 rails generate migration CreatePerson10 name:string
+add_sequence_and_vindex "person10s"
 rails db:migrate
 rake guide_validation:step_7_1 # errors
 rake guide_validation:step_7_2 # errors[]
