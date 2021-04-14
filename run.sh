@@ -65,7 +65,7 @@ function run_test() {
   echo "${language}/${framework}: $result"
   popd >/dev/null || return
 
-  cleanup_tables
+  # cleanup_tables
   return $result
 }
 
