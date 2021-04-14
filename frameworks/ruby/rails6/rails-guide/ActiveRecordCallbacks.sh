@@ -1044,17 +1044,20 @@ function check_multiple_conditions_callbacks(){
 # 8.4 Combining Callbacks Conditions
 # check_combining_conditions_callbacks checks that combining conditions in the callbacks works
 function check_combining_conditions_callbacks(){
-  # test will not work in sharded vitess because of 2 foreign keys on the same table
-  if [ "$VT_NUM_SHARDS" -gt "1" ]; then
-    return 0
-  fi
 
   # create a comment article and user models
   rails generate model Article120s title:string ignoreComments:boolean author:string wantEmails:boolean
+  # Add according vindex
+  add_sequence_and_vindex "article120s"
 
   rails generate model User120s name:string allowEmail:boolean
+  # Add according vindex
+  add_sequence_and_vindex "user120s"
 
-  rails generate model Comment120s value:string article120:references user120:references
+  rails generate model Comment120s value:string article120:references user120_id:integer
+  # add vindex and sequence table
+  add_binary_md5_vindex "comment120s" "article120_id"
+  add_sequence_table "comment120s"
 
   # run the migration
   rake_migrate

@@ -123,6 +123,26 @@ namespace :guide_association do
     e5 = Employee2.create!(name: "Manager Dev", manager: e4)
     e6 = Employee2.create!(name: "Dev 1", manager: e5)
     e7 = Employee2.create!(name: "Dev 2", manager: e5)
+    raise "e2 subordinates wrong" unless e2.subordinates == [e3,e4]
+    raise "e5 subordinates wrong" unless e5.subordinates == [e6,e7]
+    raise "e4 subordinates wrong" unless e4.subordinates == [e5]
+    raise "e4 manager wrong" unless e4.manager == e2
+    raise "e7 manager wrong" unless e7.manager == e5
+
+    # run the same tests as above, but this time the foreign key constraint is not enforced
+    e1 = Employee3.create!(name: "CEO")
+    e2 = Employee3.create!(name: "CTO", manager: e1)
+    e3 = Employee3.create!(name: "VP Dev", manager: e2)
+    e4 = Employee3.create!(name: "VP Product", manager: e2)
+    e5 = Employee3.create!(name: "Manager Dev", manager: e4)
+    e6 = Employee3.create!(name: "Dev 1", manager: e5)
+    e7 = Employee3.create!(name: "Dev 2", manager: e5)
+    # sort added because the order can be arbitrary in sharded keyspace
+    raise "e2 subordinates wrong" unless e2.subordinates.sort == [e3,e4].sort
+    raise "e5 subordinates wrong" unless e5.subordinates.sort == [e6,e7].sort
+    raise "e4 subordinates wrong" unless e4.subordinates == [e5]
+    raise "e4 manager wrong" unless e4.manager == e2
+    raise "e7 manager wrong" unless e7.manager == e5
   end
 
   task :step_3_1 do
