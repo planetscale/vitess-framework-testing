@@ -1,5 +1,7 @@
 #!/bin/sh -ex
 
+source helper.sh
+
 # 1 Why Associations?
 rails db:migrate
 rake guide_association:step_1
