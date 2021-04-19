@@ -1,5 +1,7 @@
 #!/bin/sh -ex
 
+source helper.sh
+
 # 1 Why Associations?
 rails db:migrate
 rake guide_association:step_1
@@ -26,7 +28,11 @@ rake guide_association:step_3_5 # Bi-directional Associations
 # 4 Detailed Association Reference
 # 4.1 belongs_to Association Reference
 rake guide_association:step_4_1_1 # Methods Added by belongs_to
-rake guide_association:step_4_1_2 # Options for belongs_to
+if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+  echo "Tests updates the primary vindex so will not succeed in sharded environment"
+else
+  rake guide_association:step_4_1_2 # Options for belongs_to
+fi
 rake guide_association:step_4_1_3 # Scopes for belongs_to
 rake guide_association:step_4_1_4 # Do Any Associated Objects Exist?
 # 4.1.5 When are Objects Saved? is just answering a question
@@ -37,7 +43,11 @@ rake guide_association:step_4_2_3 # Scopes for has_one
 rake guide_association:step_4_2_4 # Do Any Associated Objects Exist?
 # 4.2.5 When are Objects Saved? is just answering a question
 # 4.3 has_many Association Reference
-rake guide_association:step_4_3_1 # Methods Added by has_many
+if [ "$VT_NUM_SHARDS" -gt "1" ]; then
+  echo "Tests updates the primary vindex so will not succeed in sharded environment"
+else
+  rake guide_association:step_4_3_1 # Methods Added by has_many
+fi
 # 4.3.2 Options for has_many is well-covered in the 4.3.1 test
 rake guide_association:step_4_3_3 # Scopes for has_many
 # 4.3.4 When are Objects Saved? is just answering a question
@@ -51,6 +61,7 @@ rake guide_association:step_4_4_3 # Scopes for has_and_belongs_to_many
 
 # 5 Single Table Inheritance (STI)
 rails generate model vehicle type:string color:string price:decimal{10.2}
+add_sequence_and_vindex "vehicles"
 rails generate model car --parent=vehicle
 rails generate model motorcycle --parent=vehicle
 rails generate model bicycle --parent=vehicle

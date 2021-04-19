@@ -135,6 +135,9 @@ function check_add_reference_column(){
   rails generate migration AddUserRefToProduct6s user:references
   rake_migrate
   # add vindex for product6s to be based on user_id column for sharded keyspace.
+  # This is required since the foreign key constraint exists between them so whatever row 
+  # product references must live in the same shard.
+  # This is ensured by using the column part of the foreign key for sharding.
   add_binary_md5_vindex "product6s" "user_id"
   # now add the sequence table
   add_sequence_table "product6s"
