@@ -11,8 +11,8 @@ class AddQueryInterfaceTables < ActiveRecord::Migration[6.1]
     end
 
     create_table :book6s do |t|
-      t.belongs_to :author5, foreign_key: true
-      t.belongs_to :supplier5, foreign_key: true
+      t.belongs_to :author5
+      t.belongs_to :supplier5
       t.string :title
       t.integer :price
       t.integer :year_published
@@ -34,8 +34,8 @@ class AddQueryInterfaceTables < ActiveRecord::Migration[6.1]
     end
 
     create_table :reviews do |t|
-      t.belongs_to :customer2, foreign_key: true
-      t.belongs_to :book6, foreign_key: true
+      t.belongs_to :customer2
+      t.belongs_to :book6
       t.integer :state
       t.integer :rating
       t.string :review
