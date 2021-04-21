@@ -237,3 +237,16 @@ add_sequence_and_vindex "part5s"
 add_sequence_and_vindex "manufacturers"
 add_binary_md5_vindex "assembly5s_part5s" "part5_id"
 add_binary_md5_vindex "manufacturers_part5s" "part5_id"
+
+# Query Interface
+add_sequence_and_vindex "author5s"
+add_sequence_and_vindex "supplier5s"
+add_binary_md5_vindex "book6s" "author5_id"
+add_sequence_table "book6s"
+add_sequence_and_vindex "customer2s"
+add_binary_md5_vindex "order2s" "customer2_id"
+add_sequence_table "order2s"
+add_binary_md5_vindex "reviews" "customer2_id"
+add_sequence_table "reviews"
+add_binary_md5_vindex "book6s_order2s" "book6_id"
+
