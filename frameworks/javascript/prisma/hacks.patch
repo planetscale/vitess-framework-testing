@@ -6,9 +6,9 @@ index 3bcc844f..45a0b11b 100644
      database,
      schema: schema || defaultSchema,
      uri: connectionString,
--    ssl: Boolean(uri.query.sslmode),
-+    ssl: (uri.query.sslmode == 'true'),
-     socket: socket || host,
+-    ssl: Boolean(uri.searchParams.get('sslmode')),
++    ssl: (uri.searchParams.get('sslmode') == 'true'),
+     socket: socket || undefined,
      extraFields,
    }
 diff --git a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
