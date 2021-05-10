@@ -44,7 +44,7 @@ jobs:
           MYSQL_DATABASE: testing
           MYSQL_ROOT_PASSWORD: root
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
-      vttestserver57:
+      vitess57:
         image: vitess/vttestserver:mysql57
         ports:
           - 33577:33577
@@ -54,7 +54,7 @@ jobs:
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
-      vttestserver80:
+      vitess80:
         image: vitess/vttestserver:mysql80
         ports:
           - 33807:33807
@@ -64,7 +64,7 @@ jobs:
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33807" --health-interval=5s --health-timeout=2s --health-retries=5
-      vttestserver57sharded:
+      vitess57sharded:
         image: vitess/vttestserver:mysql57
         ports:
           - 33677:33677
@@ -74,7 +74,7 @@ jobs:
           NUM_SHARDS: "2,1"
           MYSQL_BIND_HOST: "0.0.0.0"
         options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33677" --health-interval=5s --health-timeout=2s --health-retries=5
-      vttestserver80sharded:
+      vitess80sharded:
         image: vitess/vttestserver:mysql80
         ports:
           - 33607:33607
