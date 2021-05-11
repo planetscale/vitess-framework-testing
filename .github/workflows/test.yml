@@ -53,7 +53,7 @@ jobs:
           KEYSPACES: testing
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
-        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
+        options: --privileged --health-cmd="mysqladmin ping -h127.0.0.1 -P33577" --health-interval=5s --health-timeout=2s --health-retries=5
       vitess80:
         image: vitess/vttestserver:mysql80
         ports:
@@ -63,7 +63,7 @@ jobs:
           KEYSPACES: testing
           NUM_SHARDS: "1"
           MYSQL_BIND_HOST: "0.0.0.0"
-        options: --health-cmd="mysqladmin ping -h127.0.0.1 -P33807" --health-interval=5s --health-timeout=2s --health-retries=5
+        options: --privileged --health-cmd="mysqladmin ping -h127.0.0.1 -P33807" --health-interval=5s --health-timeout=2s --health-retries=5
       vitess57sharded:
         image: vitess/vttestserver:mysql57
         ports:
