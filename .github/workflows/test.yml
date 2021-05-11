@@ -20,7 +20,7 @@ jobs:
       - id: frameworks
         env:
           FILTER_FROM_STDIN: "1"
-        run: ./tools/get-frameworks <<<${{ steps.files.outputs.all }}
+        run: ./tools/get-frameworks <<<'${{ steps.files.outputs.all }}'
 
   run_tests:
     name: Frameworks
