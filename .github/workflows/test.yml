@@ -33,7 +33,7 @@ jobs:
         ports:
           - 33577:15306
         env:
-          VITESS_COMMIT: master
+          VITESS_COMMIT: debugging-builder-in-ci
           MYSQL_DIALECT: mysql57
           VT_KEYSPACES: testing:1:0
         options: --privileged --health-cmd="mysqladmin ping -h127.0.0.1 -P15306" --health-start-period=1200s --health-interval=5s --health-timeout=2s --health-retries=5
