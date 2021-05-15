@@ -17,6 +17,9 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         with:
           format: 'json'
+      - id: info
+        name: docker info
+        run: docker info
       - id: frameworks
         env:
           FILTER_FROM_STDIN: "1"
@@ -47,6 +50,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+
+      - id: info
+        name: docker info
+        run: docker info
 
       - id: build
         name: Build changed tests
