@@ -39,6 +39,7 @@ jobs:
           VITESS_COMMIT: debugging-builder-in-ci
           MYSQL_DIALECT: mysql57
           VT_KEYSPACES: testing:1:0
+          DOCKER_DRIVER: overlay2
         options: --privileged --health-cmd="mysqladmin ping -h127.0.0.1 -P15306" --health-start-period=1500s --health-interval=5s --health-timeout=2s --health-retries=5
 
     strategy:
