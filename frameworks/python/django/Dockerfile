@@ -10,5 +10,5 @@ RUN \
 
 ADD src /src
 WORKDIR /src
-ENTRYPOINT ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py shell < test.py"]
+ENTRYPOINT ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py test -v 2"]
 
