@@ -1,5 +1,5 @@
-#  Django's guide on Model layer
-#  https://docs.djangoproject.com/en/3.2/topics/db/models
+#  Django's guide on Model layer fields
+#  https://docs.djangoproject.com/en/3.2/topics/db/models/#fields
 
 from django.test import TestCase
 from testApp.models import Person, Event, Server
