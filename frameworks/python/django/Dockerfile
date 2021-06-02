@@ -5,8 +5,7 @@ RUN apk add --no-cache mariadb-connector-c
 ADD src/requirements.txt /src/requirements.txt
 RUN \
 	apk add --no-cache --virtual .build-deps gcc libc-dev mariadb-dev && \
-	pip install --no-cache-dir -r /src/requirements.txt && \
-	apk del .build-deps
+	pip install --no-cache-dir -r /src/requirements.txt 
 
 ADD src /src
 WORKDIR /src
