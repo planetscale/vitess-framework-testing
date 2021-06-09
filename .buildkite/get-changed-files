@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "${BUILDKITE_BRANCH}" == 'master' ]; then
+	# This leans heavily on squashing when we push to master
+	git diff --name-only HEAD~1..HEAD
+else
+	git fetch origin master
+	git diff --name-only origin/master..HEAD
+fi
+
