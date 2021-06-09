@@ -1,7 +1,7 @@
 steps:
   - key: get-frameworks
     label: "Determine changed frameworks"
-    command: ./.buildkite/get-changed-files && pip install pyyaml && buildkite-agent meta-data set "frameworks" "$(./tools/get-frameworks < <(./.buildkite/get-changed-files))"
+    command: ./.buildkite/get-changed-files && pip3 install pyyaml && buildkite-agent meta-data set "frameworks" "$(./tools/get-frameworks < <(./.buildkite/get-changed-files))"
     env:
       FILTER_FROM_STDIN: "1"
   - key: build
