@@ -23,7 +23,8 @@ if(os.environ.get('FILTER_FROM_STDIN') != None):
     frameworks = list(filter(lambda f: f in filter_frameworks, frameworks))
 
 if(os.environ.get('OUTPUT') == 'plain'):
-    print('::set-output name=frameworks::' + ' '.join(frameworks))
+    for framework in frameworks:
+        print(framework)
 else:
-    print('::set-output name=frameworks::' + json.dumps(frameworks))
+    print(json.dumps(frameworks))
 
