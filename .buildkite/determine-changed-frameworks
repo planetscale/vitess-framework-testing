@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 dir="$(dirname "${0}")"
 pip3 install pyyaml
+export FILTER_FROM_STDIN=1
+export OUTPUT=plain
 echo '--- determine-changed-frameworks env:'
 env | sed 's/^/'$'\t''/'
 "${dir}/get-changed-files" # print them here for debugging purposes
