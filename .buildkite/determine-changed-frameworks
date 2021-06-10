@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 dir="$(dirname "${0}")"
 pip3 install pyyaml
 "${dir}/get-changed-files" # print them here for debugging purposes
