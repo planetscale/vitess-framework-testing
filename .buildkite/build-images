@@ -1,5 +1,4 @@
 #!/bin/bash -ex
-buildkite-agent meta-data get 'frameworks' # print for debugging
 buildkite-agent meta-data get "frameworks" | while read framework; do
 	echo "--- Building test image for ${framework}"
 	./run.sh build_image "${framework}";
