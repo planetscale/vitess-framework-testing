@@ -21,7 +21,6 @@ if(os.environ.get('FILTER_FROM_STDIN') != None):
         filter_frameworks[os.path.join(path[1], path[2])] = None
     frameworks = list(filter(lambda f: f in filter_frameworks, frameworks))
 
-print('--- OUTPUT = ', os.environ.get('OUTPUT'))
 if(os.environ.get('OUTPUT') == 'plain'):
     for framework in frameworks:
         print(framework)
