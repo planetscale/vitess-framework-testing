@@ -12,5 +12,11 @@ steps:
   - key: build
     label: "Build test containers"
     depends_on: get-frameworks
-    command: buildkite-agent meta-data get "frameworks" | while read framework; do ./run.sh build_image "${framework}"; done
+    plugins:
+      - docker#v3.8.0:
+          image: docker:dind
+          command: ["./.buildkite/build-images"]
+          mount-buildkite-agent: true
+          volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
 
