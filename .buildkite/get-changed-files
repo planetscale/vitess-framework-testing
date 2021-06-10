@@ -1,7 +1,8 @@
 #!/bin/bash
 
-echo '--- get-changed-files env:'
-env | sed 's/^/'$'\t''/'
+echo '----------'
+env
+echo '----------'
 
 if [ "${BUILDKITE_BRANCH}" == 'master' ]; then
 	# This leans heavily on squashing when we push to master
