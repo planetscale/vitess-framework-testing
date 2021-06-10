@@ -1,0 +1,218 @@
+#!/usr/local/bin/php
+<?php
+echo '--- Connecting', PHP_EOL;
+$db = new mysqli($_ENV['VT_HOST'], $_ENV['VT_USERNAME'], $_ENV['VT_PASSWORD'], $_ENV['VT_DATABASE'], $_ENV['VT_PORT']);
+if(!$db) {
+	echo '!!! Failed to connect to database', PHP_EOL;
+	exit(1);
+}
+
+echo '--- Running text protocol tests', PHP_EOL;
+if(!$db->query('CREATE TABLE test (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255))')) {
+	echo '!!! Failed to CREATE TABLE', PHP_EOL;
+	exit(2);
+}
+
+$result = $db->query('INSERT INTO test VALUES (DEFAULT, \'something\'), (DEFAULT, \'something else\')');
+if(!$result) {
+	echo '!!! Failed to INSERT', PHP_EOL;
+	exit(3);
+}
+if($db->affected_rows != 2) {
+	echo '!!! Affected rows wrong 1', PHP_EOL;
+	exit(4);
+}
+
+$result = $db->query('SELECT * FROM test');
+if(!$result) {
+	echo '!!! Failed to SELECT', PHP_EOL;
+	exit(5);
+} elseif($result->num_rows != 2) {
+	echo '!!! Row count wrong', PHP_EOL;
+	exit(6);
+}
+$row = $result->fetch_assoc();
+if(!$row) {
+	echo '!!! Failed to fetch 1', PHP_EOL;
+	exit(7);
+} elseif($row['id'] != 1) {
+	echo '!!! `id` wrong 1', PHP_EOL;
+	exit(8);
+} elseif($row['name'] != 'something') {
+	echo '!!! `name` wrong 1', PHP_EOL;
+	exit(9);
+}
+$row = $result->fetch_assoc();
+if(!$row) {
+	echo '!!! Failed to fetch 2', PHP_EOL;
+	exit(10);
+} elseif($row['id'] != 2) {
+	echo '!!! `id` wrong 2', PHP_EOL;
+	exit(11);
+} elseif($row['name'] != 'something else') {
+	echo '!!! `name` wrong 2', PHP_EOL;
+	exit(12);
+}
+if($result->fetch_assoc()) {
+	echo '!!! Wrong fetch', PHP_EOL;
+	exit(13);
+}
+
+$result = $db->query('DELETE FROM test WHERE id = 1');
+if(!$result) {
+	echo '!!! Failed to DELETE', PHP_EOL;
+	exit(14);
+}
+if($db->affected_rows != 1) {
+	echo '!!! Affected rows wrong 2', PHP_EOL;
+	exit(15);
+}
+
+$result = $db->query('DROP TABLE test');
+if(!$result) {
+	echo '!!! Failed to DROP TABLE', PHP_EOL;
+	exit(16);
+}
+
+echo '--- Running binary protocol tests', PHP_EOL;
+$stmt = $db->prepare('CREATE TABLE test (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255))');
+if(!$stmt) {
+	echo '!!! Failed to prepare CREATE TABLE', PHP_EOL;
+	exit(17);
+}
+if(!$stmt->execute()) {
+	echo '!!! Failed to execute CREATE TABLE', PHP_EOL;
+	exit(18);
+}
+
+$stmt = $db->prepare('INSERT INTO test VALUES (DEFAULT, ?)');
+if(!$stmt) {
+	echo '!!! Failed to prepare INSERT', PHP_EOL;
+	exit(19);
+}
+if(!$stmt->bind_param('s', $name)) {
+	echo '!!! Failed to bind INSERT', PHP_EOL;
+	exit(20);
+}
+$name = 'something';
+if(!$stmt->execute()) {
+	echo '!!! Failed to execute INSERT 1', PHP_EOL;
+	exit(21);
+}
+if($stmt->affected_rows != 1) {
+	echo '!!! Affected rows wrong 1', PHP_EOL;
+	exit(22);
+}
+$name = 'something else';
+if(!$stmt->execute()) {
+	echo '!!! Failed to execute INSERT 2', PHP_EOL;
+	exit(23);
+}
+if($stmt->affected_rows != 1) {
+	echo '!!! Affected rows wrong 2', PHP_EOL;
+	exit(24);
+}
+
+$stmt = $db->prepare('SELECT * FROM test');
+if(!$stmt) {
+	echo '!!! Failed to prepare SELECT', PHP_EOL;
+	exit(25);
+}
+if(!$stmt->bind_result($id, $name)) {
+	echo '!!! Failed to bind SELECT', PHP_EOL;
+	exit(26);
+}
+if(!$stmt->execute()) {
+	echo '!!! Failed to execute SELECT', PHP_EOL;
+	exit(27);
+} elseif(!$stmt->store_result()) {
+	echo '!!! Failed to store SELECT', PHP_EOL;
+	exit(28);
+} elseif($stmt->num_rows != 2) {
+	echo '!!! Row count wrong:  ', $stmt->num_rows, PHP_EOL;
+	exit(29);
+}
+if(!$stmt->fetch()) {
+	echo '!!! Failed to fetch 1', PHP_EOL;
+	exit(30);
+} elseif($id != 1) {
+	echo '!!! `id` wrong 1', PHP_EOL;
+	exit(31);
+} elseif($name != 'something') {
+	echo '!!! `name` wrong 1', PHP_EOL;
+	exit(32);
+}
+if(!$stmt->fetch()) {
+	echo '!!! Failed to fetch 2', PHP_EOL;
+	exit(33);
+} elseif($id != 2) {
+	echo '!!! `id` wrong 2', PHP_EOL;
+	exit(34);
+} elseif($name != 'something else') {
+	echo '!!! `name` wrong 2', PHP_EOL;
+	exit(35);
+}
+if($stmt->fetch()) {
+	echo '!!! Wrong fetch 1', PHP_EOL;
+	exit(36);
+}
+
+$stmt = $db->prepare('DELETE FROM test WHERE id = ?');
+if(!$stmt) {
+	echo '!!! Failed to prepare DELETE', PHP_EOL;
+	exit(37);
+}
+if(!$stmt->bind_param('i', $id)) {
+	echo '!!! Failed to bind DELETE', PHP_EOL;
+	exit(38);
+}
+$id = 1;
+$result = $stmt->execute();
+if(!$result) {
+	echo '!!! Failed to DELETE', PHP_EOL;
+	exit(39);
+} elseif($stmt->affected_rows != 1) {
+	echo '!!! Affected rows wrong 3', PHP_EOL;
+	exit(40);
+}
+
+$stmt = $db->prepare('SELECT name FROM test WHERE id = ?');
+if(!$stmt) {
+	echo '!!! Failed to prepare SELECT ... WHERE', PHP_EOL;
+	exit(41);
+}
+if(!$stmt->bind_param('i', $id)) {
+	echo '!!! Failed to bind SELECT ... WHERE params', PHP_EOL;
+	exit(42);
+}
+if(!$stmt->bind_result($name)) {
+	echo '!!! Failed to bind SELECT ... WHERE result', PHP_EOL;
+	exit(43);
+}
+$id = 2;
+if(!$stmt->execute()) {
+	echo '!!! Failed to execute SELECT ... WHERE', PHP_EOL;
+	exit(44);
+}
+if(!$stmt->fetch()) {
+	echo '!!! Failed to fetch 3', PHP_EOL;
+	exit(45);
+} elseif($name != 'something else') {
+	echo '!!! `name` wrong 3', PHP_EOL;
+	exit(46);
+}
+if($stmt->fetch()) {
+	echo '!!! Wrong fetch 2', PHP_EOL;
+	exit(47);
+}
+
+$stmt = $db->prepare('DROP TABLE test');
+if(!$stmt) {
+	echo '!!! Failed to prepare DROP TABLE', PHP_EOL;
+	exit(48);
+}
+if(!$stmt->execute()) {
+	echo '!!! Failed to DROP TABLE', PHP_EOL;
+	exit(49);
+}
+
