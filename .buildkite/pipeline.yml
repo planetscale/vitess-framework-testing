@@ -4,7 +4,7 @@ steps:
     plugins:
       - docker#v3.8.0:
           image: python:3
-          entrypoint: ["bash", "-c", "./.buildkite/get-changed-files && pip3 install pyyaml && buildkite-agent meta-data set \"frameworks\" \"$(./tools/get-frameworks < <(./.buildkite/get-changed-files))\""]
+          command: ["bash", "-c", "./.buildkite/get-changed-files && pip3 install pyyaml && buildkite-agent meta-data set \"frameworks\" \"$(./tools/get-frameworks < <(./.buildkite/get-changed-files))\""]
           mount-buildkite-agent: true
           environment:
             FILTER_FROM_STDIN: "1"
