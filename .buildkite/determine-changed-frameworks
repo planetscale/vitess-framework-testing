@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 dir="$(dirname "${0}")"
 pip3 install pyyaml
+echo '--- determine-changed-frameworks env:'
+env | sed 's/^/'$'\t''/'
 "${dir}/get-changed-files" # print them here for debugging purposes
 buildkite-agent meta-data set 'frameworks' "$(./tools/get-frameworks < <("${dir}/get-changed-files"))"
 
