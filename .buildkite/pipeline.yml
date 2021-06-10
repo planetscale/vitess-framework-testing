@@ -7,9 +7,6 @@ steps:
           command: ["./.buildkite/determine-changed-frameworks"]
           mount-buildkite-agent: true
           mount-ssh-agent: true
-          environment:
-            FILTER_FROM_STDIN: "1"
-            OUTPUT: plain
   - key: build
     label: "Build test containers"
     depends_on: get-frameworks
