@@ -6,8 +6,6 @@ steps:
           image: python:3
           command: ["bash", "-c", "./.buildkite/get-changed-files && pip3 install pyyaml && buildkite-agent meta-data set \"frameworks\" \"$(./tools/get-frameworks < <(./.buildkite/get-changed-files))\""]
           mount-buildkite-agent: true
-          mount-checkout: true
-          always-pull: false
           environment:
             FILTER_FROM_STDIN: "1"
   - key: build
