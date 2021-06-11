@@ -9,8 +9,8 @@ template = """
     plugins:
       - docker-compose#v3.7.0:
           config:
-            - docker-compose.%SERVICE%.yml
-            - docker-compose.yml
+            - .buildkite/docker-compose.%SERVICE%.yml
+            - .buildkite/docker-compose.yml
           run: test
           depends_on: %DEPENDS_ON%
           env:
