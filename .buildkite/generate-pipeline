@@ -25,11 +25,12 @@ template = """
 """
 def generate_step(server, dialect, num_shards, depends_on, framework):
     service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
-    step = template.replace('%SERVER%', server).replace('%DIALECT%', dialect).replace('%DIALECT_SHORT%', dialect.replace('.', '')).replace('%SERVICE%', service).replace('%NUM_SHARDS%', str(num_shards)).replace('%FRAMEWORK%', framework).replace('%FRAMEWORK_SLUG%', framework.replace('/', ':'))
+    framework_slug = framework.replace('/', ':')
+    step = template.replace('%SERVER%', server).replace('%DIALECT%', dialect).replace('%DIALECT_SHORT%', dialect.replace('.', '')).replace('%SERVICE%', service).replace('%NUM_SHARDS%', str(num_shards)).replace('%FRAMEWORK%', framework).replace('%FRAMEWORK_SLUG%', framework_slug)
     if(depends_on is None):
         step = '\n'.join([line for line in step.split('\n') if 'depends_on' not in line])
     else:
-        step = step.replace('%DEPENDS_ON%', 'test-' + depends_on + '-' + framework)
+        step = step.replace('%DEPENDS_ON%', 'test-' + depends_on + '-' + framework_slug)
     return step
 
 agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE) # TODO:  changed-frameworks vs frameworks based on env
