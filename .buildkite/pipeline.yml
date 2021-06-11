@@ -7,8 +7,15 @@ steps:
           command: ["./.buildkite/determine-changed-frameworks"]
           mount-buildkite-agent: true
           mount-ssh-agent: true
+  - wait
   - key: build
     label: "Build test containers"
-    depends_on: get-frameworks
     command: ./.buildkite/build-images
+  - key: generate-pipeline
+    label: "Generate test pipeline"
+    plugins:
+      - docker#v3.8.0:
+          image: python:3
+          command: ["./.buildkite/generate-pipeline"]
+          mount-buildkite-agent: true
 
