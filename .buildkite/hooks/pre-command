@@ -1,3 +1,3 @@
 set -ex
 mkdir -pv .buildkite/gen
-buildkite-agent artifact download '.buildkite/gen/*' ./.buildkite/gen/ || true
+buildkite-agent artifact download '.buildkite/gen/*' ./ || true
