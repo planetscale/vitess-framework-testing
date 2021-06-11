@@ -45,5 +45,5 @@ for f in agent.stdout:
 result = '\n'.join(result)
 
 print(result)
-agent = subprocess.run(['buildkite-agent', 'pipeline', 'upload'], input = result)
+agent = subprocess.run(['buildkite-agent', 'pipeline', 'upload'], input = result.encode('ascii'))
 
