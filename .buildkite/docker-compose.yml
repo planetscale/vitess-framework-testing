@@ -1,4 +1,0 @@
-version: '3.8'
-services:
-  test:
-    image: "gcr.io/planetscale-vitess-testing/frameworks/${FRAMEWORK}"
