@@ -8,20 +8,20 @@ template = """
     label: "Test %FRAMEWORK% against %SERVER% %DIALECT%"
     plugins:
       - docker-compose#v3.7.0:
-        config:
-          - docker-compose.%SERVICE%.yml
-          - docker-compose.yml
-        run: test
-        depends_on: %DEPENDS_ON%
-        env:
-          FRAMEWORK: "%FRAMEWORK%"
-          VT_USERNAME: root
-          VT_PASSWORD: root
-          VT_DATABASE: testing
-          VT_HOST: db
-          VT_PORT: 3306
-          VT_NUM_SHARDS: %NUM_SHARDS%
-          VT_DIALECT: mysql%DIALECT_SHORT%
+          config:
+            - docker-compose.%SERVICE%.yml
+            - docker-compose.yml
+          run: test
+          depends_on: %DEPENDS_ON%
+          env:
+            FRAMEWORK: "%FRAMEWORK%"
+            VT_USERNAME: root
+            VT_PASSWORD: root
+            VT_DATABASE: testing
+            VT_HOST: db
+            VT_PORT: 3306
+            VT_NUM_SHARDS: %NUM_SHARDS%
+            VT_DIALECT: mysql%DIALECT_SHORT%
 """
 def generate_step(server, dialect, num_shards, depends_on, framework):
     service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
