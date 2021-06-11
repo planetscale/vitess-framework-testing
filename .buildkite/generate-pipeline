@@ -6,13 +6,13 @@ import sys
 template = """
   - key: test-%SERVICE%-%FRAMEWORK_SLUG%
     label: "Test %FRAMEWORK% against %SERVER% %DIALECT%"
+    depends_on: %DEPENDS_ON%
     plugins:
       - docker-compose#v3.7.0:
           config:
             - .buildkite/docker-compose.%SERVICE%.yml
             - .buildkite/docker-compose.yml
           run: test
-          depends_on: %DEPENDS_ON%
           env:
             FRAMEWORK: "%FRAMEWORK%"
             VT_USERNAME: root
