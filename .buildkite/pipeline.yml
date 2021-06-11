@@ -18,4 +18,6 @@ steps:
           image: python:3
           command: ["./.buildkite/generate-pipeline"]
           mount-buildkite-agent: true
+    artifact_paths:
+      - ".buildkite/gen/*"
 

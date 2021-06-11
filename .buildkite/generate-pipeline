@@ -15,6 +15,7 @@ template = """
   - key: test-${SERVICE}-${FRAMEWORK_SLUG}
     label: "Test ${FRAMEWORK} against ${SERVER} ${DIALECT}"
     depends_on: ${DEPENDS_ON}
+    command: ["buildkite-agent", "artifact", "download", ".buildkite/gen", ".buildkite/gen"]
     plugins:
       - docker-compose#v3.7.0:
           config:
