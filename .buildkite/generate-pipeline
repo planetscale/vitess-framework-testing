@@ -47,6 +47,7 @@ def read(path):
     return f.read()
 
 def write(path, string):
+    print('--- writing ', path)
     f = open(path, 'w')
     f.write(string)
 
