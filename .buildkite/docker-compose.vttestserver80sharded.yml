@@ -10,7 +10,7 @@ services:
       NUM_SHARDS: "2,1"
       MYSQL_BIND_HOST: "0.0.0.0"
     healthcheck:
-      test: ["mysqladmin", "ping", "-h127.0.0.1"]
+      test: "mysqladmin ping -h127.0.0.1"
       interval: 5s
       timeout: 2s
       retries: 5

@@ -8,7 +8,7 @@ services:
       MYSQL_DATABASE: testing
       MYSQL_ROOT_PASSWORD: root
     healthcheck:
-      test: ["mysqladmin", "ping"]
+      test: "mysqladmin ping"
       interval: 5s
       timeout: 2s
       retries: 5
