@@ -3,6 +3,6 @@ mkdir -pv .buildkite/gen .buildkite/image
 buildkite-agent artifact download '.buildkite/gen/*' ./ || true
 buildkite-agent artifact download '.buildkite/image/**/*.tar.gz' ./ || true
 find .buildkite/image -type f | while read tarball; do
-	docker load < "$tarball"
+	docker load < tarball
 done
 
