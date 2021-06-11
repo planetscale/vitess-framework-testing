@@ -6,6 +6,3 @@ export OUTPUT=plain
 "${dir}/get-changed-files" # print them here for debugging purposes
 "${dir}/get-changed-files" | ./tools/get-frameworks | buildkite-agent meta-data set 'changed-frameworks'
 
-export FILTER_FROM_STDIN=0
-./tools/get-frameworks | buildkite-agent meta-data set 'frameworks'
-
