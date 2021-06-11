@@ -46,9 +46,8 @@ func main() {
 	}
 
 	database := os.Getenv("VT_DATABASE")
-	if(database == "") {
+	if(database != "") {
 		println("VT_DATABASE must be set")
-		os.Exit(4)
 	}
 
 	db_url := fmt.Sprintf("%s@tcp(%s:%d)/%s?parseTime=true", auth, host, port, database)
