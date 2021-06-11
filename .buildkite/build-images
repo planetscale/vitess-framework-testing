@@ -2,9 +2,5 @@
 for framework in $(buildkite-agent meta-data get "changed-frameworks"); do
 	echo "--- Building test image for ${framework}"
 	./run.sh build_image "${framework}";
-	image="$(./run.sh generate_image_name "${framework}")";
-	mkdir -pv ".buildkite/image/$(dirname "${framework}")";
-	docker save "${image}" | gzip > ".buildkite/image/${framework}.tar.gz";
-	buildkite-agent artifact upload ".buildkite/image/${framework}.tar.gz";
 done
 
