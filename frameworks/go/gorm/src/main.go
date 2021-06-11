@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -51,12 +52,16 @@ func main() {
 
 	db_url := fmt.Sprintf("%s@tcp(%s:%d)/%s?parseTime=true", auth, host, port, database)
 	fmt.Printf("--- Generated database URL: %s\n", db_url)
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: db_url,
-	}), &gorm.Config{})
-	if(err != nil) {
-		fmt.Printf("Error connecting to database: %s\n", err)
-		os.Exit(7)
+	var db *gorm.DB
+	var err error
+	for {
+		db, err = gorm.Open(mysql.New(mysql.Config{
+			DSN: db_url,
+		}), &gorm.Config{})
+		if(err == nil) {
+			break
+		}
+		time.Sleep(1 * time.Second)
 	}
 
 	err = db.AutoMigrate(&Product{})
