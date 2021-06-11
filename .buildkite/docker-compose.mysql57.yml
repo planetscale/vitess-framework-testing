@@ -4,7 +4,7 @@ services:
     image: mysql:5.7
     ports:
       - 3306
-    env:
+    environment:
       MYSQL_DATABASE: testing
       MYSQL_ROOT_PASSWORD: root
     healthcheck:

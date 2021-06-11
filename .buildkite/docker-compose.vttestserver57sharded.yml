@@ -4,7 +4,7 @@ services:
     image: vitess/vttestserver:mysql57
     ports:
       - 3306
-    env:
+    environment:
       PORT: "3303"
       KEYSPACES: testing,unsharded
       NUM_SHARDS: "2,1"
