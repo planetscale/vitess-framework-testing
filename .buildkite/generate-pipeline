@@ -14,6 +14,7 @@ template_mysql57 = """
           - docker-compose.yml
         run: test
         env:
+          FRAMEWORK: "%FRAMEWORK%"
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: testing
@@ -34,6 +35,7 @@ template_mysql80 = """
           - docker-compose.yml
         run: test
         env:
+          FRAMEWORK: "%FRAMEWORK%"
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: testing
@@ -55,6 +57,7 @@ template_vttestserver57 = """
           - docker-compose.yml
         run: test
         env:
+          FRAMEWORK: "%FRAMEWORK%"
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: testing
@@ -76,6 +79,7 @@ template_vttestserver80 = """
           - docker-compose.yml
         run: test
         env:
+          FRAMEWORK: "%FRAMEWORK%"
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: testing
@@ -97,6 +101,7 @@ template_vttestserver57sharded = """
           - docker-compose.yml
         run: test
         env:
+          FRAMEWORK: "%FRAMEWORK%"
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: testing
@@ -118,6 +123,7 @@ template_vttestserver80sharded = """
           - docker-compose.yml
         run: test
         env:
+          FRAMEWORK: "%FRAMEWORK%"
           VT_USERNAME: root
           VT_PASSWORD: root
           VT_DATABASE: testing
