@@ -25,7 +25,7 @@ template = """
 """
 def generate_step(server, dialect, num_shards, depends_on, framework):
     service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
-    step = template.replace('%SERVER%', service).replace('%DIALECT%', dialect).replace('%DIALECT_SHORT%', dialect.replace('.', '')).replace('%SERVICE%', server).replace('%NUM_SHARDS%', str(num_shards)).replace('%FRAMEWORK%', framework).replace('%FRAMEWORK_SLOG%', framework.replace('/', ':'))
+    step = template.replace('%SERVER%', service).replace('%DIALECT%', dialect).replace('%DIALECT_SHORT%', dialect.replace('.', '')).replace('%SERVICE%', server).replace('%NUM_SHARDS%', str(num_shards)).replace('%FRAMEWORK%', framework).replace('%FRAMEWORK_SLUG%', framework.replace('/', ':'))
     if(depends_on is None):
         step = '\n'.join([line for line in step.split('\n') if 'depends_on' not in line])
     else:
