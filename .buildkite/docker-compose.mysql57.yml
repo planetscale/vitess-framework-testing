@@ -2,6 +2,7 @@ version: '3.8'
 services:
   db:
     image: mysql:5.7
+    restart: always
     environment:
       MYSQL_DATABASE: testing
       MYSQL_ROOT_PASSWORD: root
