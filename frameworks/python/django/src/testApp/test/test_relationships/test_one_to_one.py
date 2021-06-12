@@ -26,7 +26,7 @@ class TestOneToOne(TestCase):
         # company can access its hq_address
         self.assertEqual(
             str(self.test_company.hq_address),
-            '1 ,TEST STREET ,TEST CITY'
+            "'1', 'TEST STREET', 'TEST CITY'"
         )
         # a hq_address can access its company
         self.assertEqual(

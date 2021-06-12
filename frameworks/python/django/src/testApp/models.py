@@ -56,7 +56,7 @@ class HQAddress(models.Model):
     city = models.CharField(max_length=100)
 
     def __str__(self):
-        return "%s ,%s ,%s" % (self.house_no, self.street, self.city)
+        return "'%s', '%s', '%s'" % (self.house_no, self.street, self.city)
 
 
 class Company(models.Model):
