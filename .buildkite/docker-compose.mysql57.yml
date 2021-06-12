@@ -4,12 +4,11 @@ services:
     image: mysql:5.7
     expose:
       - 3306
-    restart: always
     environment:
       MYSQL_DATABASE: testing
       MYSQL_ROOT_PASSWORD: root
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping"]
+      test: "mysqladmin ping"
       start_period: 10s
       interval: 10s
       timeout: 2s
