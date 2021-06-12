@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping"]
-      start_period: 2s
+      start_period: 5s
       interval: 5s
       timeout: 2s
       retries: 5
