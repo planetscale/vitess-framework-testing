@@ -2,6 +2,8 @@ version: '3.8'
 services:
   db:
     image: mysql:5.7
+    expose:
+      - 3306
     restart: always
     environment:
       MYSQL_DATABASE: testing
