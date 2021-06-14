@@ -57,6 +57,9 @@ push_template = """
   - key: push-${FRAMEWORK_SLUG}
     label: "Push container image for ${FRAMEWORK}"
     command: ./.buildkite/push-image '${FRAMEWORK}'
+    depends_on:
+      - test-mysql57-${FRAMEWORK_SLUG}
+      - test-mysql80-${FRAMEWORK_SLUG}
 """
 def generate_push_step(framework):
     framework_slug = framework.replace('/', '_').replace(':', '_')
