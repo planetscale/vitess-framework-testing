@@ -16,7 +16,7 @@ services:
       - db
 """
 
-template = """
+test_template = """
   - key: test-${SERVICE}-${FRAMEWORK_SLUG}
     label: "Test ${FRAMEWORK} against ${SERVER} ${DIALECT}"
     depends_on: ${DEPENDS_ON}
@@ -37,10 +37,10 @@ template = """
             - VT_DIALECT=mysql${DIALECT_SHORT}
           upload-container-logs: always
 """
-def generate_step(server, dialect, num_shards, depends_on, framework):
+def generate_test_step(server, dialect, num_shards, depends_on, framework):
     service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
     framework_slug = framework.replace('/', '_').replace(':', '_')
-    step = template.replace('${SERVER}', server).replace('${DIALECT}', dialect).replace('${DIALECT_SHORT}', dialect.replace('.', '')).replace('${SERVICE}', service).replace('${NUM_SHARDS}', str(num_shards)).replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
+    step = test_template.replace('${SERVER}', server).replace('${DIALECT}', dialect).replace('${DIALECT_SHORT}', dialect.replace('.', '')).replace('${SERVICE}', service).replace('${NUM_SHARDS}', str(num_shards)).replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
     if(depends_on is None):
         step = step.replace('${DEPENDS_ON}', 'build')
     else:
@@ -67,12 +67,12 @@ result = ['  - wait']
 for line in agent.stdout:
     line = line.decode('ascii').strip()
     write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line))
-    result.append(generate_step('MySQL', '5.7', 1, None, line))
-    result.append(generate_step('MySQL', '8.0', 1, None, line))
-    result.append(generate_step('vttestserver', '5.7', 1, 'mysql57', line))
-    result.append(generate_step('vttestserver', '8.0', 1, 'mysql80', line))
-    result.append(generate_step('vttestserver', '5.7', 2, 'vttestserver57', line))
-    result.append(generate_step('vttestserver', '8.0', 2, 'vttestserver80', line))
+    result.append(generate_test_step('MySQL', '5.7', 1, None, line))
+    result.append(generate_test_step('MySQL', '8.0', 1, None, line))
+    result.append(generate_test_step('vttestserver', '5.7', 1, 'mysql57', line))
+    result.append(generate_test_step('vttestserver', '8.0', 1, 'mysql80', line))
+    result.append(generate_test_step('vttestserver', '5.7', 2, 'vttestserver57', line))
+    result.append(generate_test_step('vttestserver', '8.0', 2, 'vttestserver80', line))
 result = '\n'.join(result)
 
 print(result)
