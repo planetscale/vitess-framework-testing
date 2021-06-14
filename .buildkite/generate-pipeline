@@ -67,18 +67,29 @@ try:
 except FileExistsError:
     pass
 
+mode = 'pull request'
+if(os.environ['BUILDKITE_BRANCH'] == 'master'):
+    mode = 'master commit'
+
 agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE) # TODO:  changed-frameworks vs frameworks based on env
 result = ['  - wait']
 for line in agent.stdout:
     line = line.decode('ascii').strip()
     write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line))
-    result.append(generate_build_step(line))
-    result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
-    result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
-    result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', line))
-    result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', line))
-    result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
-    result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
+    if(mode == 'pull request'):
+        result.append(generate_build_step(line))
+        result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
+        result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
+        result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', line))
+        result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', line))
+        result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
+        result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
+    elif(mode == 'master commit'):
+        result.append(generate_build_step(line))
+        result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
+        result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
+        result.append(generate_push_step(line))
+    # TODO:  elif(mode == 'manual trigger'):
 result = '\n'.join(result)
 
 print(result)
