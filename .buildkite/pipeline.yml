@@ -8,9 +8,6 @@ steps:
           mount-buildkite-agent: true
           mount-ssh-agent: true
   - wait
-  - key: build
-    label: "Build test containers"
-    command: ./.buildkite/build-images
   - key: generate-pipeline
     label: "Generate test pipeline"
     plugins:
