@@ -1,0 +1,5 @@
+#!/bin/bash -ex
+
+echo "--- Pushing test image for ${1}"
+./run.sh push_image "${1}";
+
