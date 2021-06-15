@@ -5,6 +5,7 @@ services:
     ports:
       - 3306
     environment:
+      # Add 3 to get to the vtcombo port, which is what we want to connect to
       PORT: "3303"
       KEYSPACES: testing
       NUM_SHARDS: "1"
