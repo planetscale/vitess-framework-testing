@@ -9,6 +9,7 @@ version: '3.8'
 services:
   test:
     image: "gcr.io/planetscale-vitess-testing/frameworks/${FRAMEWORK}"
+    pull_policy: ${PULL_POLICY}
     depends_on:
       db:
         condition: service_healthy
@@ -50,7 +51,11 @@ def generate_test_step(server, dialect, num_shards, depends_on, framework):
     service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
     framework_slug = framework.replace('/', '_').replace(':', '_')
     step = test_template.replace('${SERVER}', server).replace('${DIALECT}', dialect).replace('${DIALECT_SHORT}', dialect.replace('.', '')).replace('${SERVICE}', service).replace('${NUM_SHARDS}', str(num_shards))
-    step = step.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug).replace('${DEPENDS_ON}', depends_on + '-' + framework_slug)
+    step = step.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
+    if(depends_on is None):
+        step = '\n'.join([line for line in step.split('\n') if 'depends_on:' not in line])
+    else:
+        step = step.replace('${DEPENDS_ON}', depends_on + '-' + framework_slug)
     return step
 
 push_template = """
@@ -82,27 +87,40 @@ except FileExistsError:
 
 mode = 'pull request'
 if(os.environ['BUILDKITE_BRANCH'] == 'master'):
-    mode = 'master commit'
+    try:
+        vitess_refspec = os.environ['VITESS_REFSPEC']
+        mode = 'manual trigger'
+    except KeyError:
+        mode = 'master commit'
 
-agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE) # TODO:  changed-frameworks vs frameworks based on env
 result = ['  - wait']
-for line in agent.stdout:
-    line = line.decode('ascii').strip()
-    write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line))
-    if(mode == 'pull request'):
-        result.append(generate_build_step(line))
-        result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
-        result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
-        result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', line))
-        result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', line))
+if(mode == 'manual trigger'):
+    agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'frameworks'], stdout = subprocess.PIPE)
+    for line in agent.stdout:
+        line = line.decode('ascii').strip()
+        write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line).replace('${PULL_POLICY}', 'always'))
+        result.append(generate_test_step('vttestserver', '5.7', 1, None, line))
+        result.append(generate_test_step('vttestserver', '8.0', 1, None, line))
         result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
         result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
-    elif(mode == 'master commit'):
-        result.append(generate_build_step(line))
-        result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
-        result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
-        result.append(generate_push_step(line))
-    # TODO:  elif(mode == 'manual trigger'):
+else:
+    agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE)
+    for line in agent.stdout:
+        line = line.decode('ascii').strip()
+        write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line).replace('${PULL_POLICY}', 'always'))
+        if(mode == 'pull request'):
+            result.append(generate_build_step(line))
+            result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
+            result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
+            result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', line))
+            result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', line))
+            result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
+            result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
+        elif(mode == 'master commit'):
+            result.append(generate_build_step(line))
+            result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
+            result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
+            result.append(generate_push_step(line))
 result = '\n'.join(result)
 
 print(result)
