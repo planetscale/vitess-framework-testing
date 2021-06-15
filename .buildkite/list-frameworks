@@ -4,6 +4,11 @@ pip3 install pyyaml
 export OUTPUT=plain
 ./tools/get-frameworks | buildkite-agent meta-data set 'frameworks'
 export FILTER_FROM_STDIN=1
-"${dir}/get-changed-files" # print them here for debugging purposes
-"${dir}/get-changed-files" | ./tools/get-frameworks | buildkite-agent meta-data set 'changed-frameworks'
+frameworks="$("${dir}/get-changed-files" | ./tools/get-frameworks)"
+echo "${frameworks}"
+if [ "${frameworks}" == '' ]; then
+	buildkite-agent meta-data set 'changed-frameworks' ''
+else
+	echo "${frameworks}" | buildkite-agent meta-data set 'changed-frameworks'
+fi
 
