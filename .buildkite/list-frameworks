@@ -1,8 +1,9 @@
 #!/bin/bash -ex
 dir="$(dirname "${0}")"
 pip3 install pyyaml
-export FILTER_FROM_STDIN=1
 export OUTPUT=plain
+./tools/get-frameworks | buildkite-agent meta-data set 'frameworks'
+export FILTER_FROM_STDIN=1
 "${dir}/get-changed-files" # print them here for debugging purposes
 "${dir}/get-changed-files" | ./tools/get-frameworks | buildkite-agent meta-data set 'changed-frameworks'
 

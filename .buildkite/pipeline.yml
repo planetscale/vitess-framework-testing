@@ -1,10 +1,10 @@
 steps:
-  - key: get-frameworks
-    label: "Determine changed frameworks"
+  - key: list-frameworks
+    label: "List frameworks"
     plugins:
       - docker#v3.8.0:
           image: python:3
-          command: ["./.buildkite/determine-changed-frameworks"]
+          command: ["./.buildkite/list-frameworks"]
           mount-buildkite-agent: true
           mount-ssh-agent: true
   - wait
