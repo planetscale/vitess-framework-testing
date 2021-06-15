@@ -30,6 +30,8 @@ test_template = """
   - key: test-${SERVICE}-${FRAMEWORK_SLUG}
     label: "Test ${FRAMEWORK} against ${SERVER} ${DIALECT}"
     depends_on: ${DEPENDS_ON}
+    env:
+      - FRAMEWORK=${FRAMEWORK}
     plugins:
       - docker-compose#v3.7.0:
           config:
