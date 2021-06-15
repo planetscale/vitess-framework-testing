@@ -81,7 +81,7 @@ except FileExistsError:
     pass
 
 mode = 'pull request'
-if(os.environ['BUILDKITE_BRANCH'] == 'buildkite'):
+if(os.environ['BUILDKITE_BRANCH'] == 'master'):
     mode = 'master commit'
 
 agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE) # TODO:  changed-frameworks vs frameworks based on env
