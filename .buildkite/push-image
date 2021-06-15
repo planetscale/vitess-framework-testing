@@ -1,5 +1,6 @@
 #!/bin/bash -ex
 
 echo "--- Pushing test image for ${1}"
-./run.sh push_image "${1}";
+image="$(./run.sh generate_image_name "${1}")";
+docker push "${image}";
 
