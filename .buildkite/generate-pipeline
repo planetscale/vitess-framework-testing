@@ -86,7 +86,7 @@ except FileExistsError:
     pass
 
 mode = 'pull request'
-if(os.environ['BUILDKITE_BRANCH'] == 'master'):
+if(os.environ['BUILDKITE_BRANCH'] == 'buildkite'):
     try:
         vitess_refspec = os.environ['VITESS_REFSPEC']
         mode = 'manual trigger'
