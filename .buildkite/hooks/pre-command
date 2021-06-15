@@ -1,5 +1,4 @@
 set -ex
-env
 mkdir -pv .buildkite/gen .buildkite/image
 buildkite-agent artifact download '.buildkite/gen/*' ./ || true
 buildkite-agent artifact download '.buildkite/image/**/*.tar.gz' ./ || true
