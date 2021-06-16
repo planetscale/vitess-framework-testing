@@ -29,7 +29,7 @@ def generate_build_step(framework):
 
 test_template = """
   - key: test-${SERVICE}-${FRAMEWORK_SLUG}
-    label: "Test ${FRAMEWORK} against ${SERVER} ${DIALECT}"
+    label: "Test ${FRAMEWORK} against ${SERVER} ${DIALECT}${SHARDED_TEXT}"
     depends_on: ${DEPENDS_ON}
     plugins:
       - docker-compose#v3.7.0:
@@ -51,6 +51,7 @@ def generate_test_step(server, dialect, num_shards, depends_on, framework):
     service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
     framework_slug = framework.replace('/', '_').replace(':', '_')
     step = test_template.replace('${SERVER}', server).replace('${DIALECT}', dialect).replace('${DIALECT_SHORT}', dialect.replace('.', '')).replace('${SERVICE}', service).replace('${NUM_SHARDS}', str(num_shards))
+    step = step.replace('${SHARDED_TEXT}', ' (sharded)' if num_shards > 1 else '')
     step = step.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
     if(depends_on is None):
         step = '\n'.join([line for line in step.split('\n') if 'depends_on:' not in line])
