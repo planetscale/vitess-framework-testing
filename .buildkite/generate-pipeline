@@ -19,7 +19,7 @@ services:
 
 build_template = """
   - key: build-${FRAMEWORK_SLUG}
-    label: "Build test container image for ${FRAMEWORK}"
+    label: "Build test image for ${FRAMEWORK}"
     command: ./.buildkite/build-image '${FRAMEWORK}'
 """
 def generate_build_step(framework):
@@ -29,7 +29,7 @@ def generate_build_step(framework):
 
 test_template = """
   - key: test-${SERVICE}-${FRAMEWORK_SLUG}
-    label: "Test ${FRAMEWORK} against ${SERVER} ${DIALECT}${SHARDED_TEXT}"
+    label: "${FRAMEWORK} x ${SERVER} ${DIALECT}${SHARDED_TEXT}"
     depends_on: ${DEPENDS_ON}
     plugins:
       - docker-compose#v3.7.0:
