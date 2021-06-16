@@ -121,7 +121,7 @@ else:
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE)
     for line in agent.stdout:
         line = line.decode('ascii').strip()
-        write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line).replace('${PULL_POLICY}', 'always'))
+        write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line).replace('${PULL_POLICY}', 'never'))
         if(mode == 'pull request'):
             result.append(generate_build_step(line))
             result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
