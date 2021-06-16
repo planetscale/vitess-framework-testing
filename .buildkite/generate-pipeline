@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 
+# compose_template {{{
 compose_template = """
 version: '3.8'
 services:
@@ -16,7 +17,9 @@ services:
     links:
       - db
 """
+# }}}
 
+# build_template/generate_build_step() {{{
 build_template = """
   - key: build-${FRAMEWORK_SLUG}
     label: "Build test image for ${FRAMEWORK}"
@@ -26,7 +29,9 @@ def generate_build_step(framework):
     framework_slug = framework.replace('/', '_').replace(':', '_')
     step = build_template.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
     return step
+# }}}
 
+# test_template/generate_test_step() {{{
 test_template = """
   - key: test-${SERVICE}-${FRAMEWORK_SLUG}
     label: "${FRAMEWORK} x ${SERVER} ${DIALECT}${SHARDED_TEXT}"
@@ -58,7 +63,9 @@ def generate_test_step(server, dialect, num_shards, depends_on, framework):
     else:
         step = step.replace('${DEPENDS_ON}', depends_on + '-' + framework_slug)
     return step
+# }}}
 
+# push_template/generate_push_step() {{{
 push_template = """
   - key: push-${FRAMEWORK_SLUG}
     label: "Push container image for ${FRAMEWORK}"
@@ -71,6 +78,7 @@ def generate_push_step(framework):
     framework_slug = framework.replace('/', '_').replace(':', '_')
     step = push_template.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
     return step
+# }}}
 
 def read(path):
     f = open(path, 'r')
