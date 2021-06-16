@@ -19,7 +19,8 @@ services:
 """
 def generate_compose(framework, pull_policy):
     compose = compose_template.replace('${FRAMEWORK}', framework).replace('${PULL_POLICY}', pull_policy)
-    with open('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml') as f:
+    filename = '.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml'
+    with open(filename) as f:
         f.write(compose)
 # }}}
 
