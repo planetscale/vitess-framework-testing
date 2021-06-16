@@ -91,7 +91,7 @@ except FileExistsError:
     pass
 
 mode = 'pull request'
-if(os.environ['BUILDKITE_BRANCH'] == 'buildkite'):
+if(os.environ['BUILDKITE_BRANCH'] == 'master'):
     try:
         # curl -X POST -H "Authorization: Bearer YOUR_TOKEN_HERE" 'https://api.buildkite.com/v2/organizations/planetscale/pipelines/vitess-framework-testing/builds' -d '{"commit":"HEAD","branch":"buildkite","message":"Kicking off a manual run","env":{"VITESS_REFSPEC":"master"}}'
         vitess_refspec = os.environ['VITESS_REFSPEC']
