@@ -13,6 +13,7 @@ frameworks:
   - 'mysqldump/import'
   - 'php/drupal'
   - 'php/laravel'
+  - 'php/mysqlnd'
   - 'python/django'
   - 'python/PyMySQL'
   - 'python/mysqlclient'
