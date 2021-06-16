@@ -17,6 +17,10 @@ services:
     links:
       - db
 """
+def generate_compose(framework, pull_policy):
+    compose = compose_template.replace('${FRAMEWORK}', framework).replace('${PULL_POLICY}', pull_policy)
+    with open('.buildkite/gen/docker-compose'. + line.replace('/', '_').replace(':', '_') + '.yml') as f:
+        f.write(compose)
 # }}}
 
 # build_template/generate_build_step() {{{
@@ -80,15 +84,6 @@ def generate_push_step(framework):
     return step
 # }}}
 
-def read(path):
-    f = open(path, 'r')
-    return f.read()
-
-def write(path, string):
-    print('--- writing ', path)
-    f = open(path, 'w')
-    f.write(string)
-
 try:
     os.mkdir(".buildkite/gen")
 except FileExistsError:
@@ -108,7 +103,7 @@ if(mode == 'manual trigger'):
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'frameworks'], stdout = subprocess.PIPE)
     for line in agent.stdout:
         line = line.decode('ascii').strip()
-        write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line).replace('${PULL_POLICY}', 'always'))
+        generate_compose(line, 'always')
         result.append(generate_test_step('vttestserver', '5.7', 1, None, line))
         result.append(generate_test_step('vttestserver', '8.0', 1, None, line))
         result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
@@ -121,7 +116,7 @@ else:
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE)
     for line in agent.stdout:
         line = line.decode('ascii').strip()
-        write('.buildkite/gen/docker-compose.' + line.replace('/', '_').replace(':', '_') + '.yml', compose_template.replace('${FRAMEWORK}', line).replace('${PULL_POLICY}', 'never'))
+        generate_compose(line, 'never')
         if(mode == 'pull request'):
             result.append(generate_build_step(line))
             result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
