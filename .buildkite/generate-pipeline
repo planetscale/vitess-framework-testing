@@ -109,35 +109,35 @@ except KeyError:
 result = ['  - wait']
 if(mode == Mode.MANUAL_TRIGGER):
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'frameworks'], stdout = subprocess.PIPE)
-    for line in agent.stdout:
-        line = line.decode('ascii').strip()
-        generate_compose(line, 'always')
-        result.append(generate_test_step('vttestserver', '5.7', 1, None, line))
-        result.append(generate_test_step('vttestserver', '8.0', 1, None, line))
-        result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
-        result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
+    frameworks = json.load(agent.stdout)
+    for framework in frameworks:
+        generate_compose(framework, 'always')
+        result.append(generate_test_step('vttestserver', '5.7', 1, None, framework))
+        result.append(generate_test_step('vttestserver', '8.0', 1, None, framework))
+        result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', framework))
+        result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', framework))
 else:
     # This will throw an error when changed-frameworks isn't set, which happens
     #    when the branch has no changed frameworks.  It doesn't cause any
     #    issues, though, because it _also_ produces empty stdout, which means
     #    that no further pipeline is generated.
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE)
-    for line in agent.stdout:
-        line = line.decode('ascii').strip()
-        generate_compose(line, 'never')
+    frameworks = json.load(agent.stdout)
+    for framework in frameworks:
+        generate_compose(framework, 'never')
         if(mode == Mode.PULL_REQUEST):
-            result.append(generate_build_step(line))
-            result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
-            result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
-            result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', line))
-            result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', line))
-            result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
-            result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
+            result.append(generate_build_step(framework))
+            result.append(generate_test_step('MySQL', '5.7', 1, 'build', framework))
+            result.append(generate_test_step('MySQL', '8.0', 1, 'build', framework))
+            result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', framework))
+            result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', framework))
+            result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', framework))
+            result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', framework))
         elif(mode == Mode.MASTER_COMMIT):
-            result.append(generate_build_step(line))
-            result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
-            result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
-            result.append(generate_push_step(line))
+            result.append(generate_build_step(framework))
+            result.append(generate_test_step('MySQL', '5.7', 1, 'build', framework))
+            result.append(generate_test_step('MySQL', '8.0', 1, 'build', framework))
+            result.append(generate_push_step(framework))
 result = '\n'.join(result)
 
 print(result)

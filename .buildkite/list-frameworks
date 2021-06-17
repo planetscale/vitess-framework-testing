@@ -1,12 +1,10 @@
 #!/bin/bash -ex
 dir="$(dirname "${0}")"
 pip3 install pyyaml
-export OUTPUT=plain
+export OUTPUT=json
 ./tools/get-frameworks | buildkite-agent meta-data set 'frameworks'
 export FILTER_FROM_STDIN=1
 frameworks="$("${dir}/get-changed-files" | ./tools/get-frameworks)"
-echo "${frameworks}"
-if [ "${frameworks}" != '' ]; then
-	echo "${frameworks}" | buildkite-agent meta-data set 'changed-frameworks'
-fi
+echo "${frameworks}" | jq
+echo "${frameworks}" | buildkite-agent meta-data set 'changed-frameworks'
 
