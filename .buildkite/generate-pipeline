@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
+import enum
 import os
 import subprocess
 import sys
+
+class Mode(enum.Enum):
+    MANUAL_TRIGGER = 1
+    MASTER_COMMIT = 2
+    PULL_REQUEST = 3
 
 # compose_template {{{
 compose_template = """
@@ -93,15 +99,15 @@ except FileExistsError:
 try:
     # curl -X POST -H "Authorization: Bearer YOUR_TOKEN_HERE" 'https://api.buildkite.com/v2/organizations/planetscale/pipelines/vitess-framework-testing/builds' -d '{"commit":"HEAD","branch":"buildkite","message":"Kicking off a manual run","env":{"VITESS_REFSPEC":"master"}}'
     vitess_refspec = os.environ['VITESS_REFSPEC']
-    mode = 'manual trigger'
+    mode = Mode.MANUAL_TRIGGER
 except KeyError:
     if(os.environ['BUILDKITE_BRANCH'] == 'master'):
-        mode = 'master commit'
+        mode = Mode.MASTER_COMMIT
     else:
-        mode = 'pull request'
+        mode = Mode.PULL_REQUEST
 
 result = ['  - wait']
-if(mode == 'manual trigger'):
+if(mode == Mode.MANUAL_TRIGGER):
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'frameworks'], stdout = subprocess.PIPE)
     for line in agent.stdout:
         line = line.decode('ascii').strip()
@@ -119,7 +125,7 @@ else:
     for line in agent.stdout:
         line = line.decode('ascii').strip()
         generate_compose(line, 'never')
-        if(mode == 'pull request'):
+        if(mode == Mode.PULL_REQUEST):
             result.append(generate_build_step(line))
             result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
             result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
@@ -127,7 +133,7 @@ else:
             result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', line))
             result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', line))
             result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', line))
-        elif(mode == 'master commit'):
+        elif(mode == Mode.MASTER_COMMIT):
             result.append(generate_build_step(line))
             result.append(generate_test_step('MySQL', '5.7', 1, 'build', line))
             result.append(generate_test_step('MySQL', '8.0', 1, 'build', line))
