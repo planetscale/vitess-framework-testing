@@ -118,10 +118,6 @@ if(mode == Mode.MANUAL_TRIGGER):
         result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', framework))
         result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', framework))
 else:
-    # This will throw an error when changed-frameworks isn't set, which happens
-    #    when the branch has no changed frameworks.  It doesn't cause any
-    #    issues, though, because it _also_ produces empty stdout, which means
-    #    that no further pipeline is generated.
     agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE)
     frameworks = json.load(agent.stdout)
     for framework in frameworks:
