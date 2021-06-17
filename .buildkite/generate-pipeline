@@ -33,7 +33,7 @@ def generate_compose(framework, pull_policy):
 # build_template/generate_build_step() {{{
 build_template = """
   - key: build-${FRAMEWORK_SLUG}
-    label: "Build test image for ${FRAMEWORK}"
+    label: "Build ${FRAMEWORK}"
     command: ./.buildkite/build-image '${FRAMEWORK}'
 """
 def generate_build_step(framework):
