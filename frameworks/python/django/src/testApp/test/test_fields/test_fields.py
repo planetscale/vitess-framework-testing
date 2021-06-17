@@ -6,7 +6,7 @@ from testApp.models import Person, Event, Server
 from django.core.files.uploadedfile import SimpleUploadedFile
 from pprint import pprint
 from model_bakery import baker
-from datetime import datetime, timedelta, time
+from datetime import date, datetime, timedelta, time
 from uuid import UUID
 from decimal import Decimal
 
@@ -45,8 +45,10 @@ class FieldsTestCase(TestCase):
         self.assertIsInstance(event_1.rating, float)
 
         # testing date and datetime fields
-        self.assertEqual(event_1.start_date_time.date(), datetime.today().date())
-        self.assertEqual(event_1.start_date, datetime.today().date())
+        self.assertIsNotNone(event_1.start_date_time)
+        self.assertIsInstance(event_1.start_date_time, datetime)
+        self.assertIsNotNone(event_1.start_date)
+        self.assertIsInstance(event_1.start_date, date)
 
         # testing duration field
         self.assertIsNotNone(event_1.duration)
