@@ -102,7 +102,7 @@ try:
     vitess_refspec = os.environ['VITESS_REFSPEC']
     mode = Mode.MANUAL_TRIGGER
 except KeyError:
-    if(os.environ['BUILDKITE_BRANCH'] == 'buildkite'):
+    if(os.environ['BUILDKITE_BRANCH'] == 'master'):
         mode = Mode.MASTER_COMMIT
     else:
         mode = Mode.PULL_REQUEST
