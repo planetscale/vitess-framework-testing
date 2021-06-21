@@ -10,6 +10,10 @@ from testApp.models import (
     Restaurant,
     Place,
     Chef,
+    Person,
+    MyPerson,
+    OrderedPerson,
+    ProductReview
 )
 from django.core.exceptions import FieldError
 
@@ -99,4 +103,30 @@ class TestModelInheritance(TestCase):
             Place.objects.get(name="McLarens").restaurant,
             Restaurant.objects.get(name="McLarens"),
         )
-        
+    
+    def test_proxy_models(self):
+        test_person = Person.objects.create(first_name = "John", last_name="Doe")
+        test_my_person = MyPerson.objects.create(first_name = "Jane", last_name="Doe")
+        # The MyPerson class operates on the same database table as its parent Person class.
+        # In particular, any new instances of Person will also be accessible through MyPerson, and vice-versa
+        self.assertIsInstance(Person.objects.get(first_name='Jane'), Person)
+        self.assertIsInstance(MyPerson.objects.get(first_name='John'), MyPerson)
+
+    def test_ordered_proxy_models(self):
+        test_person = Person.objects.create(first_name = "John", last_name="Doe")
+        test_ordered_person = OrderedPerson.objects.create(first_name = "Jane", last_name="Dean")
+        last_name_list = OrderedPerson.objects.values('last_name')  
+        self.assertSequenceEqual(
+            last_name_list,
+            [
+                {'last_name':'Dean'},
+                {'last_name':'Doe'}
+            ]
+            )
+    
+    def test_multiple_inheritence(self):
+        self.assertEqual(
+            str(ProductReview.mro()),
+            "[<class 'testApp.models.ProductReview'>, <class 'testApp.models.Product'>, <class 'testApp.models.Review'>, <class 'django.db.models.base.Model'>, <class 'object'>]"
+
+        )

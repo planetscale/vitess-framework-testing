@@ -140,7 +140,7 @@ class Restaurant(Place, Rating):
 
     class Meta(Rating.Meta):
         db_table = "my_restaurant"
-=======
+
 class HQAddress(models.Model):
     house_no = models.CharField(max_length=100)
     street = models.CharField(max_length=100)
@@ -184,3 +184,29 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=100)
     authors = models.ManyToManyField(to=Author)
+
+# proxy models
+
+class MyPerson(Person):
+    class Meta:
+        proxy = True
+
+    def do_something(self):
+        # ...
+        pass
+
+class OrderedPerson(Person):
+    class Meta:
+        ordering = ["last_name"]
+        proxy = True
+
+# multiple inheritance
+class Product:
+    product_id = models.AutoField(primary_key=True)
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    ...
+
+class ProductReview(Product, Review):
+    pass
