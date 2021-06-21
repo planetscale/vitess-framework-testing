@@ -1,6 +1,6 @@
 FROM ruby:2.6.5-alpine
 
-RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata
+RUN apk add --no-cache yarn sqlite mariadb-connector-c tzdata shared-mime-info
 RUN gem update bundler
 
 ADD src/Gemfile /src/Gemfile
