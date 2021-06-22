@@ -2,7 +2,7 @@
 #  https://docs.djangoproject.com/en/3.2/topics/db/models/#fields
 
 from django.test import TestCase
-from testApp.models import Person, Event, Server
+from testApp.models.fields import Event, Server
 from django.core.files.uploadedfile import SimpleUploadedFile
 from pprint import pprint
 from model_bakery import baker

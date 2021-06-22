@@ -2,7 +2,7 @@
 #  https://docs.djangoproject.com/en/3.2/topics/db/models
 
 from django.test import TestCase
-from testApp.models import Person
+from testApp.models.crud import Person
 
 class CrudTestCase(TestCase):
 

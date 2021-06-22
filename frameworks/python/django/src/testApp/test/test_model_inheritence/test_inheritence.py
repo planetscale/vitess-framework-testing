@@ -2,7 +2,7 @@
 #  https://docs.djangoproject.com/en/3.2/topics/db/models/#model-inheritance
 
 from django.test import TestCase
-from testApp.models import (
+from testApp.models.inheritance import (
     CommonInfo,
     Worker,
     Student,
@@ -127,6 +127,6 @@ class TestModelInheritance(TestCase):
     def test_multiple_inheritence(self):
         self.assertEqual(
             str(ProductReview.mro()),
-            "[<class 'testApp.models.ProductReview'>, <class 'testApp.models.Product'>, <class 'testApp.models.Review'>, <class 'django.db.models.base.Model'>, <class 'object'>]"
+            "[<class 'testApp.models.inheritance.ProductReview'>, <class 'testApp.models.inheritance.Product'>, <class 'testApp.models.inheritance.Review'>, <class 'django.db.models.base.Model'>, <class 'object'>]"
 
         )
