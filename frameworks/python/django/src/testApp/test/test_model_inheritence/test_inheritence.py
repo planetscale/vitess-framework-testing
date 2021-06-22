@@ -122,7 +122,7 @@ class TestModelInheritance(TestCase):
                 {'last_name':'Dean'},
                 {'last_name':'Doe'}
             ]
-            )
+        )
     
     def test_multiple_inheritence(self):
         self.assertEqual(
