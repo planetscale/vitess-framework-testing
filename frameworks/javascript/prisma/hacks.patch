@@ -2,7 +2,7 @@ diff --git a/src/packages/sdk/src/convertCredentials.ts b/src/packages/sdk/src/c
 index 3bcc844f..45a0b11b 100644
 --- a/src/packages/sdk/src/convertCredentials.ts
 +++ b/src/packages/sdk/src/convertCredentials.ts
-@@ -128,7 +128,7 @@ export function uriToCredentials(
+@@ -140,7 +140,7 @@ export function uriToCredentials(
      database,
      schema: schema || defaultSchema,
      uri: connectionString,
@@ -11,10 +11,10 @@ index 3bcc844f..45a0b11b 100644
      socket: socket || undefined,
      extraFields,
    }
-diff --git a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
+diff --git a/src/packages/integration-tests/src/__tests__/integration/mariadb/__database.ts b/src/packages/integration-tests/src/__tests__/integration/mariadb/__database.ts
 index f143c928..3edcbac1 100644
---- a/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
-+++ b/src/packages/tests/src/__tests__/integration/mariadb/__database.ts
+--- a/src/packages/integration-tests/src/__tests__/integration/mariadb/__database.ts
++++ b/src/packages/integration-tests/src/__tests__/integration/mariadb/__database.ts
 @@ -15,15 +15,22 @@ export const database = {
        port: credentials.port,
        user: credentials.user,
@@ -52,10 +52,10 @@ index f143c928..3edcbac1 100644
    const credentials = uriToCredentials(connectionString)
  
    return {
-diff --git a/src/packages/tests/src/__tests__/integration/mysql/__database.ts b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
+diff --git a/src/packages/integration-tests/src/__tests__/integration/mysql/__database.ts b/src/packages/integration-tests/src/__tests__/integration/mysql/__database.ts
 index 2a1d7a85..a21f66fe 100644
---- a/src/packages/tests/src/__tests__/integration/mysql/__database.ts
-+++ b/src/packages/tests/src/__tests__/integration/mysql/__database.ts
+--- a/src/packages/integration-tests/src/__tests__/integration/mysql/__database.ts
++++ b/src/packages/integration-tests/src/__tests__/integration/mysql/__database.ts
 @@ -14,15 +14,22 @@ export const database = {
        port: credentials.port,
        user: credentials.user,
