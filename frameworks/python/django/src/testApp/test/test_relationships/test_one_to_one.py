@@ -3,7 +3,7 @@
 #  https://docs.djangoproject.com/en/3.2/topics/db/examples/one_to_one/
 
 from django.test import TestCase
-from testApp.models import HQAddress,Company
+from testApp.models.relationships import HQAddress,Company
 from django.core.exceptions import ObjectDoesNotExist
 
 class TestOneToOne(TestCase):

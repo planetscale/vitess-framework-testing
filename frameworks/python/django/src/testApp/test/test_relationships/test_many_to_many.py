@@ -3,7 +3,7 @@
 #  https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_many/
 
 from django.test import TestCase
-from testApp.models import Book, Author
+from testApp.models.relationships import Book, Author
 from datetime import date
 
 # testing many_to_many relationship with help of example of a book and author
