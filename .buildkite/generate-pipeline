@@ -8,7 +8,7 @@ import sys
 
 class Mode(enum.Enum):
     MANUAL_TRIGGER = 1
-    MASTER_COMMIT = 2
+    MAIN_COMMIT = 2
     PULL_REQUEST = 3
 
 # compose_template {{{
@@ -98,12 +98,12 @@ except FileExistsError:
     pass
 
 try:
-    # curl -X POST -H "Authorization: Bearer YOUR_TOKEN_HERE" 'https://api.buildkite.com/v2/organizations/planetscale/pipelines/vitess-framework-testing/builds' -d '{"commit":"HEAD","branch":"buildkite","message":"Kicking off a manual run","env":{"VITESS_REFSPEC":"master"}}'
+    # curl -X POST -H "Authorization: Bearer YOUR_TOKEN_HERE" 'https://api.buildkite.com/v2/organizations/planetscale/pipelines/vitess-framework-testing/builds' -d '{"commit":"HEAD","branch":"buildkite","message":"Kicking off a manual run","env":{"VITESS_REFSPEC":"main"}}'
     vitess_refspec = os.environ['VITESS_REFSPEC']
     mode = Mode.MANUAL_TRIGGER
 except KeyError:
-    if(os.environ['BUILDKITE_BRANCH'] == 'master'):
-        mode = Mode.MASTER_COMMIT
+    if(os.environ['BUILDKITE_BRANCH'] == 'main'):
+        mode = Mode.MAIN_COMMIT
     else:
         mode = Mode.PULL_REQUEST
 
@@ -130,7 +130,7 @@ else:
             result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', framework))
             result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', framework))
             result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', framework))
-        elif(mode == Mode.MASTER_COMMIT):
+        elif(mode == Mode.MAIN_COMMIT):
             result.append(generate_build_step(framework))
             result.append(generate_test_step('MySQL', '5.7', 1, 'build', framework))
             result.append(generate_test_step('MySQL', '8.0', 1, 'build', framework))
