@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-cd upstream/src/packages/tests;
+cd upstream/src/packages/integration-tests;
 
 export TEST_MYSQL_BASE_URI="mysql://${VT_USERNAME}:${VT_PASSWORD}@${VT_HOST}:${VT_PORT}";
 export TEST_MYSQL_URI="${TEST_MYSQL_BASE_URI}/${VT_DATABASE}?sslmode=false";

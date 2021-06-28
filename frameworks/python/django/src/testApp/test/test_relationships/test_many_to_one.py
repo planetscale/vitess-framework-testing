@@ -3,7 +3,7 @@
 #  https://docs.djangoproject.com/en/3.2/topics/db/examples/many_to_one/
 
 from django.test import TestCase
-from testApp.models import Reporter, Article
+from testApp.models.relationships import Reporter, Article
 from datetime import date
 
 
