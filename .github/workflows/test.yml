@@ -2,7 +2,7 @@ name: Pre-merge integration tests
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   determine_frameworks:
