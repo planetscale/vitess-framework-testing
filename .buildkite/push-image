@@ -2,5 +2,6 @@
 
 echo "--- Pushing test image for ${1}"
 image="$(./run.sh generate_image_name "${1}")";
+echo "${GCLOUD_SERVICE_KEY}" | docker login -u _json_key --password-stdin https://gcr.io/
 docker push "${image}";
 
