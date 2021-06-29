@@ -80,7 +80,7 @@ def generate_test_step(server, dialect, num_shards, depends_on, framework):
 # push_template/generate_push_step() {{{
 push_template = """
   - key: push-${FRAMEWORK_SLUG}
-    label: "Push container image for ${FRAMEWORK}"
+    label: "Push ${FRAMEWORK}"
     command: ./.buildkite/push-image '${FRAMEWORK}'
     depends_on:
       - test-mysql57-${FRAMEWORK_SLUG}
