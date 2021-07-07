@@ -1,6 +1,6 @@
 # Framework testing
 
-From a high level, the intention of this repo is to provide a suite of "black box" tests that can be run on-demand by the Vitess project to validate compatibility with MySQL.  CI is provided via Github Actions; the tests themselves are validated by running against vanilla MySQL, and validated tests are run against vttestserver to test Vitess's own compatibility.
+From a high level, the intention of this repo is to provide a suite of "black box" tests that can be run on-demand by the Vitess project to validate compatibility with MySQL.  CI is provided via Buildkite; the tests themselves are validated by running against vanilla MySQL, and validated tests are run against vttestserver to test Vitess's own compatibility.
 
 #### Running tests locally
 
