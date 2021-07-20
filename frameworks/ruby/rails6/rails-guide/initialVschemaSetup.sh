@@ -9,12 +9,9 @@ mysql_run "alter vschema on test.active_storage_attachments add vindex \`null\`(
 mysql_run "alter vschema on test.active_storage_blobs add vindex \`null\`(id) using \`null\`"
 
 # User created tables
-# TODO: Add vschema for vindex and authoritative column list for test.users column.
-# mysql_run "alter vschema on test.users add vindex \`binary_md5\`(id) using \`binary_md5\`;"
-add_sequence_table "users"
+add_sequence_and_vindex "users"
 
-# TODO: Add vschema for vindex and authoritative column list for test.microposts column.
-# mysql_run "alter vschema on test.microposts add vindex \`binary_md5\`(user_id) using \`binary_md5\`"
+add_binary_md5_vindex "microposts" "user_id"
 add_sequence_table "microposts"
 
 add_binary_md5_vindex "relationships" "follower_id"
@@ -132,8 +129,7 @@ add_binary_md5_vindex "appointments" "patient_id"
 add_sequence_table "appointments"
 
 # These 3 tables have a similar structure as the one above
-# TODO: Add assemblies table authoritative columns, as it is required while joining with assemblies_parts.
-add_sequence_table "assemblies"
+add_sequence_and_vindex "assemblies"
 add_sequence_and_vindex "parts"
 add_binary_md5_vindex "assemblies_parts" "part_id"
 
@@ -141,14 +137,12 @@ add_sequence_and_vindex "supplier2s"
 add_sequence_and_vindex "account3s"
 
 # These 3 tables have a similar structure as seen above
-# TODO: Add assembly2s table authoritative columns, as it is required while joining with assembly2s_part2s.
-add_sequence_table "assembly2s"
+add_sequence_and_vindex "assembly2s"
 add_sequence_and_vindex "part2s"
 add_binary_md5_vindex "assembly2s_part2s" "part2_id"
 
 # These 3 tables have a similar structure as seen above
-# TODO: Add assembly3s table authoritative columns, as it is required while joining with manifests.
-add_sequence_table "assembly3s"
+add_sequence_and_vindex "assembly3s"
 add_sequence_and_vindex "part3s"
 add_binary_md5_vindex "manifests" "part3_id"
 add_sequence_table "manifests"
@@ -174,8 +168,7 @@ mysql_run "alter vschema on test.employee2s add vindex \`null\`(id) using \`null
 add_sequence_and_vindex "employee3s"
 
 # These 3 tables have a similar structure as seen above
-# TODO: Add assembly4s table authoritative columns, as it is required while joining with assembly4s_part4s.
-add_sequence_table "assembly4s"
+add_sequence_and_vindex "assembly4s"
 add_sequence_and_vindex "part4s"
 add_binary_md5_vindex "assembly4s_part4s" "part4_id"
 
