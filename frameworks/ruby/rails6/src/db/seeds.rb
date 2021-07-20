@@ -20,7 +20,7 @@ User.create!(name:  "Example User",
               activated_at: Time.zone.now)
 end
 
-sleep(5.seconds)
+sleep(10.seconds)
 
 # Generate microposts for a subset of users.
 users = User.order(:created_at).take(6)
