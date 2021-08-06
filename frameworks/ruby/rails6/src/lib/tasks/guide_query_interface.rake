@@ -106,11 +106,15 @@ namespace :guide_query_interface do
     # While ActiveRecord explicitly does not make any ordering guarantees
     #    with .take(), MySQL provides implicit ordering by primary key, so
     #    we can expect specific results here
-    raise "customer wrong 4" unless Customer2.take.first_name == 'One'
+    if ENV['VT_NUM_SHARDS'] == "1"
+      raise "customer wrong 4" unless Customer2.take.first_name == 'One'
+    end
     c = Customer2.take(2)
     raise "count wrong 2" unless c.size == 2
-    raise "customer wrong 5" unless c[0].first_name == 'One'
-    raise "customer wrong 6" unless c[1].first_name == 'Two'
+    if ENV['VT_NUM_SHARDS'] == "1"
+      raise "customer wrong 5" unless c[0].first_name == 'One'
+      raise "customer wrong 6" unless c[1].first_name == 'Two'
+    end
 
     # 2.1.3 first
     raise "customer wrong 7" unless Customer2.first.first_name == 'One'
@@ -300,13 +304,13 @@ namespace :guide_query_interface do
   end
 
   task :step_6 do
-    customers = Customer2.limit(5).to_a
+    customers = Customer2.limit(5).order(:id).to_a
     raise 'count wrong 1' unless customers.size == 5
     (0..4).each do |i|
       raise "id wrong 1 (#{i})" unless customers[i].id == (i + 1)
     end
 
-    customers = Customer2.limit(5).offset(4).to_a
+    customers = Customer2.limit(5).offset(4).order(:id).to_a
     raise 'count wrong 2' unless customers.size == 5
     (0..4).each do |i|
       raise "id wrong 2 (#{i})" unless customers[i].id == (i + 1 + 4)
@@ -345,7 +349,7 @@ namespace :guide_query_interface do
     books = Book6.where('id > 100').limit(20).order('id DESC').unscope(:order).to_a
     raise 'count wrong 2' unless books.size == 20
     (0..19).each do |i|
-      raise "id wrong 2 (#{i})" unless books[i].id == (101 + i)
+      raise "id wrong 2 (#{i})" unless books[i].id > 100
     end
   end
 
@@ -393,13 +397,13 @@ namespace :guide_query_interface do
   end
 
   task :step_9_5 do
-    customers = Customer2.where('orders_count > 7')
+    customers = Customer2.where('orders_count > 7').order(:id)
     raise 'count wrong 1' unless customers.size == 3
     raise 'id wrong 1' unless customers[0].id == 8
     raise 'id wrong 2' unless customers[1].id == 9
     raise 'id wrong 3' unless customers[2].id == 10
 
-    customers = Customer2.where('orders_count > 7').reverse_order
+    customers = Customer2.where('orders_count > 7').order(:id).reverse_order
     raise 'count wrong 2' unless customers.size == 3
     raise 'id wrong 4' unless customers[0].id == 10
     raise 'id wrong 5' unless customers[1].id == 9
@@ -721,7 +725,7 @@ namespace :guide_query_interface do
     raise 'count wrong 7' unless ids.size == 12
 
     # ids
-    ids = Customer2.ids
+    ids = Customer2.ids.sort
     raise 'ids wrong' unless ids == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
   end
 
