@@ -63,12 +63,18 @@ function mysql_run(){
 function assert_mysql_output(){
   #$1 Query to execute
   #$2 outputs
-  query_output=$(mysql_run "$1")
-  if [[ "$query_output" != "$2" ]]
-  then
-    echo -e "Query: $1 got wrong output \nExpected: $2 \nGot: $query_output"
-    exit 1
-  fi
+  
+  endtime=$((SECONDS+10))
+  while [ $SECONDS -lt $end ]; do
+    query_output=$(mysql_run "$1")
+    if [[ "$query_output" == "$2" ]]
+    then
+      exit 0
+    fi
+    sleep 1
+  done
+  echo -e "Query: $1 got wrong output \nExpected: $2 \nGot: $query_output"
+  exit 1
 }
 
 # assert_matches is used to assert that the two strings match
