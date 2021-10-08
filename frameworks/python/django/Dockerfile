@@ -14,6 +14,8 @@ RUN \
 	pip install --no-cache-dir -r /src/requirements.txt && \
 	apk del .build-deps
 
+RUN apk update && apk add mysql-client && rm -f /var/cache/apk/*
+
 ADD src /src
 WORKDIR /src
-ENTRYPOINT ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py test -v 2"]
+ENTRYPOINT ["./run.sh"]

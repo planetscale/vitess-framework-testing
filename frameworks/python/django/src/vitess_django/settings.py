@@ -81,6 +81,14 @@ DATABASES = {
         'PASSWORD': os.environ['VT_PASSWORD'],
         'HOST': os.environ['VT_HOST'],
         'PORT': os.environ['VT_PORT'],
+        'TEST' : {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['VT_DATABASE'],
+            'USER': os.environ['VT_USERNAME'],
+            'PASSWORD': os.environ['VT_PASSWORD'],
+            'HOST': os.environ['VT_HOST'],
+            'PORT': os.environ['VT_PORT'],
+        }
     }
 }
 
