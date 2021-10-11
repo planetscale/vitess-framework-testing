@@ -24,19 +24,19 @@ function add_sequence_table(){
 function add_sequence_and_vindex(){
   # $1 is the name of the table
   if [ "$VT_NUM_SHARDS" -gt "1" ]; then
-    add_binary_md5_vindex "$1" "id"
+    add_binary_vindex "$1" "id"
     add_sequence_table "$1"
   else
     echo "Running unsharded mode"
   fi
 }
 
-# Adds a binary_md5 vindex for a given table
-function add_binary_md5_vindex(){
+# Adds a binary vindex for a given table
+function add_binary_vindex(){
   # $1 is the name of the table
   # $2 is the name of the column to use
   if [ "$VT_NUM_SHARDS" -gt "1" ]; then
-    mysql_run "alter vschema on test.\`${1}\` add vindex \`binary_md5\`(${2}) using \`binary_md5\`;"
+    mysql_run "alter vschema on test.\`${1}\` add vindex \`binary\`(${2}) using \`binary\`;"
   else
     echo "Running unsharded mode"
   fi
