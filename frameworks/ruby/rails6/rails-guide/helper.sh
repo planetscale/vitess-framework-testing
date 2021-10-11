@@ -65,7 +65,7 @@ function assert_mysql_output(){
   #$2 outputs
   
   endtime=$((SECONDS+10))
-  while [ $SECONDS -lt $end ]; do
+  while [ $SECONDS -lt $endtime ]; do
     query_output=$(mysql_run "$1")
     if [[ "$query_output" == "$2" ]]
     then
