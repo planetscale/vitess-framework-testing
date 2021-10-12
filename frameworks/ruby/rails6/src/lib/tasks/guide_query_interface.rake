@@ -496,7 +496,7 @@ namespace :guide_query_interface do
   end
 
   task :step_13_2 do
-    customers = Customer2.left_outer_joins(:reviews).distinct.select('customer2s.*, COUNT(reviews.id) AS reviews_count').group('customer2s.id').to_a
+    customers = Customer2.left_outer_joins(:reviews).distinct.select('customer2s.id, COUNT(reviews.id) AS reviews_count').group('customer2s.id').to_a
     raise 'count wrong 1' unless customers.count == 10
     customers.each do |c|
       raise "count wrong 2 (#{c.id})" unless c.reviews_count == 0
