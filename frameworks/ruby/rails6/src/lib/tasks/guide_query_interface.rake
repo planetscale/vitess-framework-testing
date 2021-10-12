@@ -332,11 +332,14 @@ namespace :guide_query_interface do
   end
 
   task :step_8 do
-    status_counts = Order2.group(:status).having("COUNT(*) > 4").count
-    raise 'count wrong 1' unless status_counts.size == 3
-    raise 'count wrong 2' unless status_counts['being_packed'] == 8
-    raise 'count wrong 3' unless status_counts['shipped'] == 6
-    raise 'count wrong 4' unless status_counts['complete'] == 37
+    # Vitess does not yet support filtering on the result of aggregations for sharded keyspaces
+    if ENV['VT_NUM_SHARDS'] == "1"
+      status_counts = Order2.group(:status).having("COUNT(*) > 4").count
+      raise 'count wrong 1' unless status_counts.size == 3
+      raise 'count wrong 2' unless status_counts['being_packed'] == 8
+      raise 'count wrong 3' unless status_counts['shipped'] == 6
+      raise 'count wrong 4' unless status_counts['complete'] == 37
+    end
   end
 
   task :step_9_1 do
@@ -481,7 +484,7 @@ namespace :guide_query_interface do
     raise 'count wrong 3' unless books.count == 220
 
     authors = Author5.joins(books: [{orders: :customer}, :supplier])
-    raise 'count wrong 4' unless authors.count == 220
+    raise 'count wrong 4' unless authors.length() == 220
 
     time_range = (Time.now.midnight - 1.day)..(Time.now.midnight + 1.day)
     customers = Customer2.joins(:orders).where('order2s.created_at' => time_range).distinct.to_a
@@ -770,17 +773,20 @@ namespace :guide_query_interface do
     raise 'count wrong 3' unless Customer2.includes(:orders).where(first_name: 'Three', orders: { status: :being_packed }).count == 1
     raise 'count wrong 4' unless Customer2.includes(:orders).where(first_name: 'Three', orders: { status: :cancelled }).count == 0
 
-    # average
-    raise 'average wrong 1' unless Book6.average(:price) == 617
-    raise 'average wrong 2' unless Book6.where(author: Author5.find(10)).average(:price) == 652
+    # Vitess does not yet support aggregation functions in cross-shard queries
+    if ENV['VT_NUM_SHARDS'] == "1"
+      # average
+      raise 'average wrong 1' unless Book6.average(:price) == 617
+      raise 'average wrong 2' unless Book6.where(author: Author5.find(10)).average(:price) == 652
 
-    # minimum
-    raise 'minimum wrong 1' unless Book6.minimum(:year_published) == 1703
-    raise 'minimum wrong 2' unless Book6.where(supplier: Supplier5.find(3)).minimum(:year_published) == 2005
+      # minimum
+      raise 'minimum wrong 1' unless Book6.minimum(:year_published) == 1703
+      raise 'minimum wrong 2' unless Book6.where(supplier: Supplier5.find(3)).minimum(:year_published) == 2005
 
-    # maximum
-    raise 'maximum wrong 1' unless Customer2.maximum(:orders_count) == 10
-    raise 'maximum wrong 2' unless Book6.where(year_published: 2010).maximum(:price) == 811
+      # maximum
+      raise 'maximum wrong 1' unless Customer2.maximum(:orders_count) == 10
+      raise 'maximum wrong 2' unless Book6.where(year_published: 2010).maximum(:price) == 811
+    end
 
     # sum
     raise 'sum wrong 1' unless Customer2.sum(:orders_count) == 55
