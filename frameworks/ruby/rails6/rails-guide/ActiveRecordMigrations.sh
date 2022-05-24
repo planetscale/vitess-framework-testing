@@ -508,14 +508,10 @@ function check_change_method(){
       rename_column :product115s, :part_number, :version_number
     end
   end"
+  # add the new table in vschema for sharded keyspace
+  add_sequence_and_vindex "new_product116s"
   # run the migration
   rake_migrate
-  # drop the tables from vschema as well for sharded keyspace
-  drop_table_vschema "join_table_115_117"
-  drop_table_vschema "product117s"
-  # renamed tables must be removed and added again in vschema for sharded keyspace
-  drop_table_vschema "product116s"
-  add_sequence_and_vindex "new_product116s"
   # check the structure of product115s table
   assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL version_number varchar(255) NO 0 created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # check that the tables product117s and join_table_115_117 are deleted and new_product116s is created
@@ -525,12 +521,6 @@ function check_change_method(){
 
   # check that the changes are reversible by doing a rollback
   rails db:rollback
-  # add the tables back into vschema as well for sharded keyspace
-  add_sequence_and_vindex "product117s"
-  add_binary_md5_vindex "join_table_115_117" "products117_id"
-  # renamed tables must be removed and added again in vschema for sharded keyspace
-  drop_table_vschema "new_product116s"
-  add_sequence_and_vindex "product116s"
   # run the same checks as before
   assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL part_number varchar(255) NO MUL 0 product116s_id $BIGINT YES NULL product115_id2 $BIGINT YES MUL NULL"
   assert_mysql_output "select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA = '$VT_DATABASE' and (TABLE_NAME = 'product117s' or TABLE_NAME='join_table_115_117');" "join_table_115_117 product117s"
@@ -538,9 +528,6 @@ function check_change_method(){
 
   # rollback once again
   rails db:rollback
-  # drop the tables from vschema as well for sharded keyspace
-  drop_table_vschema "join_table_115_117"
-  drop_table_vschema "product117s"
   # check the structure of the table product115s
   assert_mysql_output "describe product115s" "id $BIGINT NO PRI NULL auto_increment name varchar(255) YES NULL created_at datetime(6) NO NULL updated_at datetime(6) NO NULL"
   # check that the created tables are also removed

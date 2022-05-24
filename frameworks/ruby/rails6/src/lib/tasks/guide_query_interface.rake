@@ -106,11 +106,15 @@ namespace :guide_query_interface do
     # While ActiveRecord explicitly does not make any ordering guarantees
     #    with .take(), MySQL provides implicit ordering by primary key, so
     #    we can expect specific results here
-    raise "customer wrong 4" unless Customer2.take.first_name == 'One'
+    if ENV['VT_NUM_SHARDS'] == "1"
+      raise "customer wrong 4" unless Customer2.take.first_name == 'One'
+    end
     c = Customer2.take(2)
     raise "count wrong 2" unless c.size == 2
-    raise "customer wrong 5" unless c[0].first_name == 'One'
-    raise "customer wrong 6" unless c[1].first_name == 'Two'
+    if ENV['VT_NUM_SHARDS'] == "1"
+      raise "customer wrong 5" unless c[0].first_name == 'One'
+      raise "customer wrong 6" unless c[1].first_name == 'Two'
+    end
 
     # 2.1.3 first
     raise "customer wrong 7" unless Customer2.first.first_name == 'One'
@@ -300,13 +304,13 @@ namespace :guide_query_interface do
   end
 
   task :step_6 do
-    customers = Customer2.limit(5).to_a
+    customers = Customer2.limit(5).order(:id).to_a
     raise 'count wrong 1' unless customers.size == 5
     (0..4).each do |i|
       raise "id wrong 1 (#{i})" unless customers[i].id == (i + 1)
     end
 
-    customers = Customer2.limit(5).offset(4).to_a
+    customers = Customer2.limit(5).offset(4).order(:id).to_a
     raise 'count wrong 2' unless customers.size == 5
     (0..4).each do |i|
       raise "id wrong 2 (#{i})" unless customers[i].id == (i + 1 + 4)
@@ -328,11 +332,14 @@ namespace :guide_query_interface do
   end
 
   task :step_8 do
-    status_counts = Order2.group(:status).having("COUNT(*) > 4").count
-    raise 'count wrong 1' unless status_counts.size == 3
-    raise 'count wrong 2' unless status_counts['being_packed'] == 8
-    raise 'count wrong 3' unless status_counts['shipped'] == 6
-    raise 'count wrong 4' unless status_counts['complete'] == 37
+    # Vitess does not yet support filtering on the result of aggregations for sharded keyspaces
+    if ENV['VT_NUM_SHARDS'] == "1"
+      status_counts = Order2.group(:status).having("COUNT(*) > 4").count
+      raise 'count wrong 1' unless status_counts.size == 3
+      raise 'count wrong 2' unless status_counts['being_packed'] == 8
+      raise 'count wrong 3' unless status_counts['shipped'] == 6
+      raise 'count wrong 4' unless status_counts['complete'] == 37
+    end
   end
 
   task :step_9_1 do
@@ -345,7 +352,7 @@ namespace :guide_query_interface do
     books = Book6.where('id > 100').limit(20).order('id DESC').unscope(:order).to_a
     raise 'count wrong 2' unless books.size == 20
     (0..19).each do |i|
-      raise "id wrong 2 (#{i})" unless books[i].id == (101 + i)
+      raise "id wrong 2 (#{i})" unless books[i].id > 100
     end
   end
 
@@ -393,13 +400,13 @@ namespace :guide_query_interface do
   end
 
   task :step_9_5 do
-    customers = Customer2.where('orders_count > 7')
+    customers = Customer2.where('orders_count > 7').order(:id)
     raise 'count wrong 1' unless customers.size == 3
     raise 'id wrong 1' unless customers[0].id == 8
     raise 'id wrong 2' unless customers[1].id == 9
     raise 'id wrong 3' unless customers[2].id == 10
 
-    customers = Customer2.where('orders_count > 7').reverse_order
+    customers = Customer2.where('orders_count > 7').order(:id).reverse_order
     raise 'count wrong 2' unless customers.size == 3
     raise 'id wrong 4' unless customers[0].id == 10
     raise 'id wrong 5' unless customers[1].id == 9
@@ -477,7 +484,7 @@ namespace :guide_query_interface do
     raise 'count wrong 3' unless books.count == 220
 
     authors = Author5.joins(books: [{orders: :customer}, :supplier])
-    raise 'count wrong 4' unless authors.count == 220
+    raise 'count wrong 4' unless authors.length() == 220
 
     time_range = (Time.now.midnight - 1.day)..(Time.now.midnight + 1.day)
     customers = Customer2.joins(:orders).where('order2s.created_at' => time_range).distinct.to_a
@@ -489,7 +496,7 @@ namespace :guide_query_interface do
   end
 
   task :step_13_2 do
-    customers = Customer2.left_outer_joins(:reviews).distinct.select('customer2s.*, COUNT(reviews.id) AS reviews_count').group('customer2s.id').to_a
+    customers = Customer2.left_outer_joins(:reviews).distinct.select('customer2s.id, COUNT(reviews.id) AS reviews_count').group('customer2s.id').to_a
     raise 'count wrong 1' unless customers.count == 10
     customers.each do |c|
       raise "count wrong 2 (#{c.id})" unless c.reviews_count == 0
@@ -721,7 +728,7 @@ namespace :guide_query_interface do
     raise 'count wrong 7' unless ids.size == 12
 
     # ids
-    ids = Customer2.ids
+    ids = Customer2.ids.sort
     raise 'ids wrong' unless ids == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
   end
 
@@ -766,17 +773,20 @@ namespace :guide_query_interface do
     raise 'count wrong 3' unless Customer2.includes(:orders).where(first_name: 'Three', orders: { status: :being_packed }).count == 1
     raise 'count wrong 4' unless Customer2.includes(:orders).where(first_name: 'Three', orders: { status: :cancelled }).count == 0
 
-    # average
-    raise 'average wrong 1' unless Book6.average(:price) == 617
-    raise 'average wrong 2' unless Book6.where(author: Author5.find(10)).average(:price) == 652
+    # Vitess does not yet support aggregation functions in cross-shard queries
+    if ENV['VT_NUM_SHARDS'] == "1"
+      # average
+      raise 'average wrong 1' unless Book6.average(:price) == 617
+      raise 'average wrong 2' unless Book6.where(author: Author5.find(10)).average(:price) == 652
 
-    # minimum
-    raise 'minimum wrong 1' unless Book6.minimum(:year_published) == 1703
-    raise 'minimum wrong 2' unless Book6.where(supplier: Supplier5.find(3)).minimum(:year_published) == 2005
+      # minimum
+      raise 'minimum wrong 1' unless Book6.minimum(:year_published) == 1703
+      raise 'minimum wrong 2' unless Book6.where(supplier: Supplier5.find(3)).minimum(:year_published) == 2005
 
-    # maximum
-    raise 'maximum wrong 1' unless Customer2.maximum(:orders_count) == 10
-    raise 'maximum wrong 2' unless Book6.where(year_published: 2010).maximum(:price) == 811
+      # maximum
+      raise 'maximum wrong 1' unless Customer2.maximum(:orders_count) == 10
+      raise 'maximum wrong 2' unless Book6.where(year_published: 2010).maximum(:price) == 811
+    end
 
     # sum
     raise 'sum wrong 1' unless Customer2.sum(:orders_count) == 55

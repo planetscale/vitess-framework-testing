@@ -394,8 +394,7 @@ function check_after_initialize_and_after_find(){
   # create a user model
   rails generate model User111s name:string
 
-  # TODO: Add user111s table authoritative columns, as User111.first will need it.
-  add_sequence_table "user111s"
+  add_sequence_and_vindex "user111s"
 
   # run the migration
   rake_migrate
@@ -420,6 +419,9 @@ function check_after_initialize_and_after_find(){
   expected_output="You have initialized an object!"
   # assert that the output matches the expectation
   assert_matches "$create_output" "$expected_output"
+
+  # Sleep here so that schema-tracking can finish (if enabled)
+  sleep 5
 
   first_output=$(rails runner 'User111.first')
   expected_output="You have found an object!\nYou have initialized an object!"
@@ -461,8 +463,7 @@ function check_after_touch_with_belongs_to(){
   add_sequence_and_vindex "company1s"
 
   rails generate model Employee1 company1:references
-  # TODO: Add employee1s table authoritative columns, as Employee1.last will need it.
-  add_sequence_table "employee1s"
+  add_sequence_and_vindex "employee1s"
   # run the migration
   rake_migrate
   # implement the callback methods
@@ -485,6 +486,9 @@ function check_after_touch_with_belongs_to(){
   # insert a new company and a new employee
   rails runner 'Company1.create(:name => "Vitess")'
   rails runner 'Employee1.create(:company1_id => 1)'
+
+  # Sleep here so that schema-tracking can finish (if enabled)
+  sleep 5
 
   # find the output of touch
   touch_output=$(rails runner '@employee = Employee1.last; @employee.touch')
@@ -816,8 +820,7 @@ function check_relational_callbacks(){
   # create a user model
   rails generate model User114s name:string
 
-  # TODO: Add user114s table authoritative columns, as User114.first will need it.
-  add_sequence_table "user114s"
+  add_sequence_and_vindex "user114s"
 
   # create an articles model
   rails generate model Article114s user114:references
@@ -841,6 +844,10 @@ function check_relational_callbacks(){
 
   # create a new user
   rails runner 'User114.create(:name => "railsTester")'
+
+  # Sleep here so that schema-tracking can finish (if enabled)
+  sleep 5
+
   # create a new article for this user
   rails runner 'user = User114.first; user.article114s.create!'
   # assert the data in the tables
