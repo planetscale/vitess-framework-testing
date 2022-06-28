@@ -1,6 +1,8 @@
 # Framework testing
 
-#### Running the tests
+From a high level, the intention of this repo is to provide a suite of "black box" tests that can be run on-demand by the Vitess project to validate compatibility with MySQL.  CI is provided via Buildkite; the tests themselves are validated by running against vanilla MySQL, and validated tests are run against vttestserver to test Vitess's own compatibility.
+
+#### Running tests locally
 
 To run the tests, there are seven environment variables you need to set:  `VT_HOST`, `VT_PORT`, `VT_USERNAME`, `VT_PASSWORD`, `VT_DATABASE`, `VT_NUM_SHARDS`, and `VT_DIALECT`.
 * `VT_HOST` is an IP address or port to access the Vitess/MySQL database you want to run the tests against
@@ -58,12 +60,11 @@ export VT_DIALECT=mysql57
 
 New frameworks, languages, or tools can get added for testing by introducing the following directory structure:
 
-- __vitess\-framework\-testing__
-   - frameworks/__language__
-     - __framework__
-       - src/main.go (source code)
+- __vitess\-framework\-testing__/
+   - frameworks/__language__/
+     - __framework__/
+       - src/ (source code)
        - Dockerfile (dockerfile)
-       - build (entrypoint)
 
 Provided there is a `Dockerfile`, tests will be run automatically.  The guidelines for an individual test are as follows:
 * The test is run in a container.

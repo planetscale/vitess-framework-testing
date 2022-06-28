@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+
+import enum
+import json
+import os
+import subprocess
+import sys
+
+class Mode(enum.Enum):
+    MANUAL_TRIGGER = 1
+    MAIN_COMMIT = 2
+    PULL_REQUEST = 3
+
+# compose_template {{{
+compose_template = """
+version: '3.8'
+services:
+  test:
+    image: "gcr.io/planetscale-vitess-testing/frameworks/${FRAMEWORK}"
+    pull_policy: ${PULL_POLICY}
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+"""
+def generate_compose(framework, pull_policy):
+    compose = compose_template.replace('${FRAMEWORK}', framework).replace('${PULL_POLICY}', pull_policy)
+    filename = '.buildkite/gen/docker-compose.' + framework.replace('/', '_').replace(':', '_') + '.yml'
+    with open(filename, 'w') as f:
+        f.write(compose)
+# }}}
+
+# build_template/generate_build_step() {{{
+build_template = """
+  - key: build-${FRAMEWORK_SLUG}
+    label: "Build ${FRAMEWORK}"
+    command: ./.buildkite/build-image '${FRAMEWORK}'
+"""
+def generate_build_step(framework):
+    framework_slug = framework.replace('/', '_').replace(':', '_')
+    step = build_template.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
+    return step
+# }}}
+
+# test_template/generate_test_step() {{{
+test_template = """
+  - key: test-${SERVICE}-${FRAMEWORK_SLUG}
+    label: "${FRAMEWORK} x ${SERVER} ${DIALECT}${SHARDED_TEXT}"
+    depends_on: ${DEPENDS_ON}
+    plugins:
+      - docker-compose#v3.7.0:
+          config:
+            - .buildkite/docker-compose.${SERVICE}.yml
+            - .buildkite/gen/docker-compose.${FRAMEWORK_SLUG}.yml
+          run: test
+          env:
+            - FRAMEWORK=${FRAMEWORK}
+            - VT_USERNAME=root
+            - VT_PASSWORD=root
+            - VT_DATABASE=testing
+            - VT_HOST=db
+            - VT_PORT=3306
+            - VT_NUM_SHARDS=${NUM_SHARDS}
+            - VT_DIALECT=mysql${DIALECT_SHORT}
+"""
+def generate_test_step(server, dialect, num_shards, depends_on, framework):
+    service = server.lower() + dialect.replace('.', '') + ('sharded' if num_shards > 1 else '')
+    framework_slug = framework.replace('/', '_').replace(':', '_')
+    step = test_template.replace('${SERVER}', server).replace('${DIALECT}', dialect).replace('${DIALECT_SHORT}', dialect.replace('.', '')).replace('${SERVICE}', service).replace('${NUM_SHARDS}', str(num_shards))
+    step = step.replace('${SHARDED_TEXT}', ' (sharded)' if num_shards > 1 else '')
+    step = step.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
+    if(depends_on is None):
+        step = '\n'.join([line for line in step.split('\n') if 'depends_on:' not in line])
+    else:
+        step = step.replace('${DEPENDS_ON}', depends_on + '-' + framework_slug)
+    return step
+# }}}
+
+# push_template/generate_push_step() {{{
+push_template = """
+  - key: push-${FRAMEWORK_SLUG}
+    label: "Push ${FRAMEWORK}"
+    command: ./.buildkite/push-image '${FRAMEWORK}'
+    depends_on:
+      - test-mysql57-${FRAMEWORK_SLUG}
+      - test-mysql80-${FRAMEWORK_SLUG}
+"""
+def generate_push_step(framework):
+    framework_slug = framework.replace('/', '_').replace(':', '_')
+    step = push_template.replace('${FRAMEWORK}', framework).replace('${FRAMEWORK_SLUG}', framework_slug)
+    return step
+# }}}
+
+try:
+    os.mkdir(".buildkite/gen")
+except FileExistsError:
+    pass
+
+try:
+    # curl -X POST -H "Authorization: Bearer YOUR_TOKEN_HERE" 'https://api.buildkite.com/v2/organizations/planetscale/pipelines/vitess-framework-testing/builds' -d '{"commit":"HEAD","branch":"buildkite","message":"Kicking off a manual run","env":{"VITESS_REFSPEC":"main"}}'
+    vitess_refspec = os.environ['VITESS_REFSPEC']
+    mode = Mode.MANUAL_TRIGGER
+except KeyError:
+    if(os.environ['BUILDKITE_BRANCH'] == 'buildkite'):
+        mode = Mode.MAIN_COMMIT
+    else:
+        mode = Mode.PULL_REQUEST
+
+result = ['  - wait']
+if(mode == Mode.MANUAL_TRIGGER):
+    agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'frameworks'], stdout = subprocess.PIPE)
+    frameworks = json.load(agent.stdout)
+    for framework in frameworks:
+        generate_compose(framework, 'always')
+        result.append(generate_test_step('vttestserver', '5.7', 1, None, framework))
+        result.append(generate_test_step('vttestserver', '8.0', 1, None, framework))
+        result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', framework))
+        result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', framework))
+else:
+    agent = subprocess.Popen(['buildkite-agent', 'meta-data', 'get', 'changed-frameworks'], stdout = subprocess.PIPE)
+    frameworks = json.load(agent.stdout)
+    for framework in frameworks:
+        generate_compose(framework, 'never')
+        if(mode == Mode.PULL_REQUEST):
+            result.append(generate_build_step(framework))
+            result.append(generate_test_step('MySQL', '5.7', 1, 'build', framework))
+            result.append(generate_test_step('MySQL', '8.0', 1, 'build', framework))
+            result.append(generate_test_step('vttestserver', '5.7', 1, 'test-mysql57', framework))
+            result.append(generate_test_step('vttestserver', '8.0', 1, 'test-mysql80', framework))
+            result.append(generate_test_step('vttestserver', '5.7', 2, 'test-vttestserver57', framework))
+            result.append(generate_test_step('vttestserver', '8.0', 2, 'test-vttestserver80', framework))
+        elif(mode == Mode.MAIN_COMMIT):
+            result.append(generate_build_step(framework))
+            result.append(generate_test_step('MySQL', '5.7', 1, 'build', framework))
+            result.append(generate_test_step('MySQL', '8.0', 1, 'build', framework))
+            result.append(generate_push_step(framework))
+result = '\n'.join(result)
+
+print(result)
+agent = subprocess.run(['buildkite-agent', 'pipeline', 'upload'], input = result.encode('ascii'))
+

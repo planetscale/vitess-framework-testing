@@ -1,0 +1,10 @@
+set -ex
+mkdir -pv .buildkite/gen .buildkite/image
+buildkite-agent artifact download '.buildkite/gen/*' ./ || true
+# TODO:  Any way to figure out what framework, specifically, we're testing here
+#    so we can save time not downloading and loading all of them?
+buildkite-agent artifact download '.buildkite/image/**/*.tar.gz' ./ || true
+find .buildkite/image -type f | while read tarball; do
+	docker load < "$tarball"
+done
+

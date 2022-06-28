@@ -1,0 +1,23 @@
+agents:
+  queue: public
+
+steps:
+  - key: list-frameworks
+    label: "List frameworks"
+    plugins:
+      - docker#v3.8.0:
+          image: python:3
+          command: ["./.buildkite/list-frameworks"]
+          mount-buildkite-agent: true
+  - wait
+  - key: generate-pipeline
+    label: "Generate test pipeline"
+    plugins:
+      - docker#v3.8.0:
+          image: python:3
+          command: ["./.buildkite/generate-pipeline"]
+          mount-buildkite-agent: true
+          propagate-environment: true
+    artifact_paths:
+      - ".buildkite/gen/*"
+
