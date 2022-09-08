@@ -1,6 +1,3 @@
-agents:
-  queue: private
-
 steps:
   - key: list-frameworks
     label: "List frameworks"
